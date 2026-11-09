@@ -104,21 +104,9 @@ local OUTPUT = {
     AP_TARGET_X     = 10,
     AP_TARGET_Y     = 11,
 
-    VERTICAL_SPEED  = 13,
-    DESIRED_SPEED   = 14,
-    SPEED_ERROR     = 15,
-    ALT_CONTROL     = 16,
-    ALTITUDE        = 17,
-    ALTITUDE_TARGET = 18,
-    ALTITUDE_ERROR  = 19,
-
     -- BOOLEAN OUTPUTS
 
     MAIN_BOOSTER    = 1,
-    ALT_HOLD        = 2,
-
-    AP_TARGET_REACHED = 3,
-    AP_ENABLED        = 4,
 
     BOOSTER_NORTH   = 5,
     BOOSTER_EAST    = 6,
@@ -126,8 +114,6 @@ local OUTPUT = {
     BOOSTER_WEST    = 8,
 
     ACCELERATION_BOOSTER  = 9,
-
-    ROLL_STABILIZER = 0,
 
     START_STATUS    = 32
 }
@@ -159,7 +145,23 @@ local CONFIG = {
 
     DIRECTIONAL_BOOSTER_PULSE = 0.2,
 
-    DEBUG = true
+}
+
+
+-- ==========================================
+-- 03.1 TELEMETRY CONFIGURATION
+-- ==========================================
+
+local TELEMETRY = {
+
+    ENABLED = true,
+
+    PORT = 8080,
+
+    INTERVAL = 6,
+
+    tick = 0
+
 }
 
 
@@ -209,25 +211,6 @@ local function clamp(value, min, max)
 
 end
 
-
-local function isMapped(channel)
-
-    return channel ~= nil
-        and channel >= 1
-        and channel <= 32
-
-end
-
-
-local function writeOptionalBool(channel, value)
-
-    if isMapped(channel) then
-
-        output.setBool(channel, value)
-
-    end
-
-end
 
 
 -- ==========================================
@@ -1223,86 +1206,6 @@ local function getDirectionalBoosters(targetHeading, enabled)
 end
 
 
--- ==========================================
--- 17. DIAGNOSTICS
--- ==========================================
-
-local function updateDiagnostics(data, altitude)
-
-    SYSTEM.tick = SYSTEM.tick + 1
-
-
-    if not CONFIG.DEBUG then
-
-        return
-
-    end
-
-
-    output.setNumber(
-
-        OUTPUT.VERTICAL_SPEED,
-
-        data.verticalSpeed
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.DESIRED_SPEED,
-
-        altitude.desiredVerticalSpeed
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.SPEED_ERROR,
-
-        altitude.speedError
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.ALT_CONTROL,
-
-        altitude.altitudeControl
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.ALTITUDE,
-
-        data.altitude
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.ALTITUDE_TARGET,
-
-        data.altitudeTarget
-
-    )
-
-
-    output.setNumber(
-
-        OUTPUT.ALTITUDE_ERROR,
-
-        altitude.altitudeError
-
-    )
-
-end
-
 
 -- ==========================================
 -- 18. OUTPUT PROCESSING
@@ -1374,28 +1277,6 @@ local function writeOutputs(
         OUTPUT.MAIN_BOOSTER,
 
         SEQUENCE.commands.mainBooster
-
-    )
-
-
-    -- ALTITUDE HOLD
-
-    output.setBool(
-
-        OUTPUT.ALT_HOLD,
-
-        SEQUENCE.commands.altitudeHold
-
-    )
-
-
-    -- ROLL STABILIZER STATUS
-
-    writeOptionalBool(
-
-        OUTPUT.ROLL_STABILIZER,
-
-        SEQUENCE.commands.rollStabilizer
 
     )
 
@@ -1477,24 +1358,6 @@ output.setBool(
     )
 
 
-    output.setBool(
-
-        OUTPUT.AP_TARGET_REACHED,
-
-        autopilot.targetReached
-
-    )
-
-
-    output.setBool(
-
-        OUTPUT.AP_ENABLED,
-
-        autopilot.enabled
-
-    )
-
-
     -- AUTOPILOT DEBUG: MY COORDINATES
 
     output.setNumber(
@@ -1538,12 +1401,89 @@ end
 
 
 -- ==========================================
+-- TELEMETRY TRANSMISSION
+-- ==========================================
+
+local function sendTelemetry(data, flight, altitude, autopilot, directional)
+
+    if not TELEMETRY.ENABLED then
+        return
+    end
+
+    TELEMETRY.tick = TELEMETRY.tick + 1
+
+    if TELEMETRY.tick < TELEMETRY.INTERVAL then
+        return
+    end
+
+    TELEMETRY.tick = 0
+
+    local step = FLIGHT_PROGRAM[SEQUENCE.state]
+
+    local stage = step and step.name or "STANDBY"
+
+    local status = "IDLE"
+
+    if SEQUENCE.running then
+        status = "RUNNING"
+    elseif SEQUENCE.completed then
+        status = "COMPLETED"
+    end
+
+    local url = string.format(
+        "/telemetry?stage=%s&state=%d&status=%s&timer=%d&alt=%.2f&alt_target=%.2f&alt_error=%.2f&vs=%.2f&vs_target=%.2f&vs_error=%.2f&rps=%.2f&rps_target=%.2f&roll=%.4f&pitch=%.4f&ap=%d&ap_distance=%.2f&yaw=%.4f&my_x=%.2f&my_y=%.2f&target_x=%.2f&target_y=%.2f&main=%d&alt_hold=%d&roll_stab=%d&accel=%d&north=%d&east=%d&south=%d&west=%d&spoiler=%.2f",
+
+        stage,
+        SEQUENCE.state,
+        status,
+        SEQUENCE.timer,
+        data.altitude,
+        data.altitudeTarget,
+        altitude.altitudeError,
+        data.verticalSpeed,
+        altitude.desiredVerticalSpeed,
+        altitude.speedError,
+        data.realRPS,
+        data.targetRPS,
+        data.tiltRoll,
+        data.tiltPitch,
+        autopilot.enabled and 1 or 0,
+        autopilot.distance,
+        autopilot.yaw,
+        data.sensorX,
+        data.sensorY,
+        data.keyboardX,
+        data.keyboardY,
+        SEQUENCE.commands.mainBooster and 1 or 0,
+        SEQUENCE.commands.altitudeHold and 1 or 0,
+        SEQUENCE.commands.rollStabilizer and 1 or 0,
+        SEQUENCE.commands.accelerationBoosters and 1 or 0,
+        directional.north and 1 or 0,
+        directional.east and 1 or 0,
+        directional.south and 1 or 0,
+        directional.west and 1 or 0,
+        SEQUENCE.commands.spoiler
+    )
+
+    async.httpGet(TELEMETRY.PORT, url)
+
+end
+
+
+-- ==========================================
 -- 19. MAIN TICK
 -- ==========================================
 
 function onTick()
 
     local data = readInputs()
+
+
+
+
+    -- FLIGHT SEQUENCE
+
+    updateSequence(data)
 
 
     -- AUTOPILOT NAVIGATION CALCULATION
@@ -1556,11 +1496,6 @@ function onTick()
         SEQUENCE.commands.autopilot
 
     )
-
-
-    -- FLIGHT SEQUENCE
-
-    updateSequence(data)
 
 
     -- DIRECTIONAL BOOSTER PULSE SYSTEM
@@ -1628,11 +1563,6 @@ function onTick()
     )
 
 
-    -- DIAGNOSTICS
-
-    updateDiagnostics(data, altitude)
-
-
     -- OUTPUTS
 
     writeOutputs(
@@ -1647,6 +1577,17 @@ function onTick()
 
         data
 
+    )
+
+
+    -- TELEMETRY
+
+    sendTelemetry(
+        data,
+        flight,
+        altitude,
+        autopilot,
+        directional
     )
 
 end
