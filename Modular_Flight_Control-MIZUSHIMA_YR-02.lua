@@ -2,7 +2,7 @@
 -- OAI MIZUSHIMA YR-02
 -- MODULAR FLIGHT CONTROL
 -- Stormworks
--- Version: 12.1.0
+-- Version: 13.0.0
 --
 -- Single File
 --
@@ -23,14 +23,12 @@
 --   1. Engine Check
 --   2. Roll Stabilizer
 --   3. Main Booster
---   4. Vertical Speed Check
---   5. Directional Booster
---   6. Pitch Check
---   7. Acceleration Boosters
---   8. Altitude Hold Delay
---   9. Altitude Hold
---  10. Autopilot
---  11. Autopilot Complete
+--   4. Directional Booster
+--   5. Acceleration Boosters
+--   6. Roll Stability Check
+--   7. Altitude Hold
+--   8. Autopilot
+--   9. Autopilot Complete
 --
 -- NO ABORT
 -- NO TIMEOUT
@@ -143,7 +141,7 @@ local CONFIG = {
 
     ROLL_STABLE_TIME = 0.2,
 
-    DIRECTIONAL_BOOSTER_PULSE = 0.2,
+    DIRECTIONAL_BOOSTER_PULSE = 0.2
 
 }
 
@@ -175,8 +173,6 @@ local MARGINS = {
 
     ALTITUDE = 15,
 
-    VERTICAL_SPEED = 2,
-
     ROLL = 0.005,
 
     PITCH = 0.1
@@ -188,8 +184,6 @@ local MARGINS = {
 -- ==========================================
 
 local SYSTEM = {
-
-    tick = 0,
 
     integral = 0,
 
@@ -419,8 +413,6 @@ local function updateAutopilot(data, enabled)
         distance = distance,
 
         targetHeading = targetHeading,
-
-        targetReached = enabled and targetReached,
 
         enabled = enabled
 
@@ -1358,7 +1350,7 @@ output.setBool(
     )
 
 
-    -- AUTOPILOT DEBUG: MY COORDINATES
+    -- AUTOPILOT: CURRENT POSITION
 
     output.setNumber(
 
@@ -1378,7 +1370,7 @@ output.setBool(
     )
 
 
-    -- AUTOPILOT DEBUG: TARGET COORDINATES
+    -- AUTOPILOT: TARGET POSITION
 
     output.setNumber(
 
@@ -1404,7 +1396,7 @@ end
 -- TELEMETRY TRANSMISSION
 -- ==========================================
 
-local function sendTelemetry(data, flight, altitude, autopilot, directional)
+local function sendTelemetry(data, altitude, autopilot, directional)
 
     if not TELEMETRY.ENABLED then
         return
@@ -1584,7 +1576,6 @@ function onTick()
 
     sendTelemetry(
         data,
-        flight,
         altitude,
         autopilot,
         directional
