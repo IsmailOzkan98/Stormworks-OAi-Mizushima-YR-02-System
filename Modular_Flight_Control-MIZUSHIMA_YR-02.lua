@@ -2,7 +2,7 @@
 -- OAI MIZUSHIMA YR-02
 -- MODULAR FLIGHT CONTROL
 -- Stormworks
--- Version: 12.0
+-- Version: 12.1.0
 --
 -- Single File
 --
@@ -143,8 +143,8 @@ local CONFIG = {
 
     ALTITUDE_GAIN = 0.35,
 
-    MAX_CLIMB_SPEED = 110,
-    MAX_DESCENT_SPEED = 3,
+    MAX_CLIMB_SPEED = 105,
+    MAX_DESCENT_SPEED = 125,
 
     CONTROL_MIN = -0.45,
     CONTROL_MAX = 0.45,
@@ -154,6 +154,8 @@ local CONFIG = {
     CONTROL_RATE = 0.005,
 
     ALTITUDE_STABLE_TIME = 2,
+
+    ROLL_STABLE_TIME = 0.2,
 
     DIRECTIONAL_BOOSTER_PULSE = 0.2,
 
@@ -634,6 +636,8 @@ local SEQUENCE = {
 
     altitudeStableTimer = 0,
 
+    rollStableTimer = 0,
+
     running = false,
 
     completed = false,
@@ -773,7 +777,20 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 6: ALTITUDE HOLD
+    -- STEP 6: ROLL STABILITY CHECK
+
+    {
+        name = "ROLL_STABILITY_CHECK",
+
+        wait = {
+
+            type = "roll"
+
+        }
+    },
+
+
+    -- STEP 7: ALTITUDE HOLD
 
     {
         name = "ALTITUDE_HOLD",
@@ -792,7 +809,7 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 7: AUTOPILOT ON
+    -- STEP 8: AUTOPILOT ON
 
     {
         name = "AUTOPILOT",
@@ -811,7 +828,7 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 8: AUTOPILOT OFF
+    -- STEP 9: AUTOPILOT OFF
 
     {
         name = "AUTOPILOT_COMPLETE",
@@ -849,6 +866,8 @@ local function enterSequenceStep(index)
     SEQUENCE.timer = 0
 
     SEQUENCE.altitudeStableTimer = 0
+
+    SEQUENCE.rollStableTimer = 0
 
     -- RESET DIRECTIONAL BOOSTER FOR NEW FLIGHT
 
@@ -980,6 +999,36 @@ local function checkSequenceCondition(data, wait)
         return altitudeStable and
 
             SEQUENCE.altitudeStableTimer >= requiredTicks
+
+
+    -- ROLL STABILITY CHECK
+
+elseif wait.type == "roll" then
+
+    local rollStable =
+
+        math.abs(data.tiltRoll) <= MARGINS.ROLL
+
+
+    if rollStable then
+
+        SEQUENCE.rollStableTimer =
+            SEQUENCE.rollStableTimer + 1
+
+    else
+
+        SEQUENCE.rollStableTimer = 0
+
+    end
+
+
+    local requiredTicks =
+
+        CONFIG.ROLL_STABLE_TIME *
+        CONFIG.TICK_RATE
+
+
+    return SEQUENCE.rollStableTimer >= requiredTicks
 
 
     -- AUTOPILOT TARGET
@@ -1604,5 +1653,5 @@ end
 
 
 -- ==========================================
--- END OF YR-02 V12
+-- END OF YR-02
 -- ==========================================
