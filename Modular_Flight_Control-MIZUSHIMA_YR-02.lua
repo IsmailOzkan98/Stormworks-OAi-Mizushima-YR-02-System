@@ -1,0 +1,1608 @@
+-- ==========================================
+-- OAI MIZUSHIMA YR-02
+-- MODULAR FLIGHT CONTROL
+-- Stormworks
+-- Version: 12.0
+--
+-- Single File
+--
+-- FUNCTIONS:
+--   1. Roll Stabilizer
+--   2. Altitude Hold
+--   3. Autopilot
+--
+-- ACTUATORS:
+--   Main Booster
+--   Directional Boosters
+--   Acceleration Boosters
+--   Trust Spoiler
+--   Ailerons
+--   Elevators
+--
+-- FLIGHT SEQUENCE:
+--   1. Engine Check
+--   2. Roll Stabilizer
+--   3. Main Booster
+--   4. Vertical Speed Check
+--   5. Directional Booster
+--   6. Pitch Check
+--   7. Acceleration Boosters
+--   8. Altitude Hold Delay
+--   9. Altitude Hold
+--  10. Autopilot
+--  11. Autopilot Complete
+--
+-- NO ABORT
+-- NO TIMEOUT
+-- CONFIGURABLE MARGINS
+-- ==========================================
+
+
+-- ==========================================
+-- 01. INPUT CONFIGURATION
+-- ==========================================
+
+local INPUT = {
+
+    MULTIPLIER      = 1,
+    TILT_ROLL       = 2,
+    TILT_PITCH      = 3,
+
+    TARGET_RPS      = 4,
+    REAL_RPS        = 5,
+
+    ALTITUDE        = 6,
+    ALTITUDE_TARGET = 7,
+
+    PID_P           = 8,
+    PID_I           = 9,
+    PID_D           = 10,
+
+    ALT_HOLD_DELAY  = 11,
+    VERTICAL_SPEED  = 12,
+
+    AP_KEYBOARD_X   = 13,
+    AP_KEYBOARD_Y   = 14,
+
+    AP_SENSOR_X     = 15,
+    AP_SENSOR_Y     = 16,
+
+    AP_COMPASS      = 17,
+
+    AP_STEERING     = 18,
+    AP_CUTOFF       = 19,
+    AP_DEADZONE     = 20,
+    AP_SMOOTHING    = 21,
+
+    VERTICAL_SPEED_TARGET = 22,
+
+    START = 1
+}
+
+
+-- ==========================================
+-- 02. OUTPUT CONFIGURATION
+-- ==========================================
+
+local OUTPUT = {
+
+    -- NUMBER OUTPUTS
+
+    ROLL_LEFT       = 1,
+    ROLL_RIGHT      = 2,
+
+    ELEVATOR_LEFT   = 3,
+    ELEVATOR_RIGHT  = 4,
+
+    SPOILER         = 5,
+
+    AP_YAW          = 6,
+    AP_DISTANCE     = 7,
+
+    AP_MY_X         = 8,
+    AP_MY_Y         = 9,
+    AP_TARGET_X     = 10,
+    AP_TARGET_Y     = 11,
+
+    VERTICAL_SPEED  = 13,
+    DESIRED_SPEED   = 14,
+    SPEED_ERROR     = 15,
+    ALT_CONTROL     = 16,
+    ALTITUDE        = 17,
+    ALTITUDE_TARGET = 18,
+    ALTITUDE_ERROR  = 19,
+
+    -- BOOLEAN OUTPUTS
+
+    MAIN_BOOSTER    = 1,
+    ALT_HOLD        = 2,
+
+    AP_TARGET_REACHED = 3,
+    AP_ENABLED        = 4,
+
+    BOOSTER_NORTH   = 5,
+    BOOSTER_EAST    = 6,
+    BOOSTER_SOUTH   = 7,
+    BOOSTER_WEST    = 8,
+
+    ACCELERATION_BOOSTER  = 9,
+
+    ROLL_STABILIZER = 0,
+
+    START_STATUS    = 32
+}
+
+
+-- ==========================================
+-- 03. SYSTEM CONFIGURATION
+-- ==========================================
+
+local CONFIG = {
+
+    TICK_RATE = 60,
+
+    ALTITUDE_GAIN = 0.35,
+
+    MAX_CLIMB_SPEED = 110,
+    MAX_DESCENT_SPEED = 3,
+
+    CONTROL_MIN = -0.45,
+    CONTROL_MAX = 0.45,
+
+    INTEGRAL_LIMIT = 10,
+
+    CONTROL_RATE = 0.005,
+
+    ALTITUDE_STABLE_TIME = 2,
+
+    DIRECTIONAL_BOOSTER_PULSE = 0.2,
+
+    DEBUG = true
+}
+
+
+-- ==========================================
+-- 04. CONDITION MARGINS
+-- ==========================================
+
+local MARGINS = {
+
+    RPS = 1,
+
+    ALTITUDE = 15,
+
+    VERTICAL_SPEED = 2,
+
+    ROLL = 0.005,
+
+    PITCH = 0.1
+}
+
+
+-- ==========================================
+-- 05. SYSTEM STATE
+-- ==========================================
+
+local SYSTEM = {
+
+    tick = 0,
+
+    integral = 0,
+
+    previousVerticalSpeed = 0,
+
+    altitudeControlSmooth = 0,
+
+    autopilotYaw = 0
+}
+
+
+-- ==========================================
+-- 06. GENERAL UTILITIES
+-- ==========================================
+
+local function clamp(value, min, max)
+
+    return math.max(min, math.min(max, value))
+
+end
+
+
+local function isMapped(channel)
+
+    return channel ~= nil
+        and channel >= 1
+        and channel <= 32
+
+end
+
+
+local function writeOptionalBool(channel, value)
+
+    if isMapped(channel) then
+
+        output.setBool(channel, value)
+
+    end
+
+end
+
+
+-- ==========================================
+-- 07. INPUT PROCESSING
+-- ==========================================
+
+local function readInputs()
+
+    return {
+
+        multiplier = input.getNumber(INPUT.MULTIPLIER),
+
+        tiltRoll = input.getNumber(INPUT.TILT_ROLL),
+
+        tiltPitch = input.getNumber(INPUT.TILT_PITCH),
+
+        targetRPS = input.getNumber(INPUT.TARGET_RPS),
+
+        realRPS = input.getNumber(INPUT.REAL_RPS),
+
+        altitude = input.getNumber(INPUT.ALTITUDE),
+
+        altitudeTarget = input.getNumber(INPUT.ALTITUDE_TARGET),
+
+        P = input.getNumber(INPUT.PID_P),
+
+        I = input.getNumber(INPUT.PID_I),
+
+        D = input.getNumber(INPUT.PID_D),
+
+        altHoldDelay = input.getNumber(INPUT.ALT_HOLD_DELAY),
+
+        verticalSpeed = input.getNumber(INPUT.VERTICAL_SPEED),
+
+        verticalSpeedTarget =
+            input.getNumber(INPUT.VERTICAL_SPEED_TARGET),
+
+        start = input.getBool(INPUT.START),
+
+        -- AUTOPILOT
+
+        keyboardX = input.getNumber(INPUT.AP_KEYBOARD_X),
+
+        keyboardY = input.getNumber(INPUT.AP_KEYBOARD_Y),
+
+        sensorX = input.getNumber(INPUT.AP_SENSOR_X),
+
+        sensorY = input.getNumber(INPUT.AP_SENSOR_Y),
+
+        compass = input.getNumber(INPUT.AP_COMPASS),
+
+        steeringPower = input.getNumber(INPUT.AP_STEERING),
+
+        cutoffDistance = input.getNumber(INPUT.AP_CUTOFF),
+
+        deadzone = input.getNumber(INPUT.AP_DEADZONE),
+
+        yawSmoothing =
+            input.getNumber(INPUT.AP_SMOOTHING) / 1000
+
+    }
+
+end
+
+
+-- ==========================================
+-- 08. FUNCTION 1: ROLL STABILIZER
+-- ==========================================
+
+local function updateRollController(data, enabled)
+
+    if not enabled then
+
+        return {
+
+            rollLeft = 0,
+
+            rollRight = 0
+
+        }
+
+    end
+
+
+    local rollControl =
+
+        data.tiltRoll * data.multiplier
+
+
+    return {
+
+        rollLeft = rollControl,
+
+        rollRight = -rollControl
+
+    }
+
+end
+
+
+-- ==========================================
+-- 09. FUNCTION 2: AUTOPILOT
+-- ==========================================
+
+local function updateAutopilot(data, enabled)
+
+    -- COORDINATE DIFFERENCE
+
+    local x = data.keyboardX - data.sensorX
+
+    local y = data.keyboardY - data.sensorY
+
+
+    -- DISTANCE
+
+    local distance = math.sqrt(x*x + y*y)
+
+
+    -- ANGLE TO TARGET
+
+    local angle = math.atan(x, y)
+
+
+    -- ANGULAR NORMALIZATION
+
+    local pi2 = math.pi * 2
+
+
+    -- NORMALIZED TARGET HEADING
+
+    local targetHeading =
+
+    (data.compass + angle / pi2) % 1
+
+
+    -- ORIGINAL YAW CALCULATION
+
+    local yawError =
+
+        ((data.compass + angle / pi2) % 1 + 1.5) % 1 - 0.5
+
+
+    -- DIRECTION CONTROL
+
+    local yawTarget =
+
+        yawError * data.steeringPower
+
+
+    -- YAW LIMITER
+
+    yawTarget = clamp(yawTarget, -1, 1)
+
+
+    -- DEADZONE
+
+    if math.abs(yawError) < data.deadzone then
+
+        yawTarget = 0
+
+    end
+
+
+    -- CUTOFF
+
+    local targetReached =
+
+        distance < data.cutoffDistance
+
+
+    if targetReached then
+
+        yawTarget = 0
+
+    end
+
+
+    -- YAW SMOOTHING
+
+    if not enabled then
+
+        SYSTEM.autopilotYaw = 0
+
+    else
+
+        local smoothing = math.max(0, data.yawSmoothing)
+
+        local difference =
+
+            yawTarget - SYSTEM.autopilotYaw
+
+
+        SYSTEM.autopilotYaw =
+
+            SYSTEM.autopilotYaw +
+
+            clamp(difference, -smoothing, smoothing)
+
+    end
+
+
+    return {
+
+        yaw = SYSTEM.autopilotYaw,
+
+        distance = distance,
+
+        targetHeading = targetHeading,
+
+        targetReached = enabled and targetReached,
+
+        enabled = enabled
+
+    }
+
+end
+
+
+-- ==========================================
+-- 10. FUNCTION 3: ALTITUDE HOLD
+-- ==========================================
+
+local function updateAltitudeController(data, enabled)
+
+    local dt = 1 / CONFIG.TICK_RATE
+
+    local altitudeError =
+
+        data.altitudeTarget - data.altitude
+
+    local desiredVerticalSpeed = 0
+
+    local speedError = 0
+
+    local altitudeControl = 0
+
+
+    if enabled then
+
+        -- OUTER ALTITUDE LOOP
+
+        desiredVerticalSpeed = clamp(
+
+            altitudeError * CONFIG.ALTITUDE_GAIN,
+
+            -CONFIG.MAX_DESCENT_SPEED,
+
+            CONFIG.MAX_CLIMB_SPEED
+
+        )
+
+
+        -- INNER VERTICAL SPEED LOOP
+
+        speedError =
+
+            desiredVerticalSpeed - data.verticalSpeed
+
+
+        local proportional =
+
+            data.P * speedError
+
+
+        local verticalAcceleration =
+
+            (data.verticalSpeed -
+            SYSTEM.previousVerticalSpeed) / dt
+
+
+        local derivativeTerm =
+
+            -data.D * verticalAcceleration
+
+
+        -- INTEGRAL / ANTI-WINDUP
+
+        local candidateIntegral = clamp(
+
+            SYSTEM.integral + speedError * dt,
+
+            -CONFIG.INTEGRAL_LIMIT,
+
+            CONFIG.INTEGRAL_LIMIT
+
+        )
+
+
+        local outputWithoutIntegral =
+
+            proportional + derivativeTerm
+
+
+        local unsaturatedOutput =
+
+            outputWithoutIntegral +
+            data.I * candidateIntegral
+
+
+        local saturatedOutput = clamp(
+
+            unsaturatedOutput,
+
+            CONFIG.CONTROL_MIN,
+
+            CONFIG.CONTROL_MAX
+
+        )
+
+
+        if unsaturatedOutput == saturatedOutput
+
+            or (
+                unsaturatedOutput > CONFIG.CONTROL_MAX
+                and speedError < 0
+            )
+
+            or (
+                unsaturatedOutput < CONFIG.CONTROL_MIN
+                and speedError > 0
+            ) then
+
+            SYSTEM.integral = candidateIntegral
+
+        end
+
+
+        altitudeControl = clamp(
+
+            outputWithoutIntegral +
+            data.I * SYSTEM.integral,
+
+            CONFIG.CONTROL_MIN,
+
+            CONFIG.CONTROL_MAX
+
+        )
+
+
+        SYSTEM.previousVerticalSpeed =
+
+            data.verticalSpeed
+
+    else
+
+        SYSTEM.integral = 0
+
+        SYSTEM.previousVerticalSpeed =
+
+            data.verticalSpeed
+
+        SYSTEM.altitudeControlSmooth = 0
+
+    end
+
+
+    -- ELEVATOR SMOOTHING
+
+    local difference =
+
+        altitudeControl -
+        SYSTEM.altitudeControlSmooth
+
+
+    SYSTEM.altitudeControlSmooth =
+
+        SYSTEM.altitudeControlSmooth +
+
+        clamp(
+
+            difference,
+
+            -CONFIG.CONTROL_RATE,
+
+            CONFIG.CONTROL_RATE
+
+        )
+
+
+    return {
+
+        altitudeError = altitudeError,
+
+        desiredVerticalSpeed = desiredVerticalSpeed,
+
+        speedError = speedError,
+
+        altitudeControl = altitudeControl,
+
+        elevatorOutput = SYSTEM.altitudeControlSmooth
+
+    }
+
+end
+
+
+-- ==========================================
+-- 11. SEQUENCE STATE
+-- ==========================================
+
+local SEQUENCE = {
+
+    state = 0,
+
+    timer = 0,
+
+    altitudeStableTimer = 0,
+
+    running = false,
+
+    completed = false,
+
+    previousStart = false,
+
+    verticalSpeedExceeded = false,
+
+    directionalBoosterUsed = false,
+
+    directionalBoosterPending = false,
+
+    directionalBoosterPulseTicks = 0,
+
+    directionalBoosterSelection = {
+        north = false,
+        east = false,
+        south = false,
+        west = false
+    },
+
+    commands = {
+
+        -- FUNCTIONS
+
+        rollStabilizer = false,
+
+        altitudeHold = false,
+
+        autopilot = false,
+
+        -- ACTUATORS
+
+        mainBooster = false,
+
+        spoiler = 0,
+
+        accelerationBoosters = false
+
+    }
+
+}
+
+
+-- ==========================================
+-- 12. FLIGHT PROGRAM
+-- ==========================================
+
+local FLIGHT_PROGRAM = {
+
+    -- STEP 1: ENGINE CHECK
+
+    {
+        name = "ENGINE_CHECK",
+
+        set = {
+
+            spoiler = 1
+
+        },
+
+        wait = {
+
+            type = "rps_min"
+
+        }
+    },
+
+
+    -- STEP 2: ROLL STABILIZER
+
+    {
+        name = "ROLL_STABILIZER",
+
+        set = {
+
+            rollStabilizer = true
+
+        },
+
+        wait = {
+
+            type = "rps_min"
+
+        }
+    },
+
+
+    -- STEP 3: MAIN BOOSTER
+
+    {
+        name = "MAIN_BOOSTER",
+
+        set = {
+
+            mainBooster = true
+
+        },
+
+        wait = {
+
+            type = "vertical_speed_max"
+
+        }
+    },
+
+
+    -- STEP 4: DIRECTIONAL BOOSTER
+
+    {
+        name = "DIRECTIONAL_BOOSTER",
+
+        wait = {
+            type = "pitch"
+        }
+    },
+
+
+    -- STEP 5: ACCELERATION BOOSTERS
+
+    {
+        name = "ACCELERATION_BOOSTERS",
+
+        set = {
+
+            accelerationBoosters = true,
+
+            spoiler = 0
+
+        },
+
+        wait = {
+
+            type = "alt_hold_delay"
+
+        }
+    },
+
+
+    -- STEP 6: ALTITUDE HOLD
+
+    {
+        name = "ALTITUDE_HOLD",
+
+        set = {
+
+            altitudeHold = true
+
+        },
+
+        wait = {
+
+            type = "altitude"
+
+        }
+    },
+
+
+    -- STEP 7: AUTOPILOT ON
+
+    {
+        name = "AUTOPILOT",
+
+        set = {
+
+            autopilot = true
+
+        },
+
+        wait = {
+
+            type = "autopilot_target"
+
+        }
+    },
+
+
+    -- STEP 8: AUTOPILOT OFF
+
+    {
+        name = "AUTOPILOT_COMPLETE",
+
+        set = {
+
+            autopilot = false
+
+        },
+
+        hold = true
+
+    }
+
+}
+
+
+-- ==========================================
+-- 13. SEQUENCE STEP MANAGEMENT
+-- ==========================================
+
+local function enterSequenceStep(index)
+
+    local step = FLIGHT_PROGRAM[index]
+
+    if not step then
+
+        return
+
+    end
+
+
+    SEQUENCE.state = index
+
+    SEQUENCE.timer = 0
+
+    SEQUENCE.altitudeStableTimer = 0
+
+    -- RESET DIRECTIONAL BOOSTER FOR NEW FLIGHT
+
+    if index == 1 then
+
+        SEQUENCE.directionalBoosterUsed = false
+
+        SEQUENCE.directionalBoosterPending = false
+
+        SEQUENCE.directionalBoosterPulseTicks = 0
+
+    end
+
+
+    -- SINGLE DIRECTIONAL BOOSTER ACTIVATION
+
+    if index == 4 and not SEQUENCE.directionalBoosterUsed then
+
+        SEQUENCE.directionalBoosterUsed = true
+
+        SEQUENCE.directionalBoosterPending = true
+
+    end
+
+
+    if index == 3 then
+        SEQUENCE.verticalSpeedExceeded = false
+    end
+
+
+    if step.set then
+
+        for key, value in pairs(step.set) do
+
+            SEQUENCE.commands[key] = value
+
+        end
+
+    end
+
+end
+
+
+-- ==========================================
+-- 14. SEQUENCE CONDITIONS
+-- ==========================================
+
+local function checkSequenceCondition(data, wait)
+
+    if not wait then
+
+        return true
+
+    end
+
+
+    -- RPS CHECK
+
+    if wait.type == "rps_min" then
+
+        return data.realRPS >=
+
+            (data.targetRPS - MARGINS.RPS)
+
+
+    -- VERTICAL SPEED THRESHOLD
+
+    elseif wait.type == "vertical_speed_max" then
+
+        if data.verticalSpeed > data.verticalSpeedTarget then
+
+            SEQUENCE.verticalSpeedExceeded = true
+
+        end
+
+        return SEQUENCE.verticalSpeedExceeded
+            and data.verticalSpeed <= data.verticalSpeedTarget
+
+
+    -- PITCH CHECK
+
+    elseif wait.type == "pitch" then
+
+        return math.abs(data.tiltPitch) <=
+            MARGINS.PITCH
+
+
+    -- ALTITUDE HOLD DELAY
+
+    elseif wait.type == "alt_hold_delay" then
+
+        local delayTicks =
+
+            math.max(0, data.altHoldDelay) *
+            CONFIG.TICK_RATE
+
+        return SEQUENCE.timer >= delayTicks
+
+
+    -- ALTITUDE STABILITY
+
+    elseif wait.type == "altitude" then
+
+        local altitudeStable =
+
+            math.abs(data.altitudeTarget - data.altitude)
+            <= MARGINS.ALTITUDE
+
+
+        if altitudeStable then
+
+            SEQUENCE.altitudeStableTimer =
+
+                SEQUENCE.altitudeStableTimer + 1
+
+        else
+
+            SEQUENCE.altitudeStableTimer = 0
+
+        end
+
+
+        local requiredTicks =
+
+            CONFIG.ALTITUDE_STABLE_TIME *
+            CONFIG.TICK_RATE
+
+
+        return altitudeStable and
+
+            SEQUENCE.altitudeStableTimer >= requiredTicks
+
+
+    -- AUTOPILOT TARGET
+
+    elseif wait.type == "autopilot_target" then
+
+        local x = data.keyboardX - data.sensorX
+
+        local y = data.keyboardY - data.sensorY
+
+        local distance = math.sqrt(x*x + y*y)
+
+        return distance < data.cutoffDistance
+
+    end
+
+
+    return false
+
+end
+
+
+-- ==========================================
+-- 15. SEQUENCE EXECUTION
+-- ==========================================
+
+local function updateSequence(data)
+
+    -- START BUTTON EDGE
+
+    local startEdge =
+
+        data.start and
+        not SEQUENCE.previousStart
+
+
+    SEQUENCE.previousStart = data.start
+
+
+    -- START SEQUENCE
+
+    if startEdge
+
+        and not SEQUENCE.running
+
+        and not SEQUENCE.completed then
+
+        SEQUENCE.running = true
+
+        enterSequenceStep(1)
+
+    end
+
+
+    if not SEQUENCE.running then
+
+        return
+
+    end
+
+
+    local step =
+
+        FLIGHT_PROGRAM[SEQUENCE.state]
+
+
+    if not step then
+
+        SEQUENCE.running = false
+
+        return
+
+    end
+
+
+    -- FINAL STEP
+
+    if step.hold then
+
+        SEQUENCE.completed = true
+
+        SEQUENCE.running = false
+
+        return
+
+    end
+
+
+    -- STEP TIMER
+
+    SEQUENCE.timer =
+
+        SEQUENCE.timer + 1
+
+
+    -- CHECK CONDITION
+
+    if checkSequenceCondition(data, step.wait) then
+
+        local nextStep =
+
+            SEQUENCE.state + 1
+
+
+        if nextStep > #FLIGHT_PROGRAM then
+
+            SEQUENCE.completed = true
+
+            SEQUENCE.running = false
+
+        else
+
+            enterSequenceStep(nextStep)
+
+        end
+
+    end
+
+end
+
+
+-- ==========================================
+-- 16. DIRECTIONAL BOOSTER SELECTION
+-- ==========================================
+
+local function getDirectionalBoosters(targetHeading, enabled)
+
+    -- OPPOSITE HEADING
+
+    local oppositeBoosters =
+
+        (targetHeading + 0.5) % 1
+
+
+    oppositeBoosters =
+
+        (oppositeBoosters + 0.5) % 1 - 0.5
+
+
+    -- NORTH
+
+    local north = enabled and
+
+        (
+            oppositeBoosters >= -0.125
+            and oppositeBoosters < 0.125
+        )
+
+
+    -- EAST
+
+    local east = enabled and
+
+        (
+            oppositeBoosters >= 0.125
+            and oppositeBoosters < 0.375
+        )
+
+
+    -- SOUTH
+
+    local south = enabled and
+
+        (
+            oppositeBoosters >= 0.375
+            or oppositeBoosters < -0.375
+        )
+
+
+    -- WEST
+
+    local west = enabled and
+
+        (
+            oppositeBoosters >= -0.375
+            and oppositeBoosters < -0.125
+        )
+
+
+    return {
+
+        north = north,
+
+        east = east,
+
+        south = south,
+
+        west = west
+
+    }
+
+end
+
+
+-- ==========================================
+-- 17. DIAGNOSTICS
+-- ==========================================
+
+local function updateDiagnostics(data, altitude)
+
+    SYSTEM.tick = SYSTEM.tick + 1
+
+
+    if not CONFIG.DEBUG then
+
+        return
+
+    end
+
+
+    output.setNumber(
+
+        OUTPUT.VERTICAL_SPEED,
+
+        data.verticalSpeed
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.DESIRED_SPEED,
+
+        altitude.desiredVerticalSpeed
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.SPEED_ERROR,
+
+        altitude.speedError
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ALT_CONTROL,
+
+        altitude.altitudeControl
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ALTITUDE,
+
+        data.altitude
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ALTITUDE_TARGET,
+
+        data.altitudeTarget
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ALTITUDE_ERROR,
+
+        altitude.altitudeError
+
+    )
+
+end
+
+
+-- ==========================================
+-- 18. OUTPUT PROCESSING
+-- ==========================================
+
+local function writeOutputs(
+    flight,
+    altitude,
+    autopilot,
+    directional,
+    data
+)
+
+    -- AILERONS
+
+    output.setNumber(
+
+        OUTPUT.ROLL_LEFT,
+
+        flight.rollLeft
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ROLL_RIGHT,
+
+        flight.rollRight
+
+    )
+
+
+    -- ELEVATORS
+
+    output.setNumber(
+
+        OUTPUT.ELEVATOR_LEFT,
+
+        altitude.elevatorOutput
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.ELEVATOR_RIGHT,
+
+        altitude.elevatorOutput
+
+    )
+
+
+    -- SPOILER
+
+    output.setNumber(
+
+        OUTPUT.SPOILER,
+
+        SEQUENCE.commands.spoiler
+
+    )
+
+
+    -- MAIN BOOSTER
+
+    output.setBool(
+
+        OUTPUT.MAIN_BOOSTER,
+
+        SEQUENCE.commands.mainBooster
+
+    )
+
+
+    -- ALTITUDE HOLD
+
+    output.setBool(
+
+        OUTPUT.ALT_HOLD,
+
+        SEQUENCE.commands.altitudeHold
+
+    )
+
+
+    -- ROLL STABILIZER STATUS
+
+    writeOptionalBool(
+
+        OUTPUT.ROLL_STABILIZER,
+
+        SEQUENCE.commands.rollStabilizer
+
+    )
+
+
+    -- DIRECTIONAL BOOSTERS
+
+    output.setBool(
+
+        OUTPUT.BOOSTER_NORTH,
+
+        directional.north
+
+    )
+
+
+    output.setBool(
+
+        OUTPUT.BOOSTER_EAST,
+
+        directional.east
+
+    )
+
+
+    output.setBool(
+
+        OUTPUT.BOOSTER_SOUTH,
+
+        directional.south
+
+    )
+
+
+    output.setBool(
+
+        OUTPUT.BOOSTER_WEST,
+
+        directional.west
+
+    )
+
+
+   -- ACCELERATION BOOSTER
+
+output.setBool(
+    OUTPUT.ACCELERATION_BOOSTER,
+    SEQUENCE.commands.accelerationBoosters
+)
+
+
+    -- START STATUS
+
+    output.setBool(
+
+        OUTPUT.START_STATUS,
+
+        data.start
+
+    )
+
+
+    -- AUTOPILOT
+
+    output.setNumber(
+
+        OUTPUT.AP_YAW,
+
+        autopilot.yaw
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.AP_DISTANCE,
+
+        autopilot.distance
+
+    )
+
+
+    output.setBool(
+
+        OUTPUT.AP_TARGET_REACHED,
+
+        autopilot.targetReached
+
+    )
+
+
+    output.setBool(
+
+        OUTPUT.AP_ENABLED,
+
+        autopilot.enabled
+
+    )
+
+
+    -- AUTOPILOT DEBUG: MY COORDINATES
+
+    output.setNumber(
+
+        OUTPUT.AP_MY_X,
+
+        data.sensorX
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.AP_MY_Y,
+
+        data.sensorY
+
+    )
+
+
+    -- AUTOPILOT DEBUG: TARGET COORDINATES
+
+    output.setNumber(
+
+        OUTPUT.AP_TARGET_X,
+
+        data.keyboardX
+
+    )
+
+
+    output.setNumber(
+
+        OUTPUT.AP_TARGET_Y,
+
+        data.keyboardY
+
+    )
+
+end
+
+
+-- ==========================================
+-- 19. MAIN TICK
+-- ==========================================
+
+function onTick()
+
+    local data = readInputs()
+
+
+    -- AUTOPILOT NAVIGATION CALCULATION
+    -- Calculated even when Autopilot is disabled.
+
+    local autopilot = updateAutopilot(
+
+        data,
+
+        SEQUENCE.commands.autopilot
+
+    )
+
+
+    -- FLIGHT SEQUENCE
+
+    updateSequence(data)
+
+
+    -- DIRECTIONAL BOOSTER PULSE SYSTEM
+
+    local directional = getDirectionalBoosters(
+        autopilot.targetHeading,
+        false
+    )
+
+
+    -- CAPTURE DIRECTION AT ACTIVATION
+
+    if SEQUENCE.directionalBoosterPending then
+
+        SEQUENCE.directionalBoosterSelection =
+            getDirectionalBoosters(
+                autopilot.targetHeading,
+                true
+            )
+
+        SEQUENCE.directionalBoosterPulseTicks = math.max(
+            1,
+            math.ceil(
+                CONFIG.DIRECTIONAL_BOOSTER_PULSE *
+                CONFIG.TICK_RATE
+            )
+        )
+
+        SEQUENCE.directionalBoosterPending = false
+
+    end
+
+
+    -- OUTPUT PULSE
+
+    if SEQUENCE.directionalBoosterPulseTicks > 0 then
+
+        directional = SEQUENCE.directionalBoosterSelection
+
+        SEQUENCE.directionalBoosterPulseTicks =
+            SEQUENCE.directionalBoosterPulseTicks - 1
+
+    end
+
+
+    -- FUNCTION 1: ROLL STABILIZER
+
+    local flight = updateRollController(
+
+        data,
+
+        SEQUENCE.commands.rollStabilizer
+
+    )
+
+
+    -- FUNCTION 2: ALTITUDE HOLD
+
+    local altitude = updateAltitudeController(
+
+        data,
+
+        SEQUENCE.commands.altitudeHold
+
+    )
+
+
+    -- DIAGNOSTICS
+
+    updateDiagnostics(data, altitude)
+
+
+    -- OUTPUTS
+
+    writeOutputs(
+
+        flight,
+
+        altitude,
+
+        autopilot,
+
+        directional,
+
+        data
+
+    )
+
+end
+
+
+-- ==========================================
+-- END OF YR-02 V12
+-- ==========================================
