@@ -402,9 +402,9 @@ local function updateBottomBoosters(data, enabled)
 
     local rollAngle = math.atan(
 
-        data.tiltRollVert,
+        data.tiltRollHoriz,
 
-        data.tiltRollHoriz
+        data.tiltRollVert
 
     )
 
@@ -891,7 +891,21 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 5: ACCELERATION BOOSTERS
+    -- STEP 5: BOTTOM BOOSTER SYSTEM
+
+    {
+        name = "BOTTOM_BOOSTER_SYSTEM",
+
+        set = {
+
+            bottomBoosters = true
+
+        }
+
+    },
+
+
+    -- STEP 6: ACCELERATION BOOSTERS
 
     {
         name = "ACCELERATION_BOOSTERS",
@@ -912,10 +926,14 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 6: ROLL STABILITY CHECK
+    -- STEP 7: ROLL STABILITY CHECK
 
     {
         name = "ROLL_STABILITY_CHECK",
+
+        set = {
+            bottomBoosters = false
+        },
 
         wait = {
 
@@ -925,7 +943,7 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 7: ALTITUDE HOLD
+    -- STEP 8: ALTITUDE HOLD
 
     {
         name = "ALTITUDE_HOLD",
@@ -944,7 +962,7 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 8: AUTOPILOT ON
+    -- STEP 9: AUTOPILOT ON
 
     {
         name = "AUTOPILOT",
@@ -963,7 +981,7 @@ local FLIGHT_PROGRAM = {
     },
 
 
-    -- STEP 9: AUTOPILOT OFF
+    -- STEP 10: AUTOPILOT OFF
 
     {
         name = "AUTOPILOT_COMPLETE",
@@ -1729,11 +1747,11 @@ function onTick()
 
     local boosterOutputs = {
 
-        north = directional.north or bottom.bottomDos,
+        north = directional.north or bottom.bottomCuatro,
 
         east = directional.east or bottom.bottomTres,
 
-        south = directional.south or bottom.bottomCuatro,
+        south = directional.south or bottom.bottomDos,
 
         west = directional.west or bottom.bottomUno
 
