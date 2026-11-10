@@ -1,4 +1,4 @@
--- ==========================================
+
 -- OAI MIZUSHIMA YR-02
 -- MODULAR FLIGHT CONTROL
 -- Stormworks
@@ -20,30 +20,29 @@
 --   Elevators
 --
 -- FLIGHT SEQUENCE:
---   1. Engine Check
---   2. Roll Stabilizer
---   3. Main Booster
---   4. Directional Booster
---   5. Acceleration Boosters
---   6. Roll Stability Check
---   7. Altitude Hold
---   8. Autopilot
---   9. Autopilot Complete
+--  1. ENGINE CHECK
+--  2. ROLL STABILIZER
+--  3. MAIN BOOSTER
+--  4. DIRECTIONAL BOOSTER
+--  5. BOTTOM BOOSTER SYSTEM
+--  6. ACCELERATION BOOSTERS
+--  7. ROLL STABILITY CHECK
+--  8. ALTITUDE HOLD
+--  9. AUTOPILOT
+--  10. AUTOPILOT COMPLETE
 --
 -- NO ABORT
 -- NO TIMEOUT
 -- CONFIGURABLE MARGINS
--- ==========================================
 
 
--- ==========================================
 -- 01. INPUT CONFIGURATION
--- ==========================================
+
 
 local INPUT = {
 
     MULTIPLIER      = 1,
-    TILT_ROLL       = 2,
+    TILT_ROLL_HORIZ = 2,
     TILT_PITCH      = 3,
 
     TARGET_RPS      = 4,
@@ -74,13 +73,15 @@ local INPUT = {
 
     VERTICAL_SPEED_TARGET = 22,
 
+    TILT_ROLL_VERT = 23,
+
     START = 1
 }
 
 
--- ==========================================
+
 -- 02. OUTPUT CONFIGURATION
--- ==========================================
+
 
 local OUTPUT = {
 
@@ -117,9 +118,9 @@ local OUTPUT = {
 }
 
 
--- ==========================================
+
 -- 03. SYSTEM CONFIGURATION
--- ==========================================
+
 
 local CONFIG = {
 
@@ -146,9 +147,9 @@ local CONFIG = {
 }
 
 
--- ==========================================
+
 -- 03.1 TELEMETRY CONFIGURATION
--- ==========================================
+
 
 local TELEMETRY = {
 
@@ -163,9 +164,9 @@ local TELEMETRY = {
 }
 
 
--- ==========================================
+
 -- 04. CONDITION MARGINS
--- ==========================================
+
 
 local MARGINS = {
 
@@ -178,12 +179,27 @@ local MARGINS = {
     PITCH = 0.08,
 
     PITCH_STABILITY_TRIGGER = 0.01
+
 }
 
 
--- ==========================================
+
+-- 04.1 BOTTOM BOOSTER CONFIGURATION
+
+
+local BOTTOM_CONFIG = {
+
+    ENABLED = true,
+
+    ZONE = 25 / 360,
+
+    MIN_SENSOR_MAGNITUDE = 0.001
+
+}
+
+
 -- 05. SYSTEM STATE
--- ==========================================
+
 
 local SYSTEM = {
 
@@ -194,12 +210,13 @@ local SYSTEM = {
     altitudeControlSmooth = 0,
 
     autopilotYaw = 0
+
 }
 
 
--- ==========================================
+
 -- 06. GENERAL UTILITIES
--- ==========================================
+
 
 local function clamp(value, min, max)
 
@@ -209,9 +226,21 @@ end
 
 
 
--- ==========================================
+-- ANGLE DIFFERENCE
+
+
+local function angleDifference(a, b)
+
+    return math.abs(
+        (a - b + 0.5) % 1 - 0.5
+    )
+
+end
+
+
+
 -- 07. INPUT PROCESSING
--- ==========================================
+
 
 local function readInputs()
 
@@ -219,7 +248,9 @@ local function readInputs()
 
         multiplier = input.getNumber(INPUT.MULTIPLIER),
 
-        tiltRoll = input.getNumber(INPUT.TILT_ROLL),
+        tiltRollHoriz = input.getNumber(INPUT.TILT_ROLL_HORIZ),
+
+        tiltRollVert = input.getNumber(INPUT.TILT_ROLL_VERT),
 
         tiltPitch = input.getNumber(INPUT.TILT_PITCH),
 
@@ -272,9 +303,9 @@ local function readInputs()
 end
 
 
--- ==========================================
+
 -- 08. FUNCTION 1: ROLL STABILIZER
--- ==========================================
+
 
 local function updateRollController(data, enabled)
 
@@ -293,7 +324,7 @@ local function updateRollController(data, enabled)
 
     local rollControl =
 
-        data.tiltRoll * data.multiplier
+        data.tiltRollHoriz * data.multiplier
 
 
     return {
@@ -307,21 +338,134 @@ local function updateRollController(data, enabled)
 end
 
 
--- ==========================================
+
 -- 08.1 FUNCTION: PITCH STABILITY TRIGGER
--- ==========================================
+
 
 local function checkPitchStability(data)
 
     return math.abs(data.tiltPitch)
-        <= MARGINS.PITCH_STABILITY
+        <= MARGINS.PITCH_STABILITY_TRIGGER
 
 end
 
 
--- ==========================================
+
+-- 08.2 FUNCTION: BOTTOM BOOSTER DETECTION
+
+
+local function updateBottomBoosters(data, enabled)
+
+    -- DEFAULT OUTPUT
+
+    local result = {
+
+        bottomUno = false,
+
+        bottomDos = false,
+
+        bottomTres = false,
+
+        bottomCuatro = false
+
+    }
+
+
+    -- ENABLE CHECK
+
+    if not enabled or not BOTTOM_CONFIG.ENABLED then
+
+        return result
+
+    end
+
+
+    -- SENSOR MAGNITUDE CHECK
+
+    local magnitude = math.sqrt(
+
+        data.tiltRollHoriz * data.tiltRollHoriz +
+
+        data.tiltRollVert * data.tiltRollVert
+
+    )
+
+
+    if magnitude < BOTTOM_CONFIG.MIN_SENSOR_MAGNITUDE then
+
+        return result
+
+    end
+
+
+    -- RECONSTRUCT ROLL ANGLE
+
+    local rollAngle = math.atan(
+
+        data.tiltRollVert,
+
+        data.tiltRollHoriz
+
+    )
+
+
+    -- BOTTOM DIRECTION
+
+    local bottomAngle =
+
+        (rollAngle + math.pi) % (math.pi * 2)
+
+
+    -- NORMALIZE TO TURNS
+
+    bottomAngle = bottomAngle / (math.pi * 2)
+
+
+    -- DETECTION ZONE
+
+    local halfZone = BOTTOM_CONFIG.ZONE / 2
+
+
+    -- BOTTOM UNO
+
+    result.bottomUno =
+
+        angleDifference(bottomAngle, 0.25)
+        <= halfZone
+
+
+    -- BOTTOM DOS
+
+    result.bottomDos =
+
+        angleDifference(bottomAngle, 0.00)
+        <= halfZone
+
+
+    -- BOTTOM TRES
+
+    result.bottomTres =
+
+        angleDifference(bottomAngle, 0.75)
+        <= halfZone
+
+
+    -- BOTTOM CUATRO
+
+    result.bottomCuatro =
+
+        angleDifference(bottomAngle, 0.50)
+        <= halfZone
+
+
+    return result
+
+end
+
+
+
 -- 09. FUNCTION 2: AUTOPILOT
--- ==========================================
+
 
 local function updateAutopilot(data, enabled)
 
@@ -435,9 +579,9 @@ local function updateAutopilot(data, enabled)
 end
 
 
--- ==========================================
+
 -- 10. FUNCTION 3: ALTITUDE HOLD
--- ==========================================
+
 
 local function updateAltitudeController(data, enabled)
 
@@ -613,9 +757,9 @@ local function updateAltitudeController(data, enabled)
 end
 
 
--- ==========================================
+
 -- 11. SEQUENCE STATE
--- ==========================================
+
 
 local SEQUENCE = {
 
@@ -664,16 +808,18 @@ local SEQUENCE = {
 
         spoiler = 0,
 
-        accelerationBoosters = false
+        accelerationBoosters = false,
+
+        bottomBoosters = false
 
     }
 
 }
 
 
--- ==========================================
+
 -- 12. FLIGHT PROGRAM
--- ==========================================
+
 
 local FLIGHT_PROGRAM = {
 
@@ -835,9 +981,9 @@ local FLIGHT_PROGRAM = {
 }
 
 
--- ==========================================
+
 -- 13. SEQUENCE STEP MANAGEMENT
--- ==========================================
+
 
 local function enterSequenceStep(index)
 
@@ -900,9 +1046,9 @@ local function enterSequenceStep(index)
 end
 
 
--- ==========================================
+
 -- 14. SEQUENCE CONDITIONS
--- ==========================================
+
 
 local function checkSequenceCondition(data, wait)
 
@@ -996,7 +1142,7 @@ elseif wait.type == "roll" then
 
     local rollStable =
 
-        math.abs(data.tiltRoll) <= MARGINS.ROLL
+        math.abs(data.tiltRollHoriz) <= MARGINS.ROLL
 
 
     if rollStable then
@@ -1040,9 +1186,9 @@ elseif wait.type == "roll" then
 end
 
 
--- ==========================================
+
 -- 15. SEQUENCE EXECUTION
--- ==========================================
+
 
 local function updateSequence(data)
 
@@ -1139,9 +1285,9 @@ local function updateSequence(data)
 end
 
 
--- ==========================================
+
 -- 16. DIRECTIONAL BOOSTER SELECTION
--- ==========================================
+
 
 local function getDirectionalBoosters(targetHeading, enabled)
 
@@ -1213,9 +1359,9 @@ end
 
 
 
--- ==========================================
+
 -- 18. OUTPUT PROCESSING
--- ==========================================
+
 
 local function writeOutputs(
     flight,
@@ -1327,10 +1473,10 @@ local function writeOutputs(
 
    -- ACCELERATION BOOSTER
 
-output.setBool(
-    OUTPUT.ACCELERATION_BOOSTER,
-    SEQUENCE.commands.accelerationBoosters
-)
+    output.setBool(
+        OUTPUT.ACCELERATION_BOOSTER,
+        SEQUENCE.commands.accelerationBoosters
+    )
 
 
     -- START STATUS
@@ -1406,9 +1552,9 @@ output.setBool(
 end
 
 
--- ==========================================
+
 -- TELEMETRY TRANSMISSION
--- ==========================================
+
 
 local function sendTelemetry(data, altitude, autopilot, directional)
 
@@ -1451,7 +1597,7 @@ local function sendTelemetry(data, altitude, autopilot, directional)
         altitude.speedError,
         data.realRPS,
         data.targetRPS,
-        data.tiltRoll,
+        data.tiltRollHoriz,
         data.tiltPitch,
         autopilot.enabled and 1 or 0,
         autopilot.distance,
@@ -1476,16 +1622,14 @@ local function sendTelemetry(data, altitude, autopilot, directional)
 end
 
 
--- ==========================================
+
 -- 19. MAIN TICK
--- ==========================================
+
 
 function onTick()
 
     local data = readInputs()
-
-
-
+    
 
     -- FLIGHT SEQUENCE
 
@@ -1569,6 +1713,33 @@ function onTick()
     )
 
 
+    
+    -- BOTTOM BOOSTER DETECTION
+    
+
+    local bottom = updateBottomBoosters(
+
+        data,
+
+        SEQUENCE.commands.bottomBoosters
+
+    )
+
+    -- COMBINE DIRECTIONAL AND BOTTOM BOOSTERS
+
+    local boosterOutputs = {
+
+        north = directional.north or bottom.bottomDos,
+
+        east = directional.east or bottom.bottomTres,
+
+        south = directional.south or bottom.bottomCuatro,
+
+        west = directional.west or bottom.bottomUno
+
+    }
+
+
     -- OUTPUTS
 
     writeOutputs(
@@ -1579,7 +1750,7 @@ function onTick()
 
         autopilot,
 
-        directional,
+        boosterOutputs,
 
         data
 
@@ -1592,12 +1763,11 @@ function onTick()
         data,
         altitude,
         autopilot,
-        directional
+        boosterOutputs
     )
 
 end
 
 
--- ==========================================
+
 -- END OF YR-02
--- ==========================================
