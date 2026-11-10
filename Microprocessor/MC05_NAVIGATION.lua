@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 05: NAVIGATION
--- VERSION: 1.0.0
+-- VERSION: 1.0.1
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -40,14 +40,14 @@ local INPUT = {
 
 local OUTPUT = {
 
-    AP_YAW = 1,
-    AP_DISTANCE = 2,
+    AP_YAW = 6,
+    AP_DISTANCE = 7,
 
-    AP_MY_X = 3,
-    AP_MY_Y = 4,
+    AP_MY_X = 8,
+    AP_MY_Y = 9,
 
-    AP_TARGET_X = 5,
-    AP_TARGET_Y = 6,
+    AP_TARGET_X = 10,
+    AP_TARGET_Y = 11,
 
     AP_TARGET_HEADING = 7
 
