@@ -1,76 +1,83 @@
 
 -- OAI MIZUSHIMA YR-02
--- MC02: FLIGHT SEQUENCE
--- Stormworks
--- Migrated from v13.1.0
--- Version v1.0.0
+-- MC 01: FLIGHT SEQUENCE
+-- VERSION: 1.0.0
+--
+-- ORIGINAL LOGIC: V13.1.0
+-- MODULAR EXTRACTION
+--
+-- RESPONSIBILITY:
+--   Flight sequence management
+--
+-- NO ABORT
+-- NO TIMEOUT
+-- NO AUTOMATIC RESTART
+-- ORIGINAL CONDITIONS PRESERVED
 
---------------------------------------------------
+
 -- 01. INPUT CONFIGURATION
---------------------------------------------------
 
 local INPUT = {
 
-    NUMBER = {
-        TARGET_RPS = 1,
-        REAL_RPS = 2,
+    TILT_ROLL_HORIZ = 2,
+    TILT_PITCH = 3,
 
-        ALTITUDE = 3,
-        ALTITUDE_TARGET = 4,
+    TARGET_RPS = 4,
+    REAL_RPS = 5,
 
-        ALT_HOLD_DELAY = 5,
-        VERTICAL_SPEED = 6,
-        VERTICAL_SPEED_TARGET = 7,
+    ALTITUDE = 6,
+    ALTITUDE_TARGET = 7,
 
-        TILT_PITCH = 8,
-        TILT_ROLL_HORIZ = 9,
+    ALT_HOLD_DELAY = 11,
+    VERTICAL_SPEED = 12,
 
-        AP_KEYBOARD_X = 10,
-        AP_KEYBOARD_Y = 11,
+    AP_KEYBOARD_X = 13,
+    AP_KEYBOARD_Y = 14,
 
-        AP_SENSOR_X = 12,
-        AP_SENSOR_Y = 13,
+    AP_SENSOR_X = 15,
+    AP_SENSOR_Y = 16,
 
-        AP_CUTOFF = 14
-    },
+    AP_CUTOFF = 19,
 
-    BOOL = {
-        START = 1
-    }
+    VERTICAL_SPEED_TARGET = 22,
+
+    START = 1
 }
 
---------------------------------------------------
+
 -- 02. OUTPUT CONFIGURATION
---------------------------------------------------
 
 local OUTPUT = {
 
-    NUMBER = {
-        SPOILER_COMMAND = 1,
-        SEQUENCE_STATE = 2,
-        SEQUENCE_TIMER = 3
-    },
+    -- NUMBER OUTPUTS
 
-    BOOL = {
-        ROLL_STABILIZER_ENABLE = 1,
-        ALTITUDE_HOLD_ENABLE = 2,
-        AUTOPILOT_ENABLE = 3,
+    SEQUENCE_STATE = 1,
+    SEQUENCE_TIMER = 2,
+    SPOILER = 3,
 
-        MAIN_BOOSTER_COMMAND = 4,
-        BOTTOM_BOOSTERS_ENABLE = 5,
-        ACCELERATION_BOOSTERS_COMMAND = 6,
+    ALTITUDE_STABLE_TIMER = 4,
+    ROLL_STABLE_TIMER = 5,
 
-        DIRECTIONAL_BOOSTER_REQUEST = 7,
+    -- BOOLEAN OUTPUTS
 
-        SEQUENCE_RUNNING = 8,
-        SEQUENCE_COMPLETED = 9,
-        START_STATUS = 10
-    }
+    RUNNING = 1,
+    COMPLETED = 2,
+
+    ROLL_STABILIZER = 3,
+    MAIN_BOOSTER = 4,
+    DIRECTIONAL_TRIGGER = 5,
+
+    BOTTOM_BOOSTERS = 6,
+    ACCELERATION_BOOSTERS = 7,
+
+    ALTITUDE_HOLD = 8,
+    AUTOPILOT = 9,
+
+    START_STATUS = 10
 }
 
---------------------------------------------------
+
 -- 03. SYSTEM CONFIGURATION
---------------------------------------------------
 
 local CONFIG = {
 
@@ -79,11 +86,11 @@ local CONFIG = {
     ALTITUDE_STABLE_TIME = 2,
 
     ROLL_STABLE_TIME = 0.2
+
 }
 
---------------------------------------------------
+
 -- 04. CONDITION MARGINS
---------------------------------------------------
 
 local MARGINS = {
 
@@ -93,68 +100,70 @@ local MARGINS = {
 
     ROLL = 0.005,
 
-    PITCH = 0.08
+    PITCH = 0.08,
+
+    PITCH_STABILITY_TRIGGER = 0.01
+
 }
 
---------------------------------------------------
+
 -- 05. INPUT PROCESSING
---------------------------------------------------
 
 local function readInputs()
 
     return {
 
-        targetRPS =
-            input.getNumber(INPUT.NUMBER.TARGET_RPS),
-
-        realRPS =
-            input.getNumber(INPUT.NUMBER.REAL_RPS),
-
-        altitude =
-            input.getNumber(INPUT.NUMBER.ALTITUDE),
-
-        altitudeTarget =
-            input.getNumber(INPUT.NUMBER.ALTITUDE_TARGET),
-
-        altHoldDelay =
-            input.getNumber(INPUT.NUMBER.ALT_HOLD_DELAY),
-
-        verticalSpeed =
-            input.getNumber(INPUT.NUMBER.VERTICAL_SPEED),
-
-        verticalSpeedTarget =
-            input.getNumber(INPUT.NUMBER.VERTICAL_SPEED_TARGET),
+        tiltRollHoriz =
+            input.getNumber(INPUT.TILT_ROLL_HORIZ),
 
         tiltPitch =
-            input.getNumber(INPUT.NUMBER.TILT_PITCH),
+            input.getNumber(INPUT.TILT_PITCH),
 
-        tiltRollHoriz =
-            input.getNumber(INPUT.NUMBER.TILT_ROLL_HORIZ),
+        targetRPS =
+            input.getNumber(INPUT.TARGET_RPS),
+
+        realRPS =
+            input.getNumber(INPUT.REAL_RPS),
+
+        altitude =
+            input.getNumber(INPUT.ALTITUDE),
+
+        altitudeTarget =
+            input.getNumber(INPUT.ALTITUDE_TARGET),
+
+        altHoldDelay =
+            input.getNumber(INPUT.ALT_HOLD_DELAY),
+
+        verticalSpeed =
+            input.getNumber(INPUT.VERTICAL_SPEED),
+
+        verticalSpeedTarget =
+            input.getNumber(INPUT.VERTICAL_SPEED_TARGET),
 
         keyboardX =
-            input.getNumber(INPUT.NUMBER.AP_KEYBOARD_X),
+            input.getNumber(INPUT.AP_KEYBOARD_X),
 
         keyboardY =
-            input.getNumber(INPUT.NUMBER.AP_KEYBOARD_Y),
+            input.getNumber(INPUT.AP_KEYBOARD_Y),
 
         sensorX =
-            input.getNumber(INPUT.NUMBER.AP_SENSOR_X),
+            input.getNumber(INPUT.AP_SENSOR_X),
 
         sensorY =
-            input.getNumber(INPUT.NUMBER.AP_SENSOR_Y),
+            input.getNumber(INPUT.AP_SENSOR_Y),
 
         cutoffDistance =
-            input.getNumber(INPUT.NUMBER.AP_CUTOFF),
+            input.getNumber(INPUT.AP_CUTOFF),
 
         start =
-            input.getBool(INPUT.BOOL.START)
+            input.getBool(INPUT.START)
+
     }
 
 end
 
---------------------------------------------------
+
 -- 06. SEQUENCE STATE
---------------------------------------------------
 
 local SEQUENCE = {
 
@@ -176,19 +185,17 @@ local SEQUENCE = {
 
     directionalBoosterUsed = false,
 
-    directionalBoosterPending = false,
+    -- One-tick event for PROPULSION CONTROL
+
+    directionalBoosterTrigger = false,
 
     commands = {
-
-        -- FUNCTIONS
 
         rollStabilizer = false,
 
         altitudeHold = false,
 
         autopilot = false,
-
-        -- PROPULSION
 
         mainBooster = false,
 
@@ -197,12 +204,14 @@ local SEQUENCE = {
         accelerationBoosters = false,
 
         bottomBoosters = false
+
     }
+
 }
 
---------------------------------------------------
+
 -- 07. FLIGHT PROGRAM
---------------------------------------------------
+-- ORIGINAL V13.1.0 ORDER AND CONDITIONS
 
 local FLIGHT_PROGRAM = {
 
@@ -220,6 +229,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 2: ROLL STABILIZER
 
     {
@@ -233,6 +243,7 @@ local FLIGHT_PROGRAM = {
             type = "rps_min"
         }
     },
+
 
     -- STEP 3: MAIN BOOSTER
 
@@ -248,6 +259,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 4: DIRECTIONAL BOOSTER
 
     {
@@ -258,6 +270,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 5: BOTTOM BOOSTER SYSTEM
 
     {
@@ -266,7 +279,9 @@ local FLIGHT_PROGRAM = {
         set = {
             bottomBoosters = true
         }
+
     },
+
 
     -- STEP 6: ACCELERATION BOOSTERS
 
@@ -283,6 +298,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 7: ROLL STABILITY CHECK
 
     {
@@ -296,6 +312,7 @@ local FLIGHT_PROGRAM = {
             type = "roll"
         }
     },
+
 
     -- STEP 8: ALTITUDE HOLD
 
@@ -311,6 +328,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 9: AUTOPILOT ON
 
     {
@@ -325,6 +343,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
+
     -- STEP 10: AUTOPILOT OFF
 
     {
@@ -335,12 +354,13 @@ local FLIGHT_PROGRAM = {
         },
 
         hold = true
+
     }
+
 }
 
---------------------------------------------------
+
 -- 08. SEQUENCE STEP MANAGEMENT
---------------------------------------------------
 
 local function enterSequenceStep(index)
 
@@ -358,15 +378,15 @@ local function enterSequenceStep(index)
 
     SEQUENCE.rollStableTimer = 0
 
+
     -- RESET DIRECTIONAL BOOSTER FOR NEW FLIGHT
 
     if index == 1 then
 
         SEQUENCE.directionalBoosterUsed = false
 
-        SEQUENCE.directionalBoosterPending = false
-
     end
+
 
     -- SINGLE DIRECTIONAL BOOSTER ACTIVATION
 
@@ -375,13 +395,17 @@ local function enterSequenceStep(index)
 
         SEQUENCE.directionalBoosterUsed = true
 
-        SEQUENCE.directionalBoosterPending = true
+        SEQUENCE.directionalBoosterTrigger = true
 
     end
+
 
     if index == 3 then
+
         SEQUENCE.verticalSpeedExceeded = false
+
     end
+
 
     if step.set then
 
@@ -395,9 +419,8 @@ local function enterSequenceStep(index)
 
 end
 
---------------------------------------------------
+
 -- 09. SEQUENCE CONDITIONS
---------------------------------------------------
 
 local function checkSequenceCondition(data, wait)
 
@@ -405,12 +428,14 @@ local function checkSequenceCondition(data, wait)
         return true
     end
 
+
     -- RPS CHECK
 
     if wait.type == "rps_min" then
 
         return data.realRPS >=
             (data.targetRPS - MARGINS.RPS)
+
 
     -- VERTICAL SPEED THRESHOLD
 
@@ -425,31 +450,33 @@ local function checkSequenceCondition(data, wait)
         return SEQUENCE.verticalSpeedExceeded
             and data.verticalSpeed <= data.verticalSpeedTarget
 
+
     -- PITCH CHECK
 
     elseif wait.type == "pitch" then
 
         return math.abs(data.tiltPitch) <= MARGINS.PITCH
 
+
     -- ALTITUDE HOLD DELAY
 
     elseif wait.type == "alt_hold_delay" then
 
         local delayTicks =
-
-            math.max(0, data.altHoldDelay)
-            * CONFIG.TICK_RATE
+            math.max(0, data.altHoldDelay) *
+            CONFIG.TICK_RATE
 
         return SEQUENCE.timer >= delayTicks
+
 
     -- ALTITUDE STABILITY
 
     elseif wait.type == "altitude" then
 
         local altitudeStable =
-
             math.abs(data.altitudeTarget - data.altitude)
             <= MARGINS.ALTITUDE
+
 
         if altitudeStable then
 
@@ -462,21 +489,23 @@ local function checkSequenceCondition(data, wait)
 
         end
 
+
         local requiredTicks =
+            CONFIG.ALTITUDE_STABLE_TIME *
+            CONFIG.TICK_RATE
 
-            CONFIG.ALTITUDE_STABLE_TIME
-            * CONFIG.TICK_RATE
 
-        return altitudeStable
-            and SEQUENCE.altitudeStableTimer >= requiredTicks
+        return altitudeStable and
+            SEQUENCE.altitudeStableTimer >= requiredTicks
+
 
     -- ROLL STABILITY CHECK
 
     elseif wait.type == "roll" then
 
         local rollStable =
-
             math.abs(data.tiltRollHoriz) <= MARGINS.ROLL
+
 
         if rollStable then
 
@@ -489,12 +518,14 @@ local function checkSequenceCondition(data, wait)
 
         end
 
-        local requiredTicks =
 
-            CONFIG.ROLL_STABLE_TIME
-            * CONFIG.TICK_RATE
+        local requiredTicks =
+            CONFIG.ROLL_STABLE_TIME *
+            CONFIG.TICK_RATE
+
 
         return SEQUENCE.rollStableTimer >= requiredTicks
+
 
     -- AUTOPILOT TARGET
 
@@ -510,24 +541,30 @@ local function checkSequenceCondition(data, wait)
 
     end
 
+
     return false
 
 end
 
---------------------------------------------------
+
 -- 10. SEQUENCE EXECUTION
---------------------------------------------------
 
 local function updateSequence(data)
+
+    -- RESET ONE-TICK EVENT
+
+    SEQUENCE.directionalBoosterTrigger = false
+
 
     -- START BUTTON EDGE
 
     local startEdge =
+        data.start and
+        not SEQUENCE.previousStart
 
-        data.start
-        and not SEQUENCE.previousStart
 
     SEQUENCE.previousStart = data.start
+
 
     -- START SEQUENCE
 
@@ -541,11 +578,14 @@ local function updateSequence(data)
 
     end
 
+
     if not SEQUENCE.running then
         return
     end
 
+
     local step = FLIGHT_PROGRAM[SEQUENCE.state]
+
 
     if not step then
 
@@ -554,6 +594,7 @@ local function updateSequence(data)
         return
 
     end
+
 
     -- FINAL STEP
 
@@ -567,15 +608,18 @@ local function updateSequence(data)
 
     end
 
+
     -- STEP TIMER
 
     SEQUENCE.timer = SEQUENCE.timer + 1
+
 
     -- CHECK CONDITION
 
     if checkSequenceCondition(data, step.wait) then
 
         local nextStep = SEQUENCE.state + 1
+
 
         if nextStep > #FLIGHT_PROGRAM then
 
@@ -593,108 +637,106 @@ local function updateSequence(data)
 
 end
 
---------------------------------------------------
+
 -- 11. OUTPUT PROCESSING
---------------------------------------------------
 
 local function writeOutputs(data)
 
-    -- NUMERIC OUTPUTS
+    -- NUMBER OUTPUTS
 
     output.setNumber(
-        OUTPUT.NUMBER.SPOILER_COMMAND,
-        SEQUENCE.commands.spoiler
-    )
-
-    output.setNumber(
-        OUTPUT.NUMBER.SEQUENCE_STATE,
+        OUTPUT.SEQUENCE_STATE,
         SEQUENCE.state
     )
 
     output.setNumber(
-        OUTPUT.NUMBER.SEQUENCE_TIMER,
+        OUTPUT.SEQUENCE_TIMER,
         SEQUENCE.timer
     )
 
-    -- FUNCTION COMMANDS
-
-    output.setBool(
-        OUTPUT.BOOL.ROLL_STABILIZER_ENABLE,
-        SEQUENCE.commands.rollStabilizer
+    output.setNumber(
+        OUTPUT.SPOILER,
+        SEQUENCE.commands.spoiler
     )
 
-    output.setBool(
-        OUTPUT.BOOL.ALTITUDE_HOLD_ENABLE,
-        SEQUENCE.commands.altitudeHold
+    output.setNumber(
+        OUTPUT.ALTITUDE_STABLE_TIMER,
+        SEQUENCE.altitudeStableTimer
     )
 
-    output.setBool(
-        OUTPUT.BOOL.AUTOPILOT_ENABLE,
-        SEQUENCE.commands.autopilot
+    output.setNumber(
+        OUTPUT.ROLL_STABLE_TIMER,
+        SEQUENCE.rollStableTimer
     )
 
-    -- PROPULSION COMMANDS
+
+    -- BOOLEAN OUTPUTS
 
     output.setBool(
-        OUTPUT.BOOL.MAIN_BOOSTER_COMMAND,
-        SEQUENCE.commands.mainBooster
-    )
-
-    output.setBool(
-        OUTPUT.BOOL.BOTTOM_BOOSTERS_ENABLE,
-        SEQUENCE.commands.bottomBoosters
-    )
-
-    output.setBool(
-        OUTPUT.BOOL.ACCELERATION_BOOSTERS_COMMAND,
-        SEQUENCE.commands.accelerationBoosters
-    )
-
-    -- DIRECTIONAL BOOSTER REQUEST
-    -- One-tick request for MC06.
-
-    output.setBool(
-        OUTPUT.BOOL.DIRECTIONAL_BOOSTER_REQUEST,
-        SEQUENCE.directionalBoosterPending
-    )
-
-    SEQUENCE.directionalBoosterPending = false
-
-    -- SEQUENCE STATUS
-
-    output.setBool(
-        OUTPUT.BOOL.SEQUENCE_RUNNING,
+        OUTPUT.RUNNING,
         SEQUENCE.running
     )
 
     output.setBool(
-        OUTPUT.BOOL.SEQUENCE_COMPLETED,
+        OUTPUT.COMPLETED,
         SEQUENCE.completed
     )
 
     output.setBool(
-        OUTPUT.BOOL.START_STATUS,
+        OUTPUT.ROLL_STABILIZER,
+        SEQUENCE.commands.rollStabilizer
+    )
+
+    output.setBool(
+        OUTPUT.MAIN_BOOSTER,
+        SEQUENCE.commands.mainBooster
+    )
+
+    output.setBool(
+        OUTPUT.DIRECTIONAL_TRIGGER,
+        SEQUENCE.directionalBoosterTrigger
+    )
+
+    output.setBool(
+        OUTPUT.BOTTOM_BOOSTERS,
+        SEQUENCE.commands.bottomBoosters
+    )
+
+    output.setBool(
+        OUTPUT.ACCELERATION_BOOSTERS,
+        SEQUENCE.commands.accelerationBoosters
+    )
+
+    output.setBool(
+        OUTPUT.ALTITUDE_HOLD,
+        SEQUENCE.commands.altitudeHold
+    )
+
+    output.setBool(
+        OUTPUT.AUTOPILOT,
+        SEQUENCE.commands.autopilot
+    )
+
+    output.setBool(
+        OUTPUT.START_STATUS,
         data.start
     )
 
 end
 
---------------------------------------------------
+
 -- 12. MAIN TICK
---------------------------------------------------
 
 function onTick()
 
     local data = readInputs()
 
-    -- FLIGHT SEQUENCE
-
     updateSequence(data)
-
-    -- OUTPUTS
 
     writeOutputs(data)
 
 end
 
--- END OF MC02
+
+-- END OF MC 01
+-- OAI MIZUSHIMA YR-02
