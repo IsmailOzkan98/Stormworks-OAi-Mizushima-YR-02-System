@@ -2,7 +2,7 @@
 -- OAI MIZUSHIMA YR-02
 -- MODULAR FLIGHT CONTROL
 -- Stormworks
--- Version: 13.0.0
+-- Version: 13.1.0
 --
 -- Single File
 --
@@ -175,7 +175,9 @@ local MARGINS = {
 
     ROLL = 0.005,
 
-    PITCH = 0.1
+    PITCH = 0.08,
+
+    PITCH_STABILITY_TRIGGER = 0.01
 }
 
 
@@ -301,6 +303,18 @@ local function updateRollController(data, enabled)
         rollRight = -rollControl
 
     }
+
+end
+
+
+-- ==========================================
+-- 08.1 FUNCTION: PITCH STABILITY TRIGGER
+-- ==========================================
+
+local function checkPitchStability(data)
+
+    return math.abs(data.tiltPitch)
+        <= MARGINS.PITCH_STABILITY
 
 end
 
