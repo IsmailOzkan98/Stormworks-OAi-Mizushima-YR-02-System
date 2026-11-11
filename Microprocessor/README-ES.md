@@ -32,9 +32,13 @@ El objetivo de esta arquitectura es mantener las funciones de vuelo separadas, f
 | MC04 | ALTITUDE CONTROL | Control de altitud mediante PID |
 | MC05 | NAVIGATION | Navegación y cálculo de rumbo |
 | MC06 | PROPULSION | Gestión de propulsores y spoiler |
-| MC07 | TELEMETRY | Supervisión y transmisión HTTP |
+| MC07 | TELEMETRY | Supervisión, recopilación de datos y transmisión HTTP controlable |
 
 MC07 es opcional. Su ausencia no debe impedir el funcionamiento de los controles principales de vuelo.
+
+La transmisión HTTP de MC07 dispone de un control externo mediante un interruptor físico conectado a su entrada Boolean 12 (`TELEMETRY_ENABLE`).
+
+La adquisición y recopilación interna de datos permanece activa independientemente del estado de transmisión.
 
 ## 1.2. Principios de arquitectura
 
@@ -78,6 +82,7 @@ El tipo de canal no indica por sí mismo qué representa la señal. Para identif
 | Dato de navegación | Información de posición, distancia o rumbo | AP_DISTANCE, AP_TARGET_HEADING |
 | Salida de actuador | Orden destinada a controlar un actuador | ELEVATOR_LEFT, MAIN_BOOSTER |
 | Telemetría | Información recopilada para supervisión | SEQUENCE_TIMER, AP_YAW |
+| Control de telemetría | Orden que habilita o deshabilita la transmisión HTTP | TELEMETRY_ENABLE |
 
 ## 2.3. Interpretación de las tablas
 
@@ -281,6 +286,23 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC06 | Bool 7 | MC07 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor sur |
 | MC06 | Bool 8 | MC07 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor oeste |
 
+### 4.11. Physical Switch → MC07 — Telemetry Control
+
+El interruptor físico permite controlar externamente la transmisión HTTP de MC07.
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| Physical Switch | Bool 1 | MC07 | Bool 12 | TELEMETRY_ENABLE | Boolean | Orden de control | Habilita o deshabilita la transmisión HTTP |
+
+**Funcionamiento:**
+
+- `TRUE`: permite iniciar nuevas transmisiones HTTP.
+- `FALSE`: impide iniciar nuevas transmisiones HTTP.
+- La adquisición y recopilación interna de sensores continúa activa.
+- Al volver a activar el interruptor, la transmisión se reanuda respetando el intervalo configurado.
+
+La señal `TELEMETRY_ENABLE` controla exclusivamente la transmisión de telemetría. No controla los sistemas principales de vuelo ni la lectura de sensores.
+
 ---
 
 # 5. Tabla maestra de sensores y parámetros de entrada
@@ -329,6 +351,7 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | DIRECTIONAL_BOOSTER_TRIGGER | Orden de control | MC02 | MC06 | Bool 2 |
 | BOTTOM_BOOSTERS | Orden de control | MC02 | MC06 | Bool 3 |
 | ACCELERATION_BOOSTERS | Orden de control | MC02 | MC06 | Bool 4 |
+| TELEMETRY_ENABLE | Orden de control | Interruptor físico | MC07 | Bool 12 |
 
 ---
 
@@ -665,20 +688,34 @@ El mecanismo de reinicio entre MC01 y MC06 debe verificarse en la integración f
 
 # 12. MC07 — TELEMETRY
 
-**Responsabilidad:** supervisión de vuelo y transmisión HTTP.
+Responsabilidad: supervisión de vuelo, recopilación de datos y transmisión HTTP.
 
 MC07 recibe datos de los demás módulos y de sensores físicos. Organiza esta información para generar telemetría.
 
 No gobierna directamente los actuadores de vuelo.
 
-## 12.1. Configuración
+La transmisión HTTP dispone de un control externo mediante la entrada Boolean 12 (`TELEMETRY_ENABLE`).
 
-| Parámetro | Valor |
-|---|---|
-| ENABLED | true |
-| PORT | 8080 |
-| INTERVAL | 6 ticks |
-| Frecuencia nominal | 10 transmisiones por segundo a 60 Hz |
+El control de transmisión es independiente de la adquisición de datos: MC07 continúa leyendo y procesando sus entradas aunque la transmisión HTTP esté deshabilitada.
+
+### 12.1. Configuración
+
+| Parámetro | Valor | Descripción |
+|---|---:|---|
+| TELEMETRY_ENABLE | Boolean 12 | Interruptor físico de transmisión |
+| PORT | 8080 | Puerto del servidor HTTP |
+| INTERVAL | 6 ticks | Intervalo de transmisión |
+| Frecuencia nominal | 10 transmisiones por segundo | A 60 Hz |
+
+**Control de transmisión:**
+
+- `TELEMETRY_ENABLE = TRUE`: habilita las nuevas solicitudes HTTP.
+- `TELEMETRY_ENABLE = FALSE`: deshabilita las nuevas solicitudes HTTP.
+- El contador de intervalo se reinicia mientras la transmisión está deshabilitada.
+- La adquisición y recopilación de datos continúa funcionando.
+- Al habilitar nuevamente la transmisión, se reanuda el envío respetando el intervalo configurado.
+
+El interruptor no cancela una solicitud HTTP que ya haya sido iniciada.
 
 ## 12.2. Entradas Number
 
@@ -717,6 +754,7 @@ No gobierna directamente los actuadores de vuelo.
 | Bool 9 | EAST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 6 |
 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | MC06 Bool 7 |
 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 8 |
+| Bool 12 | TELEMETRY_ENABLE | Boolean | Orden de control | Interruptor físico |
 
 ## 12.4. Información transmitida
 
@@ -738,8 +776,9 @@ MC07 recopila información sobre:
 - Estado de mantenimiento de altitud.
 - Estado de estabilización.
 - Valor del spoiler.
+- Estado de habilitación de transmisión HTTP.
 
-## 12.5. Comunicación HTTP
+### 12.5. Comunicación HTTP
 
 La transmisión se realiza mediante la funcionalidad HTTP de Stormworks Lua:
 
@@ -748,6 +787,25 @@ La transmisión se realiza mediante la funcionalidad HTTP de Stormworks Lua:
 El endpoint utiliza el formato:
 
 `/telemetry?...`
+
+**Control de transmisión:**
+
+La entrada Boolean 12 (`TELEMETRY_ENABLE`) determina si MC07 puede iniciar nuevas solicitudes HTTP.
+
+Cuando la entrada está desactivada:
+
+- No se inician nuevas solicitudes HTTP.
+- El contador de intervalo se reinicia.
+- La adquisición de sensores continúa.
+- Los datos internos siguen actualizándose.
+
+Cuando la entrada está activada:
+
+- Se permite iniciar nuevas solicitudes HTTP.
+- Se respeta el intervalo configurado.
+- La transmisión continúa mientras la habilitación permanezca activa.
+
+Una solicitud HTTP iniciada antes de desactivar el interruptor no se cancela automáticamente.
 
 MC07 proporciona una salida de comunicación HTTP, pero no dispone de salidas de control de actuadores dentro de la arquitectura descrita.
 
@@ -894,6 +952,33 @@ ALT_PID_P / ALT_PID_I / ALT_PID_D --+
                                   MC07 Num 6
 ```
 
+### 14.5. Control de transmisión de telemetría
+
+              INTERRUPTOR FÍSICO
+                       |
+                       | Boolean 1
+                       |
+                       v
+                 MC07 Bool 12
+               TELEMETRY_ENABLE
+                       |
+                       v
+                CONTROL HTTP
+                       |
+              +--------+--------+
+              |                 |
+              v                 v
+          ENABLED             DISABLED
+              |                 |
+              v                 v
+        TRANSMISIÓN HTTP    SIN NUEVAS
+              |             SOLICITUDES
+              v                 |
+             HTTP               |
+                                |
+        ADQUISICIÓN DE DATOS CONTINÚA
+              EN AMBOS ESTADOS
+
 ---
 
 # 15. Procedimiento de validación del montaje
@@ -950,6 +1035,26 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 - [ ] MC07 transmite telemetría correctamente.
 - [ ] La secuencia puede iniciarse nuevamente sin conservar estados no deseados.
 
+### 15.5. Pruebas de control de telemetría
+
+[ ] El interruptor físico está conectado a MC07 Boolean 12.
+
+[ ] MC07 recibe correctamente la señal TELEMETRY_ENABLE.
+
+[ ] Con TELEMETRY_ENABLE activado, se realizan nuevas solicitudes HTTP.
+
+[ ] Con TELEMETRY_ENABLE desactivado, no se inician nuevas solicitudes HTTP.
+
+[ ] El contador de intervalo se reinicia cuando la transmisión está deshabilitada.
+
+[ ] La adquisición de sensores continúa independientemente del estado del interruptor.
+
+[ ] Los datos internos continúan actualizándose con la transmisión deshabilitada.
+
+[ ] Al volver a activar el interruptor, la transmisión se reanuda.
+
+[ ] El funcionamiento de los controles principales de vuelo no depende del interruptor de telemetría.
+
 ---
 
 # 16. Consideraciones de integración pendientes
@@ -965,6 +1070,10 @@ Los siguientes puntos deben comprobarse durante el montaje y las pruebas física
 | Cableado físico de actuadores | Por comprobar en vehículo | Confirmar correspondencia de cada salida |
 | Distribución Composite física | Por comprobar en vehículo | Verificar conexiones y ramificaciones |
 | Telemetría HTTP | Pendiente de prueba integrada | Verificar recepción en el puerto 8080 |
+| TELEMETRY_ENABLE | Canal definido: MC07 Bool 12 | Conectar el interruptor físico a MC07 Boolean 12 |
+| Control de transmisión HTTP | Implementado en MC07 | Verificar habilitación y deshabilitación física |
+| Adquisición de datos durante la deshabilitación | Independiente de HTTP | Comprobar que los sensores siguen actualizándose |
+| Reinicio del contador de telemetría | Implementado en MC07 | Comprobar el reinicio al deshabilitar la transmisión |
 
 Las conexiones lógicas indicadas en este documento deben respetarse aunque la distribución física del cableado sea diferente.
 
