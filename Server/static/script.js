@@ -542,6 +542,10 @@ function updateInterface(data) {
     setValue("pitch", number(data, "pitch", 2));
     setValue("yaw", number(data, "yaw", 2));
 
+    // AIRCRAFT SPEED
+
+    setValue("absoluteSpeed", number(data, "absolute_speed", 1));
+
     // NAVIGATION
 
     setValue("gpsX", number(data, "my_x", 2));
