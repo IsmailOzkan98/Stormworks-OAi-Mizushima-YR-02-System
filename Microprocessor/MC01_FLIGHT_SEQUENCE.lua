@@ -46,7 +46,7 @@ local INPUT = {
 
     AP_CUTOFF = 19,
 
-    VERTICAL_SPEED_TARGET = 22, -- Minimum vertical speed to trigger directional booster
+    MAX_TAKEOFF_VSPEED = 22, -- Minimum vertical speed to trigger directional booster
 
 
     -- Boolean Inputs
@@ -151,7 +151,7 @@ local function readInputs()
             input.getNumber(INPUT.VERTICAL_SPEED),
 
         verticalSpeedTarget =
-            input.getNumber(INPUT.VERTICAL_SPEED_TARGET),
+            input.getNumber(INPUT.MAX_TAKEOFF_VSPEED),
 
         targetX =
             input.getNumber(INPUT.AP_TARGET_X),

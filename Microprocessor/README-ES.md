@@ -263,12 +263,9 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 |---|---|---|---|---|---|---|---|
 | MC02 | Num 1 | MC07 | Num 1 | SEQUENCE_STATE | Number | Estado | Fase actual de la secuencia |
 | MC02 | Num 2 | MC07 | Num 2 | SEQUENCE_TIMER | Number | Estado | Tiempo transcurrido de la secuencia |
-| MC02 | Num 3 | MC07 | Num 17 | SPOILER | Number | Orden de control | Valor del spoiler |
 | MC02 | Bool 1 | MC07 | Bool 1 | RUNNING | Boolean | Estado | Secuencia en ejecución |
 | MC02 | Bool 2 | MC07 | Bool 2 | COMPLETED | Boolean | Estado | Secuencia completada |
 | MC02 | Bool 3 | MC07 | Bool 6 | ROLL_STABILIZER | Boolean | Estado | Estabilización de roll habilitada |
-| MC02 | Bool 4 | MC07 | Bool 4 | MAIN_BOOSTER | Boolean | Estado | Propulsor principal solicitado |
-| MC02 | Bool 7 | MC07 | Bool 7 | ACCELERATION_BOOSTERS | Boolean | Estado | Propulsores de aceleración solicitados |
 | MC02 | Bool 8 | MC07 | Bool 5 | ALTITUDE_HOLD | Boolean | Estado | Mantenimiento de altitud habilitado |
 | MC02 | Bool 9 | MC07 | Bool 3 | AUTOPILOT | Boolean | Estado | Piloto automático habilitado |
 
@@ -276,46 +273,58 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 
 | Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
 |---|---|---|---|---|---|---|---|
+| MC06 | Number 5 | MC07 | Number 17 | SPOILER | Number | Estado de actuador | Posición o valor aplicado al spoiler |
+| MC06 | Bool 1 | MC07 | Bool 4 | MAIN_BOOSTER | Boolean | Estado de actuador | Estado del propulsor principal |
 | MC06 | Bool 5 | MC07 | Bool 8 | NORTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor norte |
 | MC06 | Bool 6 | MC07 | Bool 9 | EAST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor este |
 | MC06 | Bool 7 | MC07 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor sur |
 | MC06 | Bool 8 | MC07 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor oeste |
+| MC06 | Bool 9 | MC07 | Bool 7 | ACCELERATION_BOOSTER | Boolean | Estado de actuador | Estado de los propulsores de aceleración |
 
 ---
+
 
 # 5. Tabla maestra de sensores y parámetros de entrada
 
 Esta tabla identifica las señales que deben suministrarse desde sensores físicos o desde valores de configuración.
 
-Los canales indicados corresponden a las entradas documentadas de cada controlador. Cuando un mismo sensor se utiliza en varios módulos, debe distribuirse su señal a todos los destinos que la necesitan.
+Los canales indicados corresponden a las entradas documentadas de cada controlador. Cuando un mismo sensor o parámetro se utiliza en varios módulos, debe distribuirse su señal a todos los destinos que la necesitan.
 
 | Señal | Naturaleza | Dato | MC01 | MC03 | MC04 | MC05 | MC06 | MC07 |
 |---|---|---|---|---|---|---|---|---|
+| PITCH_RANGE | Parámetro de configuración | Number | Num 1 | — | — | — | — | — |
 | TILT_ROLL_HORIZ | Sensor físico | Number | Num 2 | Num 2 | — | — | Num 3 | Num 9 |
 | TILT_PITCH | Sensor físico | Number | Num 3 | — | — | — | — | Num 10 |
 | TARGET_RPS | Parámetro de configuración | Number | Num 4 | — | — | — | — | Num 8 |
 | REAL_RPS | Sensor físico | Number | Num 5 | — | — | — | — | Num 7 |
 | ALTITUDE | Sensor físico | Number | Num 6 | — | Num 1 | — | — | Num 3 |
-| ALTITUDE_TARGET | Parámetro de configuración | Number | Num 7 | — | Num 2 | — | — | Num 4 |
+| ALT_TARGET | Parámetro de configuración | Number | Num 7 | — | Num 2 | — | — | Num 4 |
+| ROLL_STABLE_TIME | Parámetro de configuración | Number | Num 8 | — | — | — | — | — |
 | VERTICAL_SPEED | Sensor físico | Number | Num 12 | — | Num 6 | — | — | Num 5 |
 | AP_TARGET_X | Entrada de navegación | Number | Num 13 | — | — | Num 1 | — | — |
 | AP_TARGET_Y | Entrada de navegación | Number | Num 14 | — | — | Num 2 | — | — |
 | AP_SENSOR_X | Sensor de posición | Number | Num 15 | — | — | Num 3 | — | — |
 | AP_SENSOR_Y | Sensor de posición | Number | Num 16 | — | — | Num 4 | — | — |
 | AP_COMPASS | Sensor físico | Number | — | — | — | Num 5 | — | — |
-| AP_STEERING | Parámetro de configuración | Number | — | — | — | Num 6 | — | — |
-| AP_CUTOFF | Parámetro de configuración | Number | Num 19 | — | — | Num 7 | — | — |
+| AP_STEER_POWER | Parámetro de configuración | Number | — | — | — | Num 6 | — | — |
+| AP_CUTOFF_DIST | Parámetro de configuración | Number | Num 19 | — | — | Num 7 | — | — |
 | AP_DEADZONE | Parámetro de configuración | Number | — | — | — | Num 8 | — | — |
-| AP_SMOOTHING | Parámetro de configuración | Number | — | — | — | Num 9 | — | — |
-| VERTICAL_SPEED_TARGET | Parámetro de configuración | Number | Num 22 | — | — | — | — | — |
+| AP_STEER_SMOOTH | Parámetro de configuración | Number | — | — | — | Num 9 | — | — |
+| MAX_TAKEOFF_VSPEED | Parámetro de configuración | Number | Num 22 | — | — | — | — | — |
 | ROLL_CONTROL_MULTIPLIER | Parámetro de configuración | Number | — | Num 1 | — | — | — | — |
 | TILT_ROLL_VERT | Sensor físico | Number | — | — | — | — | Num 4 | — |
 | ALT_PID_P | Parámetro de configuración | Number | — | — | Num 3 | — | — | — |
 | ALT_PID_I | Parámetro de configuración | Number | — | — | Num 4 | — | — | — |
 | ALT_PID_D | Parámetro de configuración | Number | — | — | Num 5 | — | — | — |
+| MAX_CLIMB_SPEED | Parámetro de configuración | Number | — | — | Num 7 | — | — | — |
+| MAX_DESCENT_SPEED | Parámetro de configuración | Number | — | — | Num 8 | — | — | — |
+| ALTITUDE_GAIN | Parámetro de configuración | Number | — | — | Num 9 | — | — | — |
 | ALT_HOLD_DELAY | Parámetro de configuración | Number | Num 11 | — | — | — | — | — |
+| ALTITUDE_STABLE_TIME | Parámetro de configuración | Number | Num 10 | — | — | — | — | — |
+| ABSOLUTE_SPEED | Sensor físico | Number | — | — | — | — | — | Num 18 |
 
-**Nota sobre esta tabla:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
+**Nota:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
+
 
 ## 5.1. Señales de entrada Boolean
 
@@ -343,20 +352,24 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
 | Bool 1 | START | Boolean | Orden de control | Interruptor de inicio |
+| Num 1 | PITCH_RANGE | Number | Parámetro de configuración | Configuración |
 | Num 2 | TILT_ROLL_HORIZ | Number | Sensor físico | Sensor de inclinación |
 | Num 3 | TILT_PITCH | Number | Sensor físico | Sensor de inclinación |
-| Num 4 | TARGET_RPS | Number | Parámetro | Configuración |
+| Num 4 | TARGET_RPS | Number | Parámetro de configuración | Configuración |
 | Num 5 | REAL_RPS | Number | Sensor físico | Sensor RPS |
 | Num 6 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 7 | ALTITUDE_TARGET | Number | Parámetro | Configuración |
+| Num 7 | ALT_TARGET | Number | Parámetro de configuración | Configuración |
+| Num 8 | ROLL_STABLE_TIME | Number | Parámetro de configuración | Configuración |
+| Num 10 | ALTITUDE_STABLE_TIME | Number | Parámetro de configuración | Configuración |
+| Num 11 | ALT_HOLD_DELAY | Number | Parámetro de configuración | Configuración |
 | Num 12 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
 | Num 13 | AP_TARGET_X | Number | Entrada de navegación | Configuración de objetivo |
 | Num 14 | AP_TARGET_Y | Number | Entrada de navegación | Configuración de objetivo |
 | Num 15 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición |
 | Num 16 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición |
-| Num 19 | AP_CUTOFF | Number | Parámetro | Configuración |
-| Num 22 | VERTICAL_SPEED_TARGET | Number | Parámetro | Configuración |
-| Num 11 | ALT_HOLD_DELAY | Number | Parámetro | Configuración |
+| Num 19 | AP_CUTOFF_DIST | Number | Parámetro de configuración | Configuración |
+| Num 22 | MAX_TAKEOFF_VSPEED | Number | Parámetro de configuración | Configuración |
+
 
 ## 6.2. Salidas Boolean
 
@@ -447,9 +460,10 @@ MC03 calcula las órdenes de corrección de roll a partir de la inclinación hor
 
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
-| Num 1 | ROLL_CONTROL_MULTIPLIER | Number | Parámetro | Configuración |
+| Num 1 | ROLL_CONTROL_MULTIPLIER | Number | Parámetro de configuración | Configuración |
 | Num 2 | TILT_ROLL_HORIZ | Number | Sensor físico | Sensor de inclinación |
 | Bool 3 | ROLL_STABILIZER | Boolean | Orden de control | MC02 Bool 3 |
+
 
 ## 8.2. Salidas
 
@@ -481,12 +495,16 @@ MC04 calcula la velocidad vertical deseada y utiliza el control PID para generar
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
 | Num 1 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 2 | ALTITUDE_TARGET | Number | Parámetro | Configuración de altitud objetivo |
-| Num 3 | ALT_PID_P | Number | Parámetro | Configuración PID |
-| Num 4 | ALT_PID_I | Number | Parámetro | Configuración PID |
-| Num 5 | ALT_PID_D | Number | Parámetro | Configuración PID |
+| Num 2 | ALT_TARGET | Number | Parámetro de configuración | Configuración de altitud objetivo |
+| Num 3 | ALT_PID_P | Number | Parámetro de configuración | Configuración PID |
+| Num 4 | ALT_PID_I | Number | Parámetro de configuración | Configuración PID |
+| Num 5 | ALT_PID_D | Number | Parámetro de configuración | Configuración PID |
 | Num 6 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
+| Num 7 | MAX_CLIMB_SPEED | Number | Parámetro de configuración | Configuración |
+| Num 8 | MAX_DESCENT_SPEED | Number | Parámetro de configuración | Configuración |
+| Num 9 | ALTITUDE_GAIN | Number | Parámetro de configuración | Configuración |
 | Bool 8 | ALTITUDE_HOLD | Boolean | Orden de control | MC02 Bool 8 |
+
 
 ## 9.2. Salidas
 
@@ -532,11 +550,12 @@ MC05 calcula la posición relativa respecto al objetivo y genera los datos de na
 | Num 3 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición X |
 | Num 4 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición Y |
 | Num 5 | AP_COMPASS | Number | Sensor físico | Brújula |
-| Num 6 | AP_STEERING | Number | Parámetro | Configuración de dirección |
-| Num 7 | AP_CUTOFF | Number | Parámetro | Configuración de distancia de corte |
-| Num 8 | AP_DEADZONE | Number | Parámetro | Configuración de zona muerta |
-| Num 9 | AP_SMOOTHING | Number | Parámetro | Configuración de suavizado |
+| Num 6 | AP_STEER_POWER | Number | Parámetro de configuración | Configuración |
+| Num 7 | AP_CUTOFF_DIST | Number | Parámetro de configuración | Configuración |
+| Num 8 | AP_DEADZONE | Number | Parámetro de configuración | Configuración |
+| Num 9 | AP_STEER_SMOOTH | Number | Parámetro de configuración | Configuración |
 | Bool 9 | AUTOPILOT | Boolean | Orden de control | MC02 Bool 9 |
+
 
 ## 10.2. Salidas
 
@@ -687,11 +706,11 @@ No gobierna directamente los actuadores de vuelo.
 | Num 1 | SEQUENCE_STATE | Number | Estado | MC02 Num 1 |
 | Num 2 | SEQUENCE_TIMER | Number | Estado | MC02 Num 2 |
 | Num 3 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 4 | ALTITUDE_TARGET | Number | Parámetro | Configuración |
+| Num 4 | ALT_TARGET | Number | Parámetro de configuración | Configuración |
 | Num 5 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
 | Num 6 | DESIRED_VERTICAL_SPEED | Number | Cálculo de control | MC04 Num 5 |
 | Num 7 | REAL_RPS | Number | Sensor físico | Sensor RPS |
-| Num 8 | TARGET_RPS | Number | Parámetro | Configuración |
+| Num 8 | TARGET_RPS | Number | Parámetro de configuración | Configuración |
 | Num 9 | TILT_ROLL_HORIZ | Number | Sensor físico | Sensor de inclinación |
 | Num 10 | TILT_PITCH | Number | Sensor físico | Sensor de inclinación |
 | Num 11 | AP_DISTANCE | Number | Dato de navegación | MC05 Num 7 |
@@ -701,6 +720,8 @@ No gobierna directamente los actuadores de vuelo.
 | Num 15 | AP_TARGET_X | Number | Dato de navegación | MC05 Num 10 |
 | Num 16 | AP_TARGET_Y | Number | Dato de navegación | MC05 Num 11 |
 | Num 17 | SPOILER | Number | Orden de control | MC06 Num 5 |
+| Num 18 | ABSOLUTE_SPEED | Number | Sensor físico | Sensor de velocidad absoluta |
+
 
 ## 12.3. Entradas Boolean
 
