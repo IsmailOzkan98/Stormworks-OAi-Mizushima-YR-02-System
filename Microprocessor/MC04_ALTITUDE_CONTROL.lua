@@ -16,6 +16,8 @@
 
 local INPUT = {
 
+    -- Numerical Inputs
+
     ALTITUDE        = 1,
     ALTITUDE_TARGET = 2,
 
@@ -24,6 +26,13 @@ local INPUT = {
     ALT_PID_D       = 5,
 
     VERTICAL_SPEED  = 6,
+    MAX_CLIMB_SPEED = 7,
+    MAX_DESCENT_SPEED = 8,
+
+    ALTITUDE_GAIN = 9,
+
+
+    -- Boolean Inputs
 
     ALTITUDE_HOLD   = 8
 
@@ -51,11 +60,6 @@ local OUTPUT = {
 local CONFIG = {
 
     TICK_RATE = 60,
-
-    ALTITUDE_GAIN = 0.35,
-
-    MAX_CLIMB_SPEED = 105,
-    MAX_DESCENT_SPEED = 125,
 
     CONTROL_MIN = -0.45,
     CONTROL_MAX = 0.45,
@@ -297,7 +301,16 @@ function onTick()
             input.getNumber(INPUT.ALT_PID_D),
 
         verticalSpeed =
-            input.getNumber(INPUT.VERTICAL_SPEED)
+            input.getNumber(INPUT.VERTICAL_SPEED),
+
+        maxClimbSpeed =
+            input.getNumber(INPUT.MAX_CLIMB_SPEED),
+
+        maxDescentSpeed =
+            input.getNumber(INPUT.MAX_DESCENT_SPEED),
+
+        altitudeGain =
+            input.getNumber(INPUT.ALTITUDE_GAIN)
 
     }
 
