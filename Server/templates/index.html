@@ -75,45 +75,94 @@
                 <span>01</span> FLIGHT TELEMETRY
             </div>
 
-            <div class="metric-grid">
+            
+            <div class="telemetry-stack">
 
-                <div class="card">
-                    <div class="card-label">ALTITUDE</div>
-                    <div class="value highlight" id="altitude">--</div>
-                    <div class="unit">METERS</div>
+                <!-- ALTITUDE GRAPH -->
+
+                <div class="telemetry-chart-panel">
+
+                    <div class="telemetry-chart-header">
+                        <span>ALTITUDE PROFILE</span>
+                        <span>60 SEC HISTORY</span>
+                    </div>
+
+                    <div class="telemetry-readouts">
+
+                        <div>
+                            <span>ALTITUDE</span>
+                            <strong id="altitude">--</strong>
+                            <small>METERS</small>
+                        </div>
+
+                        <div>
+                            <span>TARGET</span>
+                            <strong id="altTarget">--</strong>
+                            <small>METERS</small>
+                        </div>
+
+                        <div>
+                            <span>ERROR</span>
+                            <strong id="altError">--</strong>
+                            <small>METERS</small>
+                        </div>
+
+                    </div>
+
+                    <div class="telemetry-legend">
+                        <span class="legend-alt">● ACTUAL</span>
+                        <span class="legend-target">● TARGET</span>
+                        <span class="legend-error">● ERROR</span>
+                    </div>
+
+                    <canvas id="altitudeChart"></canvas>
+
                 </div>
 
-                <div class="card">
-                    <div class="card-label">VERTICAL SPEED</div>
-                    <div class="value cyan" id="verticalSpeed">--</div>
-                    <div class="unit">METERS / SECOND</div>
-                </div>
 
-                <div class="card">
-                    <div class="card-label">ALTITUDE TARGET</div>
-                    <div class="value" id="altTarget">--</div>
-                    <div class="unit">METERS</div>
-                </div>
+                <!-- VERTICAL SPEED GRAPH -->
 
-                <div class="card">
-                    <div class="card-label">VERTICAL SPEED TARGET</div>
-                    <div class="value" id="vsTarget">--</div>
-                    <div class="unit">METERS / SECOND</div>
-                </div>
+                <div class="telemetry-chart-panel">
 
-                <div class="card">
-                    <div class="card-label">ALTITUDE ERROR</div>
-                    <div class="value yellow" id="altError">--</div>
-                    <div class="unit">METERS</div>
-                </div>
+                    <div class="telemetry-chart-header">
+                        <span>VERTICAL SPEED PROFILE</span>
+                        <span>60 SEC HISTORY</span>
+                    </div>
 
-                <div class="card">
-                    <div class="card-label">VERTICAL SPEED ERROR</div>
-                    <div class="value yellow" id="vsError">--</div>
-                    <div class="unit">METERS / SECOND</div>
+                    <div class="telemetry-readouts">
+
+                        <div>
+                            <span>VERTICAL SPEED</span>
+                            <strong id="verticalSpeed">--</strong>
+                            <small>M/S</small>
+                        </div>
+
+                        <div>
+                            <span>TARGET</span>
+                            <strong id="vsTarget">--</strong>
+                            <small>M/S</small>
+                        </div>
+
+                        <div>
+                            <span>ERROR</span>
+                            <strong id="vsError">--</strong>
+                            <small>M/S</small>
+                        </div>
+
+                    </div>
+
+                    <div class="telemetry-legend">
+                        <span class="legend-alt">● ACTUAL</span>
+                        <span class="legend-target">● TARGET</span>
+                        <span class="legend-error">● ERROR</span>
+                    </div>
+
+                    <canvas id="verticalSpeedChart"></canvas>
+
                 </div>
 
             </div>
+
 
             <div class="section-heading">
                 <span>02</span> ENGINE & CONTROL
