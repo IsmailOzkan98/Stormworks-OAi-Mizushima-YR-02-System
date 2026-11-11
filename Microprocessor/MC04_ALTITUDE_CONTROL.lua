@@ -19,9 +19,9 @@ local INPUT = {
     ALTITUDE        = 1,
     ALTITUDE_TARGET = 2,
 
-    ALT_PID_P           = 3,
-    ALT_PID_I           = 4,
-    ALT_PID_D           = 5,
+    ALT_PID_P       = 3,
+    ALT_PID_I       = 4,
+    ALT_PID_D       = 5,
 
     VERTICAL_SPEED  = 6,
 
