@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.1.0
+-- VERSION: 1.2.1
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -122,11 +122,11 @@ local function updateAltitudeController(data, enabled)
 
         desiredVerticalSpeed = clamp(
 
-            altitudeError * CONFIG.ALTITUDE_GAIN,
+            altitudeError * data.altitudeGain,
 
-            -CONFIG.MAX_DESCENT_SPEED,
+            -data.maxDescentSpeed,
 
-            CONFIG.MAX_CLIMB_SPEED
+            data.maxClimbSpeed
 
         )
 
