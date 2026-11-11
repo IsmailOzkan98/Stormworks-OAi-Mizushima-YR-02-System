@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 03: FLIGHT CONTROL
--- VERSION: 1.0.0
+-- VERSION: 1.0.1
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -30,8 +30,8 @@ local INPUT = {
 
 local OUTPUT = {
 
-    ROLL_LEFT  = 1,
-    ROLL_RIGHT = 2
+    ROLL_RIGHT = 1,
+    ROLL_LEFT = 2
 
 }
 
@@ -114,7 +114,7 @@ function onTick()
 
     output.setNumber(
 
-        OUTPUT.ROLL_LEFT,
+        OUTPUT.ROLL_RIGHT,
 
         flight.rollLeft
 
@@ -123,7 +123,7 @@ function onTick()
 
     output.setNumber(
 
-        OUTPUT.ROLL_RIGHT,
+        OUTPUT.ROLL_LEFT,
 
         flight.rollRight
 
