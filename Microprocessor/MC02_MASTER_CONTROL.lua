@@ -15,22 +15,35 @@
 --------------------------------------------------
 
 local INPUT = {
+
     RUNNING = 1,
+
     COMPLETED = 2,
+
     ROLL_STABILIZER = 3,
+
     MAIN_BOOSTER = 4,
+
     DIRECTIONAL_BOOSTER_TRIGGER = 5,
+
     BOTTOM_BOOSTERS = 6,
+
     ACCELERATION_BOOSTERS = 7,
+
     ALTITUDE_HOLD = 8,
+
     AUTOPILOT = 9,
+    
     START_STATUS = 10
 }
 
 local INPUT_NUM = {
+
     SEQUENCE_STATE = 1,
     SEQUENCE_TIMER = 2,
+
     SPOILER = 3,
+
     ALTITUDE_STABLE_TIMER = 4,
     ROLL_STABLE_TIMER = 5
 }

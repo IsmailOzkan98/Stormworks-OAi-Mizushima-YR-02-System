@@ -16,7 +16,7 @@
 
 local INPUT = {
 
-    MULTIPLIER      = 1,
+    ROLL_CONTROL_MULTIPLIER = 1,
     TILT_ROLL_HORIZ = 2,
 
     ROLL_STABILIZER = 3
@@ -59,7 +59,7 @@ local function updateRollController(data, enabled)
 
     local rollControl =
 
-        data.tiltRollHoriz * data.multiplier
+        data.tiltRollHoriz * data.rollControlMultiplier
 
 
     return {
@@ -83,8 +83,8 @@ function onTick()
 
     local data = {
 
-        multiplier =
-            input.getNumber(INPUT.MULTIPLIER),
+        rollControlMultiplier =
+            input.getNumber(INPUT.ROLL_CONTROL_MULTIPLIER),
 
         tiltRollHoriz =
             input.getNumber(INPUT.TILT_ROLL_HORIZ)

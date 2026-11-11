@@ -19,9 +19,9 @@ local INPUT = {
     ALTITUDE        = 1,
     ALTITUDE_TARGET = 2,
 
-    PID_P           = 3,
-    PID_I           = 4,
-    PID_D           = 5,
+    ALT_PID_P           = 3,
+    ALT_PID_I           = 4,
+    ALT_PID_D           = 5,
 
     VERTICAL_SPEED  = 6,
 
@@ -288,13 +288,13 @@ function onTick()
             input.getNumber(INPUT.ALTITUDE_TARGET),
 
         P =
-            input.getNumber(INPUT.PID_P),
+            input.getNumber(INPUT.ALT_PID_P),
 
         I =
-            input.getNumber(INPUT.PID_I),
+            input.getNumber(INPUT.ALT_PID_I),
 
         D =
-            input.getNumber(INPUT.PID_D),
+            input.getNumber(INPUT.ALT_PID_D),
 
         verticalSpeed =
             input.getNumber(INPUT.VERTICAL_SPEED)

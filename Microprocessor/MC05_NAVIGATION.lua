@@ -16,8 +16,8 @@
 
 local INPUT = {
 
-    AP_KEYBOARD_X = 1,
-    AP_KEYBOARD_Y = 2,
+    AP_TARGET_X = 1,
+    AP_TARGET_Y = 2,
 
     AP_SENSOR_X = 3,
     AP_SENSOR_Y = 4,
@@ -84,9 +84,9 @@ local function updateAutopilot(data, enabled)
 
     -- COORDINATE DIFFERENCE
 
-    local x = data.keyboardX - data.sensorX
+    local x = data.targetX - data.sensorX
 
-    local y = data.keyboardY - data.sensorY
+    local y = data.targetY - data.sensorY
 
 
     -- DISTANCE
@@ -202,11 +202,11 @@ function onTick()
 
     local data = {
 
-        keyboardX =
-            input.getNumber(INPUT.AP_KEYBOARD_X),
+        targetX =
+            input.getNumber(INPUT.AP_TARGET_X),
 
-        keyboardY =
-            input.getNumber(INPUT.AP_KEYBOARD_Y),
+        targetY =
+            input.getNumber(INPUT.AP_TARGET_Y),
 
         sensorX =
             input.getNumber(INPUT.AP_SENSOR_X),
@@ -297,7 +297,7 @@ function onTick()
 
         OUTPUT.AP_TARGET_X,
 
-        data.keyboardX
+        data.targetX
 
     )
 
@@ -305,7 +305,7 @@ function onTick()
 
         OUTPUT.AP_TARGET_Y,
 
-        data.keyboardY
+        data.targetY
 
     )
 
