@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 01: FLIGHT SEQUENCE
--- VERSION: 1.0.0
+-- VERSION: 1.1.2
 --
 -- ORIGINAL LOGIC: V13.1.0
 -- MODULAR EXTRACTION
@@ -19,6 +19,10 @@
 
 local INPUT = {
 
+    -- Numeric Inputs
+
+    PITCH_RANGE = 1,
+
     TILT_ROLL_HORIZ = 2,
     TILT_PITCH = 3,
 
@@ -28,6 +32,9 @@ local INPUT = {
     ALTITUDE = 6,
     ALTITUDE_TARGET = 7,
 
+    ROLL_STABLE_TIME = 8,
+
+    ALTITUDE_STABLE_TIME = 10,
     ALT_HOLD_DELAY = 11, -- Altitude hold delay in seconds
     VERTICAL_SPEED = 12,
 
@@ -39,7 +46,10 @@ local INPUT = {
 
     AP_CUTOFF = 19,
 
-    VERTICAL_SPEED_TARGET = 22, -- Minimum vertical speed to trigger directional booster
+    MAX_TAKEOFF_VSPEED = 22, -- Minimum vertical speed to trigger directional booster
+
+
+    -- Boolean Inputs
 
     START = 1
 }
@@ -83,10 +93,6 @@ local CONFIG = {
 
     TICK_RATE = 60,
 
-    ALTITUDE_STABLE_TIME = 2,
-
-    ROLL_STABLE_TIME = 0.2
-
 }
 
 
@@ -100,8 +106,6 @@ local MARGINS = {
 
     ROLL = 0.005,
 
-    PITCH = 0.08,
-
     PITCH_STABILITY_TRIGGER = 0.01
 
 }
@@ -112,6 +116,9 @@ local MARGINS = {
 local function readInputs()
 
     return {
+
+        pitchRange =
+            input.getNumber(INPUT.PITCH_RANGE) / 360,
 
         tiltRollHoriz =
             input.getNumber(INPUT.TILT_ROLL_HORIZ),
@@ -131,14 +138,20 @@ local function readInputs()
         altitudeTarget =
             input.getNumber(INPUT.ALTITUDE_TARGET),
 
+        rollStableTime =
+            input.getNumber(INPUT.ROLL_STABLE_TIME),
+
         altHoldDelay =
             input.getNumber(INPUT.ALT_HOLD_DELAY),
+
+        altitudeStableTime =
+            input.getNumber(INPUT.ALTITUDE_STABLE_TIME),
 
         verticalSpeed =
             input.getNumber(INPUT.VERTICAL_SPEED),
 
         verticalSpeedTarget =
-            input.getNumber(INPUT.VERTICAL_SPEED_TARGET),
+            input.getNumber(INPUT.MAX_TAKEOFF_VSPEED),
 
         targetX =
             input.getNumber(INPUT.AP_TARGET_X),
@@ -455,7 +468,7 @@ local function checkSequenceCondition(data, wait)
 
     elseif wait.type == "pitch" then
 
-        return math.abs(data.tiltPitch) <= MARGINS.PITCH
+        return math.abs(data.tiltPitch) <= data.pitchRange
 
 
     -- ALTITUDE HOLD DELAY
@@ -491,7 +504,7 @@ local function checkSequenceCondition(data, wait)
 
 
         local requiredTicks =
-            CONFIG.ALTITUDE_STABLE_TIME *
+            data.altitudeStableTime *
             CONFIG.TICK_RATE
 
 
@@ -520,7 +533,7 @@ local function checkSequenceCondition(data, wait)
 
 
         local requiredTicks =
-            CONFIG.ROLL_STABLE_TIME *
+            data.rollStableTime *
             CONFIG.TICK_RATE
 
 
