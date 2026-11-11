@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.0.1
+-- VERSION: 1.0.2
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -36,8 +36,8 @@ local INPUT = {
 
 local OUTPUT = {
 
-    ELEVATOR_LEFT  = 3,
-    ELEVATOR_RIGHT = 4
+    ELEVATOR_RIGHT  = 3,
+    ELEVATOR_LEFT = 4
 
 }
 
@@ -322,7 +322,7 @@ function onTick()
 
     output.setNumber(
 
-        OUTPUT.ELEVATOR_LEFT,
+        OUTPUT.ELEVATOR_RIGHT,
 
         altitude.elevatorOutput
 
@@ -331,7 +331,7 @@ function onTick()
 
     output.setNumber(
 
-        OUTPUT.ELEVATOR_RIGHT,
+        OUTPUT.ELEVATOR_LEFT,
 
         altitude.elevatorOutput
 
