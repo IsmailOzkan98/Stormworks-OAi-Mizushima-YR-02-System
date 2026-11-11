@@ -49,7 +49,7 @@ local OUTPUT = {
     AP_TARGET_X = 10,
     AP_TARGET_Y = 11,
 
-    AP_TARGET_HEADING = 7
+    AP_TARGET_HEADING = 12
 
 }
 
