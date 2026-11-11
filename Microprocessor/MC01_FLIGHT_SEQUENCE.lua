@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 01: FLIGHT SEQUENCE
--- VERSION: 1.0.0
+-- VERSION: 1.1.1
 --
 -- ORIGINAL LOGIC: V13.1.0
 -- MODULAR EXTRACTION
@@ -18,6 +18,10 @@
 -- 01. INPUT CONFIGURATION
 
 local INPUT = {
+
+    -- Numeric Inputs
+
+    PITCH_RANGE = 1,
 
     TILT_ROLL_HORIZ = 2,
     TILT_PITCH = 3,
@@ -43,6 +47,9 @@ local INPUT = {
     AP_CUTOFF = 19,
 
     VERTICAL_SPEED_TARGET = 22, -- Minimum vertical speed to trigger directional booster
+
+
+    -- Boolean Inputs
 
     START = 1
 }
@@ -99,8 +106,6 @@ local MARGINS = {
 
     ROLL = 0.005,
 
-    PITCH = 0.08,
-
     PITCH_STABILITY_TRIGGER = 0.01
 
 }
@@ -111,6 +116,9 @@ local MARGINS = {
 local function readInputs()
 
     return {
+
+        pitchRange =
+            input.getNumber(INPUT.PITCH_RANGE),
 
         tiltRollHoriz =
             input.getNumber(INPUT.TILT_ROLL_HORIZ),
@@ -460,7 +468,7 @@ local function checkSequenceCondition(data, wait)
 
     elseif wait.type == "pitch" then
 
-        return math.abs(data.tiltPitch) <= MARGINS.PITCH
+        return math.abs(data.tiltPitch) <= data.pitchRange
 
 
     -- ALTITUDE HOLD DELAY
@@ -496,7 +504,7 @@ local function checkSequenceCondition(data, wait)
 
 
         local requiredTicks =
-            CONFIG.ALTITUDE_STABLE_TIME *
+            data.altitudeStableTime *
             CONFIG.TICK_RATE
 
 
@@ -525,7 +533,7 @@ local function checkSequenceCondition(data, wait)
 
 
         local requiredTicks =
-            CONFIG.ROLL_STABLE_TIME *
+            data.rollStableTime *
             CONFIG.TICK_RATE
 
 
