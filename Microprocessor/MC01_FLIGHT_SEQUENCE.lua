@@ -28,6 +28,9 @@ local INPUT = {
     ALTITUDE = 6,
     ALTITUDE_TARGET = 7,
 
+    ROLL_STABLE_TIME = 8,
+
+    ALTITUDE_STABLE_TIME = 10,
     ALT_HOLD_DELAY = 11, -- Altitude hold delay in seconds
     VERTICAL_SPEED = 12,
 
@@ -83,10 +86,6 @@ local CONFIG = {
 
     TICK_RATE = 60,
 
-    ALTITUDE_STABLE_TIME = 2,
-
-    ROLL_STABLE_TIME = 0.2
-
 }
 
 
@@ -131,8 +130,14 @@ local function readInputs()
         altitudeTarget =
             input.getNumber(INPUT.ALTITUDE_TARGET),
 
+        rollStableTime =
+            input.getNumber(INPUT.ROLL_STABLE_TIME),
+
         altHoldDelay =
             input.getNumber(INPUT.ALT_HOLD_DELAY),
+
+        altitudeStableTime =
+            input.getNumber(INPUT.ALTITUDE_STABLE_TIME),
 
         verticalSpeed =
             input.getNumber(INPUT.VERTICAL_SPEED),
