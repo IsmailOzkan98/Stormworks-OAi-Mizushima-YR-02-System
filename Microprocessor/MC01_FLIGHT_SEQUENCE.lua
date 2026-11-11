@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 01: FLIGHT SEQUENCE
--- VERSION: 1.1.2
+-- VERSION: 1.2.0
 --
 -- ORIGINAL LOGIC: V13.1.0
 -- MODULAR EXTRACTION
@@ -79,6 +79,7 @@ local OUTPUT = {
 
     BOTTOM_BOOSTERS = 6,
     ACCELERATION_BOOSTERS = 7,
+    AFTERBURNER = 11,
 
     ALTITUDE_HOLD = 8,
     AUTOPILOT = 9,
@@ -216,7 +217,9 @@ local SEQUENCE = {
 
         accelerationBoosters = false,
 
-        bottomBoosters = false
+        bottomBoosters = false,
+
+        afterburner = false
 
     }
 
@@ -348,7 +351,8 @@ local FLIGHT_PROGRAM = {
         name = "AUTOPILOT",
 
         set = {
-            autopilot = true
+            autopilot = true,
+            afterburner = true
         },
 
         wait = {
@@ -733,6 +737,11 @@ local function writeOutputs(data)
     output.setBool(
         OUTPUT.START_STATUS,
         data.start
+    )
+
+    output.setBool(
+        OUTPUT.AFTERBURNER,
+        SEQUENCE.commands.afterburner
     )
 
 end

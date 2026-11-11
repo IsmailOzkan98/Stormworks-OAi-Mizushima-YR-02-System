@@ -317,6 +317,7 @@ const systems = [
     ["alt_hold", "altHold", "ALTITUDE HOLD"],
     ["roll_stab", "rollStab", "ROLL STABILIZER"],
     ["accel", "accel", "THROTTLE CONTROL"],
+    ["afterburner", "afterburner", "AFTERBURNER"],
     ["north", "north", "NORTH BOOSTER"],
     ["east", "east", "EAST BOOSTER"],
     ["south", "south", "SOUTH BOOSTER"],

@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 07: TELEMETRY
--- VERSION: 1.2.2
+-- VERSION: 1.3.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -58,7 +58,9 @@ local INPUT = {
     BOOSTER_NORTH = 8,
     BOOSTER_EAST = 9,
     BOOSTER_SOUTH = 10,
-    BOOSTER_WEST = 11
+    BOOSTER_WEST = 11,
+
+    AFTERBURNER = 12
 
 }
 
@@ -208,7 +210,7 @@ local function sendTelemetry(data)
         .. "&north=%d&east=%d&south=%d&west=%d"
 
         -- FLIGHT CONTROL
-        .. "&spoiler=%.2f&absolute_speed=%.2f",
+        .. "&afterburner=%d&spoiler=%.2f&absolute_speed=%.2f",
 
         stage,
         data.sequenceState,
@@ -246,6 +248,8 @@ local function sendTelemetry(data)
         data.boosterEast and 1 or 0,
         data.boosterSouth and 1 or 0,
         data.boosterWest and 1 or 0,
+
+        data.afterburner and 1 or 0,
 
         data.spoiler,
         data.absoluteSpeed
@@ -394,6 +398,11 @@ function onTick()
     data.boosterWest =
 
         input.getBool(INPUT.BOOSTER_WEST)
+
+
+    data.afterburner =
+
+        input.getBool(INPUT.AFTERBURNER)
 
 
     --------------------------------------------------

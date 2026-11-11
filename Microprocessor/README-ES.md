@@ -201,6 +201,7 @@ MC01 genera las órdenes generales y los valores de estado de la secuencia. MC02
 | MC01 | Num 3 | MC02 | Num 3 | SPOILER | Number | Orden de control | Valor de control del spoiler |
 | MC01 | Num 4 | MC02 | Num 4 | ALTITUDE_STABLE_TIMER | Number | Estado | Temporizador de estabilidad de altitud |
 | MC01 | Num 5 | MC02 | Num 5 | ROLL_STABLE_TIMER | Number | Estado | Temporizador de estabilidad de roll |
+| MC01 | Bool 11 | MC02 | Bool 11 | AFTERBURNER | Boolean | Orden de control | Solicita la activación o desactivación del Afterburner |
 
 ## 4.2. MC02 → MC03 — Flight Control
 
@@ -231,6 +232,7 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC02 | Bool 6 | MC06 | Bool 3 | BOTTOM_BOOSTERS | Boolean | Orden de control | Habilita los propulsores inferiores |
 | MC02 | Bool 7 | MC06 | Bool 4 | ACCELERATION_BOOSTERS | Boolean | Orden de control | Control de propulsores de aceleración |
 | MC02 | Num 3 | MC06 | Num 1 | SPOILER | Number | Orden de control | Transmite el valor del spoiler |
+| MC02 | Bool 11 | MC06 | Bool 5 | AFTERBURNER | Boolean | Orden de control | Transmite la orden de activación o desactivación del Afterburner |
 
 ## 4.6. MC05 → MC06 — Navigation to Propulsion
 
@@ -280,6 +282,7 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC06 | Bool 7 | MC07 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor sur |
 | MC06 | Bool 8 | MC07 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor oeste |
 | MC06 | Bool 9 | MC07 | Bool 7 | ACCELERATION_BOOSTER | Boolean | Estado de actuador | Estado de los propulsores de aceleración |
+| MC06 | Bool 10 | MC07 | Bool 12 | AFTERBURNER | Boolean | Estado de actuador | Estado de activación del Afterburner |
 
 ---
 
@@ -338,6 +341,7 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | DIRECTIONAL_BOOSTER_TRIGGER | Orden de control | MC02 | MC06 | Bool 2 |
 | BOTTOM_BOOSTERS | Orden de control | MC02 | MC06 | Bool 3 |
 | ACCELERATION_BOOSTERS | Orden de control | MC02 | MC06 | Bool 4 |
+| AFTERBURNER | Orden de control | MC02 | MC06 | Bool 5 |
 
 ---
 
@@ -385,6 +389,7 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Bool 8 | ALTITUDE_HOLD | MC02 Bool 8 | Orden de control | Activación de mantenimiento de altitud |
 | Bool 9 | AUTOPILOT | MC02 Bool 9 | Orden de control | Activación del piloto automático |
 | Bool 10 | START_STATUS | MC02 Bool 10 | Estado | Estado de inicio |
+| Bool 11 | AFTERBURNER | MC02 Bool 11 | Orden de control | Solicitud de activación o desactivación del Afterburner |
 
 ## 6.3. Salidas Number
 
@@ -420,6 +425,7 @@ No realiza los cálculos de estabilización, navegación o control de altitud.
 | Bool 8 | ALTITUDE_HOLD | Boolean | MC01 Bool 8 |
 | Bool 9 | AUTOPILOT | Boolean | MC01 Bool 9 |
 | Bool 10 | START_STATUS | Boolean | MC01 Bool 10 |
+| Bool 11 | AFTERBURNER | Boolean | MC01 Bool 11 |
 | Num 1 | SEQUENCE_STATE | Number | MC01 Num 1 |
 | Num 2 | SEQUENCE_TIMER | Number | MC01 Num 2 |
 | Num 3 | SPOILER | Number | MC01 Num 3 |
@@ -442,6 +448,7 @@ MC02 utiliza una distribución directa: conserva el tipo, número y valor de cad
 | Bool 8 | ALTITUDE_HOLD | MC04 Bool 8 / MC07 Bool 5 |
 | Bool 9 | AUTOPILOT | MC05 Bool 9 / MC07 Bool 3 |
 | Bool 10 | START_STATUS | Disponible para supervisión |
+| Bool 11 | AFTERBURNER | MC06 Bool 5 |
 | Num 1 | SEQUENCE_STATE | MC07 Num 1 |
 | Num 2 | SEQUENCE_TIMER | MC07 Num 2 |
 | Num 3 | SPOILER | MC06 Num 1 / MC07 Num 17 |
@@ -618,6 +625,7 @@ También utiliza sus propios sensores de inclinación para seleccionar los propu
 | Bool 2 | DIRECTIONAL_BOOSTER_TRIGGER | Boolean | Orden de control | MC02 Bool 5 |
 | Bool 3 | BOTTOM_BOOSTERS | Boolean | Orden de control | MC02 Bool 6 |
 | Bool 4 | ACCELERATION_BOOSTERS | Boolean | Orden de control | MC02 Bool 7 |
+| Bool 5 | AFTERBURNER | Boolean | Orden de control | MC02 Bool 11 |
 
 ## 11.3. Salidas Number
 
@@ -635,6 +643,7 @@ También utiliza sus propios sensores de inclinación para seleccionar los propu
 | Bool 7 | SOUTH_BOOSTER | Boolean | Salida de actuador | Activación del propulsor sur |
 | Bool 8 | WEST_BOOSTER | Boolean | Salida de actuador | Activación del propulsor oeste |
 | Bool 9 | ACCELERATION_BOOSTER | Boolean | Salida de actuador | Activación del propulsor de aceleración |
+| Bool 10 | AFTERBURNER | Boolean | Salida de actuador | Activación del Afterburner |
 
 ## 11.5. Selección de propulsores direccionales
 
@@ -720,7 +729,7 @@ No gobierna directamente los actuadores de vuelo.
 | Num 15 | AP_TARGET_X | Number | Dato de navegación | MC05 Num 10 |
 | Num 16 | AP_TARGET_Y | Number | Dato de navegación | MC05 Num 11 |
 | Num 17 | SPOILER | Number | Orden de control | MC06 Num 5 |
-| Num 18 | ABSOLUTE_SPEED | Number | Sensor físico | Sensor de velocidad absoluta |
+| Num 18 | ABSOLUTE_SPEED | Number | Sensor físico | Sensor de velocidad absoluta; convertido a km/h en MC07 |
 
 
 ## 12.3. Entradas Boolean
@@ -738,6 +747,7 @@ No gobierna directamente los actuadores de vuelo.
 | Bool 9 | EAST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 6 |
 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | MC06 Bool 7 |
 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 8 |
+| Bool 12 | AFTERBURNER | Boolean | Estado de actuador | MC06 Bool 10 |
 
 ## 12.4. Información transmitida
 
@@ -759,6 +769,8 @@ MC07 recopila información sobre:
 - Estado de mantenimiento de altitud.
 - Estado de estabilización.
 - Valor del spoiler.
+- Estado de activación del Afterburner.
+- Velocidad absoluta en km/h.
 
 ## 12.5. Comunicación HTTP
 
@@ -794,6 +806,7 @@ Los canales lógicos están identificados por los scripts. La correspondencia co
 | MC06 | Bool 6 | EAST_BOOSTER | Boolean | Propulsor este |
 | MC06 | Bool 7 | SOUTH_BOOSTER | Boolean | Propulsor sur |
 | MC06 | Bool 8 | WEST_BOOSTER | Boolean | Propulsor oeste |
+| MC06 | Bool 10 | AFTERBURNER | Boolean | Afterburner |
 
 **Nota:** las salidas `DESIRED_VERTICAL_SPEED` de MC04 y las salidas de navegación de MC05 son señales internas de comunicación entre controladores, no salidas físicas de actuadores.
 
@@ -953,7 +966,7 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 | MC03 | Activación y respuesta de estabilización |
 | MC04 | Control PID, salida de elevadores y velocidad vertical deseada |
 | MC05 | Posición, distancia, rumbo y salida de navegación |
-| MC06 | Propulsor principal, aceleración, direccionales y spoiler |
+| MC06 | Propulsor principal, Afterburner, aceleración, direccionales, inferiores y spoiler |
 | MC07 | Recepción de datos y transmisión HTTP |
 
 ## 15.4. Pruebas de integración
@@ -970,6 +983,13 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 - [ ] MC07 recibe los datos de navegación y estados.
 - [ ] MC07 transmite telemetría correctamente.
 - [ ] La secuencia puede iniciarse nuevamente sin conservar estados no deseados.
+- [ ] MC01 transmite correctamente la orden AFTERBURNER a MC02 por Bool 11.
+- [ ] MC02 retransmite correctamente AFTERBURNER a MC06 por Bool 5.
+- [ ] MC06 activa y desactiva correctamente la salida AFTERBURNER por Bool 10.
+- [ ] MC06 transmite correctamente el estado AFTERBURNER por Bool 10.
+- [ ] MC07 recibe correctamente AFTERBURNER por Bool 12.
+- [ ] MC07 transmite el estado AFTERBURNER en el parámetro HTTP `afterburner`.
+- [ ] El parámetro HTTP `afterburner` devuelve 1 cuando está activado y 0 cuando está desactivado.
 
 ---
 
@@ -986,6 +1006,7 @@ Los siguientes puntos deben comprobarse durante el montaje y las pruebas física
 | Cableado físico de actuadores | Por comprobar en vehículo | Confirmar correspondencia de cada salida |
 | Distribución Composite física | Por comprobar en vehículo | Verificar conexiones y ramificaciones |
 | Telemetría HTTP | Pendiente de prueba integrada | Verificar recepción en el puerto 8080 |
+| Afterburner | Canales definidos | Verificar MC01 Bool 11 → MC02 Bool 11 → MC06 Bool 5 → MC06 Bool 10 → MC07 Bool 12 y comprobar transmisión HTTP |
 
 Las conexiones lógicas indicadas en este documento deben respetarse aunque la distribución física del cableado sea diferente.
 

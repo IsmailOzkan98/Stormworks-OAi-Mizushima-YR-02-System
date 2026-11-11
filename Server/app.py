@@ -51,6 +51,8 @@ telemetry = {
     "south": 0,
     "west": 0,
 
+    "afterburner": 0,
+
     "spoiler": 0,
 
     "absolute_speed": 0,
