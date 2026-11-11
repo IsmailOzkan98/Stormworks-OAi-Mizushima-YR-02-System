@@ -332,7 +332,7 @@ function onTick()
             input.getNumber(INPUT.SPOILER),
 
         absoluteSpeed =
-            input.getNumber(INPUT.ABSOLUTE_SPEED)
+            input.getNumber(INPUT.ABSOLUTE_SPEED) * 3.6 
 
     }
 

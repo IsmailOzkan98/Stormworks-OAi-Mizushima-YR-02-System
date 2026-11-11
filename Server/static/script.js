@@ -4,6 +4,305 @@ const REFRESH_RATE_MS = 250;
 const DIRECTION_PULSE_MS = 1500;
 
 let latestTelemetryTimestamp = 0;
+
+
+/* FLIGHT TELEMETRY HISTORY */
+
+const GRAPH_HISTORY_SECONDS = 60;
+
+const telemetryHistory = [];
+
+function getNumericValue(data, key) {
+    if (
+        data[key] === null ||
+        data[key] === undefined ||
+        data[key] === ""
+    ) {
+        return null;
+    }
+
+    const value = Number(data[key]);
+
+    return Number.isFinite(value) ? value : null;
+}
+
+function recordTelemetry(data) {
+
+    const timestamp = Number(data.timestamp);
+
+    telemetryHistory.push({
+        timestamp,
+
+        altitude: getNumericValue(data, "alt"),
+        altitudeTarget: getNumericValue(data, "alt_target"),
+        altitudeError: getNumericValue(data, "alt_error"),
+
+        verticalSpeed: getNumericValue(data, "vs"),
+        verticalSpeedTarget: getNumericValue(data, "vs_target"),
+        verticalSpeedError: getNumericValue(data, "vs_error")
+    });
+
+    const cutoff = timestamp - GRAPH_HISTORY_SECONDS;
+
+    while (
+        telemetryHistory.length > 0 &&
+        telemetryHistory[0].timestamp < cutoff
+    ) {
+        telemetryHistory.shift();
+    }
+}
+
+
+
+/* GRAPH RENDERING ENGINE */
+
+function drawTelemetryChart(canvasId, leftKeys, rightKey) {
+
+    const canvas = document.getElementById(canvasId);
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    const styles = getComputedStyle(document.documentElement);
+
+    const colors = {
+        altitude: styles.getPropertyValue("--graph-altitude").trim(),
+        target: styles.getPropertyValue("--graph-target").trim(),
+        altError: styles.getPropertyValue("--graph-alt-error").trim(),
+        vsError: styles.getPropertyValue("--graph-vs-error").trim()
+    };
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (!width || !height) return;
+
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, width, height);
+
+    const left = 39;
+    const right = width - 39;
+    const top = 10;
+    const bottom = height - 20;
+
+    const plotWidth = right - left;
+    const plotHeight = bottom - top;
+
+    const latest = telemetryHistory[
+        telemetryHistory.length - 1
+    ];
+
+    if (!latest) return;
+
+    const startTime =
+        latest.timestamp - GRAPH_HISTORY_SECONDS;
+
+    const leftValues = telemetryHistory.flatMap(point =>
+        leftKeys
+            .map(key => point[key])
+            .filter(value => value !== null)
+    );
+
+    const rightValues = telemetryHistory
+        .map(point => point[rightKey])
+        .filter(value => value !== null);
+
+    if (!leftValues.length) return;
+
+    function getRange(values) {
+
+        let min = Math.min(...values);
+        let max = Math.max(...values);
+
+        if (min === max) {
+            min -= 1;
+            max += 1;
+        }
+
+        const padding = (max - min) * 0.12;
+
+        return {
+            min: min - padding,
+            max: max + padding
+        };
+    }
+
+    const leftRange = getRange(leftValues);
+
+    const rightRange = rightValues.length
+        ? getRange(rightValues)
+        : { min: -1, max: 1 };
+
+    function getX(timestamp) {
+        return left +
+            ((timestamp - startTime) /
+            GRAPH_HISTORY_SECONDS) * plotWidth;
+    }
+
+    function getY(value, range) {
+        return bottom -
+            ((value - range.min) /
+            (range.max - range.min)) * plotHeight;
+    }
+
+    /* GRID */
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(184,166,117,0.16)";
+    ctx.setLineDash([3, 4]);
+
+    for (let i = 0; i <= 4; i++) {
+
+        const y = top + (plotHeight / 4) * i;
+
+        ctx.beginPath();
+        ctx.moveTo(left, y);
+        ctx.lineTo(right, y);
+        ctx.stroke();
+    }
+
+    for (let i = 0; i <= 4; i++) {
+
+        const x = left + (plotWidth / 4) * i;
+
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.lineTo(x, bottom);
+        ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+
+    /* AXIS LABELS */
+
+    ctx.fillStyle = "#aaa38f";
+    ctx.font = "9px IBM Plex Mono";
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+        leftRange.max.toFixed(1),
+        left - 5,
+        top + 3
+    );
+
+    ctx.fillText(
+        leftRange.min.toFixed(1),
+        left - 5,
+        bottom
+    );
+
+    ctx.textAlign = "left";
+
+    ctx.fillText(
+        rightRange.max.toFixed(1),
+        right + 5,
+        top + 3
+    );
+
+    ctx.fillText(
+        rightRange.min.toFixed(1),
+        right + 5,
+        bottom
+    );
+
+    ctx.textAlign = "center";
+
+    ctx.fillText("-60s", left, height - 4);
+    ctx.fillText("-30s", left + plotWidth / 2, height - 4);
+    ctx.fillText("NOW", right, height - 4);
+
+    /* DRAW CURVES */
+
+    function drawCurve(key, color, range, dashed = false) {
+
+        ctx.beginPath();
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+
+        ctx.setLineDash(dashed ? [5, 3] : []);
+
+        let started = false;
+
+        telemetryHistory.forEach(point => {
+
+            const value = point[key];
+
+            if (
+                value === null ||
+                point.timestamp < startTime
+            ) {
+                started = false;
+                return;
+            }
+
+            const x = getX(point.timestamp);
+            const y = getY(value, range);
+
+            if (!started) {
+                ctx.moveTo(x, y);
+                started = true;
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // ACTUAL VALUE
+    drawCurve(
+        leftKeys[0],
+        colors.altitude,
+        leftRange
+    );
+
+    // TARGET VALUE
+    drawCurve(
+        leftKeys[1],
+        colors.target,
+        leftRange,
+        true
+    );
+
+    // ERROR VALUE - SECONDARY SCALE
+    drawCurve(
+        rightKey,
+        canvasId === "altitudeChart"
+            ? colors.altError
+            : colors.vsError,
+        rightRange
+    );
+}
+
+/* UPDATE BOTH GRAPHS */
+
+function drawTelemetryGraphs() {
+
+    drawTelemetryChart(
+        "altitudeChart",
+        ["altitude", "altitudeTarget"],
+        "altitudeError"
+    );
+
+    drawTelemetryChart(
+        "verticalSpeedChart",
+        ["verticalSpeed", "verticalSpeedTarget"],
+        "verticalSpeedError"
+    );
+}
+
+
 let previousConnection = null;
 let previousSnapshot = {};
 let previousStage = null;
@@ -212,6 +511,7 @@ function updateInterface(data) {
     previousStage = stage;
     previousStatus = status;
 
+    
     // FLIGHT TELEMETRY
 
     setValue("altitude", number(data, "alt"));
@@ -221,6 +521,15 @@ function updateInterface(data) {
     setValue("verticalSpeed", number(data, "vs"));
     setValue("vsTarget", number(data, "vs_target"));
     setValue("vsError", number(data, "vs_error"));
+
+    // RECORD GRAPH HISTORY
+
+    recordTelemetry(data);
+
+    // DRAW LIVE GRAPHS
+
+    drawTelemetryGraphs();
+
 
     // ENGINE
 
@@ -232,6 +541,10 @@ function updateInterface(data) {
     setValue("roll", number(data, "roll", 2));
     setValue("pitch", number(data, "pitch", 2));
     setValue("yaw", number(data, "yaw", 2));
+
+    // AIRCRAFT SPEED
+
+    setValue("absoluteSpeed", number(data, "absolute_speed", 1));
 
     // NAVIGATION
 
@@ -353,3 +666,5 @@ updateTelemetry();
 setInterval(updateTelemetry, REFRESH_RATE_MS);
 
 setInterval(updateConnectionStatus, 100);
+
+window.addEventListener("resize", drawTelemetryGraphs);
