@@ -71,7 +71,7 @@ El tipo de canal no indica por sí mismo qué representa la señal. Para identif
 | Naturaleza | Descripción | Ejemplos |
 |---|---|---|
 | Sensor físico | Valor procedente de un sensor instalado en el vehículo | ALTITUDE, REAL_RPS, AP_COMPASS |
-| Parámetro de configuración | Valor ajustable que modifica el comportamiento de un controlador | PID_P, PID_I, PID_D, MULTIPLIER |
+| Parámetro de configuración | Valor ajustable que modifica el comportamiento de un controlador | ALT_PID_P, ALT_PID_I, ALT_PID_D, ROLL_CONTROL_MULTIPLIER |
 | Orden de control | Instrucción enviada para habilitar o activar una función | ALTITUDE_HOLD, AUTOPILOT |
 | Estado | Información sobre el estado de una secuencia o sistema | RUNNING, COMPLETED |
 | Cálculo de control | Resultado producido por un algoritmo de control | DESIRED_VERTICAL_SPEED |
@@ -151,10 +151,10 @@ Los parámetros de configuración son valores que deben proporcionarse al microc
 
 Ejemplos:
 
-- PID_P
-- PID_I
-- PID_D
-- MULTIPLIER
+- ALT_PID_P
+- ALT_PID_I
+- ALT_PID_D
+- ROLL_CONTROL_MULTIPLIER
 - ALTITUDE_TARGET
 - TARGET_RPS
 - AP_STEERING
@@ -298,8 +298,8 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | ALTITUDE | Sensor físico | Number | Num 6 | — | Num 1 | — | — | Num 3 |
 | ALTITUDE_TARGET | Parámetro de configuración | Number | Num 7 | — | Num 2 | — | — | Num 4 |
 | VERTICAL_SPEED | Sensor físico | Number | Num 12 | — | Num 6 | — | — | Num 5 |
-| AP_KEYBOARD_X | Entrada de navegación | Number | Num 13 | — | — | Num 1 | — | — |
-| AP_KEYBOARD_Y | Entrada de navegación | Number | Num 14 | — | — | Num 2 | — | — |
+| AP_TARGET_X | Entrada de navegación | Number | Num 13 | — | — | Num 1 | — | — |
+| AP_TARGET_Y | Entrada de navegación | Number | Num 14 | — | — | Num 2 | — | — |
 | AP_SENSOR_X | Sensor de posición | Number | Num 15 | — | — | Num 3 | — | — |
 | AP_SENSOR_Y | Sensor de posición | Number | Num 16 | — | — | Num 4 | — | — |
 | AP_COMPASS | Sensor físico | Number | — | — | — | Num 5 | — | — |
@@ -308,11 +308,11 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | AP_DEADZONE | Parámetro de configuración | Number | — | — | — | Num 8 | — | — |
 | AP_SMOOTHING | Parámetro de configuración | Number | — | — | — | Num 9 | — | — |
 | VERTICAL_SPEED_TARGET | Parámetro de configuración | Number | Num 22 | — | — | — | — | — |
-| MULTIPLIER | Parámetro de configuración | Number | — | Num 1 | — | — | — | — |
+| ROLL_CONTROL_MULTIPLIER | Parámetro de configuración | Number | — | Num 1 | — | — | — | — |
 | TILT_ROLL_VERT | Sensor físico | Number | — | — | — | — | Num 4 | — |
-| PID_P | Parámetro de configuración | Number | — | — | Num 3 | — | — | — |
-| PID_I | Parámetro de configuración | Number | — | — | Num 4 | — | — | — |
-| PID_D | Parámetro de configuración | Number | — | — | Num 5 | — | — | — |
+| ALT_PID_P | Parámetro de configuración | Number | — | — | Num 3 | — | — | — |
+| ALT_PID_I | Parámetro de configuración | Number | — | — | Num 4 | — | — | — |
+| ALT_PID_D | Parámetro de configuración | Number | — | — | Num 5 | — | — | — |
 | ALT_HOLD_DELAY | Parámetro de configuración | Number | Num 11 | — | — | — | — | — |
 
 **Nota sobre esta tabla:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
@@ -350,8 +350,8 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Num 6 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
 | Num 7 | ALTITUDE_TARGET | Number | Parámetro | Configuración |
 | Num 12 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
-| Num 13 | AP_KEYBOARD_X | Number | Entrada de navegación | Configuración de objetivo |
-| Num 14 | AP_KEYBOARD_Y | Number | Entrada de navegación | Configuración de objetivo |
+| Num 13 | AP_TARGET_X | Number | Entrada de navegación | Configuración de objetivo |
+| Num 14 | AP_TARGET_Y | Number | Entrada de navegación | Configuración de objetivo |
 | Num 15 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición |
 | Num 16 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición |
 | Num 19 | AP_CUTOFF | Number | Parámetro | Configuración |
@@ -447,7 +447,7 @@ MC03 calcula las órdenes de corrección de roll a partir de la inclinación hor
 
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
-| Num 1 | MULTIPLIER | Number | Parámetro | Configuración |
+| Num 1 | ROLL_CONTROL_MULTIPLIER | Number | Parámetro | Configuración |
 | Num 2 | TILT_ROLL_HORIZ | Number | Sensor físico | Sensor de inclinación |
 | Bool 3 | ROLL_STABILIZER | Boolean | Orden de control | MC02 Bool 3 |
 
@@ -482,9 +482,9 @@ MC04 calcula la velocidad vertical deseada y utiliza el control PID para generar
 |---|---|---|---|---|
 | Num 1 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
 | Num 2 | ALTITUDE_TARGET | Number | Parámetro | Configuración de altitud objetivo |
-| Num 3 | PID_P | Number | Parámetro | Configuración PID |
-| Num 4 | PID_I | Number | Parámetro | Configuración PID |
-| Num 5 | PID_D | Number | Parámetro | Configuración PID |
+| Num 3 | ALT_PID_P | Number | Parámetro | Configuración PID |
+| Num 4 | ALT_PID_I | Number | Parámetro | Configuración PID |
+| Num 5 | ALT_PID_D | Number | Parámetro | Configuración PID |
 | Num 6 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
 | Bool 8 | ALTITUDE_HOLD | Boolean | Orden de control | MC02 Bool 8 |
 
@@ -527,8 +527,8 @@ MC05 calcula la posición relativa respecto al objetivo y genera los datos de na
 
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
-| Num 1 | AP_KEYBOARD_X | Number | Entrada de navegación | Configuración de coordenada X objetivo |
-| Num 2 | AP_KEYBOARD_Y | Number | Entrada de navegación | Configuración de coordenada Y objetivo |
+| Num 1 | AP_TARGET_X | Number | Entrada de navegación | Configuración de coordenada X objetivo |
+| Num 2 | AP_TARGET_Y | Number | Entrada de navegación | Configuración de coordenada Y objetivo |
 | Num 3 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición X |
 | Num 4 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición Y |
 | Num 5 | AP_COMPASS | Number | Sensor físico | Brújula |
@@ -873,13 +873,13 @@ COORDENADAS OBJETIVO
 ## 14.4. Flujo de control de altitud
 
 ```text
-SENSOR DE ALTITUD --------+
-                          |
-ALTITUDE_TARGET ----------+
-                          |
-SENSOR VERTICAL_SPEED ----+
-                          |
-PID_P / PID_I / PID_D ----+
+SENSOR DE ALTITUD ------------------+
+                                    |
+ALTITUDE_TARGET --------------------+
+                                    |
+SENSOR VERTICAL_SPEED --------------+
+                                    |
+ALT_PID_P / ALT_PID_I / ALT_PID_D --+
                           |
                           v
                    MC04 ALTITUDE

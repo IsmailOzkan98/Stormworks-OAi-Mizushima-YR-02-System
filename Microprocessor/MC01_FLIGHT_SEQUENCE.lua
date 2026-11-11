@@ -28,18 +28,18 @@ local INPUT = {
     ALTITUDE = 6,
     ALTITUDE_TARGET = 7,
 
-    ALT_HOLD_DELAY = 11,
+    ALT_HOLD_DELAY = 11, -- Altitude hold delay in seconds
     VERTICAL_SPEED = 12,
 
-    AP_KEYBOARD_X = 13,
-    AP_KEYBOARD_Y = 14,
+    AP_TARGET_X = 13, -- Old name AP_KEYBOARD_X
+    AP_TARGET_Y = 14, -- Old name AP_KEYBOARD_Y
 
     AP_SENSOR_X = 15,
     AP_SENSOR_Y = 16,
 
     AP_CUTOFF = 19,
 
-    VERTICAL_SPEED_TARGET = 22,
+    VERTICAL_SPEED_TARGET = 22, -- Minimum vertical speed to trigger directional booster
 
     START = 1
 }
@@ -140,11 +140,11 @@ local function readInputs()
         verticalSpeedTarget =
             input.getNumber(INPUT.VERTICAL_SPEED_TARGET),
 
-        keyboardX =
-            input.getNumber(INPUT.AP_KEYBOARD_X),
+        targetX =
+            input.getNumber(INPUT.AP_TARGET_X),
 
-        keyboardY =
-            input.getNumber(INPUT.AP_KEYBOARD_Y),
+        targetY =
+            input.getNumber(INPUT.AP_TARGET_Y),
 
         sensorX =
             input.getNumber(INPUT.AP_SENSOR_X),
@@ -531,9 +531,9 @@ local function checkSequenceCondition(data, wait)
 
     elseif wait.type == "autopilot_target" then
 
-        local x = data.keyboardX - data.sensorX
+        local x = data.targetX - data.sensorX
 
-        local y = data.keyboardY - data.sensorY
+        local y = data.targetY - data.sensorY
 
         local distance = math.sqrt(x*x + y*y)
 
