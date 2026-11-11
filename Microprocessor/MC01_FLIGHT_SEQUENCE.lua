@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 01: FLIGHT SEQUENCE
--- VERSION: 1.1.1
+-- VERSION: 1.1.2
 --
 -- ORIGINAL LOGIC: V13.1.0
 -- MODULAR EXTRACTION
@@ -118,7 +118,7 @@ local function readInputs()
     return {
 
         pitchRange =
-            input.getNumber(INPUT.PITCH_RANGE),
+            input.getNumber(INPUT.PITCH_RANGE) / 360,
 
         tiltRollHoriz =
             input.getNumber(INPUT.TILT_ROLL_HORIZ),
