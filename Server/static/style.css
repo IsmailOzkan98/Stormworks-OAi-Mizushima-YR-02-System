@@ -17,6 +17,17 @@
 
     --mono: 'IBM Plex Mono', monospace;
     --display: 'Barlow Condensed', sans-serif;
+
+    /* TELEMETRY GRAPH COLORS */
+    --graph-altitude: #b8a675;
+    --graph-target: #b2cccc;
+
+    --graph-alt-error: #d17a70;
+    --graph-vs-error: #d17a70;
+
+    /* TELEMETRY ERROR READOUTS */
+    --alt-error-color: #d9bc79;
+    --vs-error-color: #d9bc79;
 }
 
 * {
@@ -268,6 +279,14 @@ h1 span {
 }
 
 /* METRIC CARDS */
+
+#altError {
+    color: var(--alt-error-color);
+}
+
+#vsError {
+    color: var(--vs-error-color);
+}
 
 .metric-grid {
     display: grid;
@@ -1007,7 +1026,7 @@ footer {
 }
 
 .legend-error {
-    color: var(--yellow);
+    color: var(--graph-alt-error);
 }
 
 .telemetry-chart-panel canvas {

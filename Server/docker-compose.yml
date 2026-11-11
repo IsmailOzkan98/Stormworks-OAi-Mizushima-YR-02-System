@@ -4,4 +4,8 @@ services:
     container_name: stormworks-test
     ports:
       - "8080:8080"
+    volumes:
+      - ./app.py:/app/app.py
+      - ./templates:/app/templates
+      - ./static:/app/static
     restart: unless-stopped

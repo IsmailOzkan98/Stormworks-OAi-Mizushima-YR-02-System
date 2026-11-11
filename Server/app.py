@@ -53,6 +53,8 @@ telemetry = {
 
     "spoiler": 0,
 
+    "absolute_speed": 0,
+
     "timestamp": 0
 }
 

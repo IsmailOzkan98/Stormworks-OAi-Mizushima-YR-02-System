@@ -64,6 +64,15 @@ function drawTelemetryChart(canvasId, leftKeys, rightKey) {
 
     const ctx = canvas.getContext("2d");
 
+    const styles = getComputedStyle(document.documentElement);
+
+    const colors = {
+        altitude: styles.getPropertyValue("--graph-altitude").trim(),
+        target: styles.getPropertyValue("--graph-target").trim(),
+        altError: styles.getPropertyValue("--graph-alt-error").trim(),
+        vsError: styles.getPropertyValue("--graph-vs-error").trim()
+    };
+
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
 
@@ -252,27 +261,26 @@ function drawTelemetryChart(canvasId, leftKeys, rightKey) {
     }
 
     // ACTUAL VALUE
-
     drawCurve(
         leftKeys[0],
-        "#b8a675",
+        colors.altitude,
         leftRange
     );
 
     // TARGET VALUE
-
     drawCurve(
         leftKeys[1],
-        "#b2cccc",
+        colors.target,
         leftRange,
         true
     );
 
     // ERROR VALUE - SECONDARY SCALE
-
     drawCurve(
         rightKey,
-        "#d9bc79",
+        canvasId === "altitudeChart"
+            ? colors.altError
+            : colors.vsError,
         rightRange
     );
 }
