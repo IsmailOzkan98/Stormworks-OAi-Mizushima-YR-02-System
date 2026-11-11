@@ -42,6 +42,8 @@ local INPUT = {
 
     SPOILER = 17,
 
+    ABSOLUTE_SPEED = 18,
+
     RUNNING = 1,
     COMPLETED = 2,
 
@@ -172,74 +174,81 @@ local function sendTelemetry(data)
 
         data.desiredVerticalSpeed - data.verticalSpeed
 
-
+        
     --------------------------------------------------
     -- TELEMETRY URL
     --------------------------------------------------
 
     local url = string.format(
 
-        "/telemetry?stage=%s&state=%d&status=%s&timer=%d&alt=%.2f&alt_target=%.2f&alt_error=%.2f&vs=%.2f&vs_target=%.2f&vs_error=%.2f&rps=%.2f&rps_target=%.2f&roll=%.4f&pitch=%.4f&ap=%d&ap_distance=%.2f&yaw=%.4f&my_x=%.2f&my_y=%.2f&target_x=%.2f&target_y=%.2f&main=%d&alt_hold=%d&roll_stab=%d&accel=%d&north=%d&east=%d&south=%d&west=%d&spoiler=%.2f",
+        "/telemetry?"
+        .. "stage=%s&state=%d&status=%s&timer=%d"
+
+        -- ALTITUDE
+        .. "&alt=%.2f&alt_target=%.2f&alt_error=%.2f"
+
+        -- VERTICAL SPEED
+        .. "&vs=%.2f&vs_target=%.2f&vs_error=%.2f"
+
+        -- ENGINE
+        .. "&rps=%.2f&rps_target=%.2f"
+
+        -- ATTITUDE
+        .. "&roll=%.4f&pitch=%.4f"
+
+        -- AUTOPILOT
+        .. "&ap=%d&ap_distance=%.2f&yaw=%.4f"
+        .. "&my_x=%.2f&my_y=%.2f"
+        .. "&target_x=%.2f&target_y=%.2f"
+
+        -- SYSTEMS
+        .. "&main=%d&alt_hold=%d&roll_stab=%d&accel=%d"
+
+        -- DIRECTIONAL BOOSTERS
+        .. "&north=%d&east=%d&south=%d&west=%d"
+
+        -- FLIGHT CONTROL
+        .. "&spoiler=%.2f&absolute_speed=%.2f",
 
         stage,
-
         data.sequenceState,
-
         status,
-
         data.sequenceTimer,
 
         data.altitude,
-
         data.altitudeTarget,
-
         altitudeError,
 
         data.verticalSpeed,
-
         data.desiredVerticalSpeed,
-
         speedError,
 
         data.realRPS,
-
         data.targetRPS,
 
         data.tiltRollHoriz,
-
         data.tiltPitch,
 
         data.autopilot and 1 or 0,
-
         data.apDistance,
-
         data.apYaw,
-
         data.myX,
-
         data.myY,
-
         data.targetX,
-
         data.targetY,
 
         data.mainBooster and 1 or 0,
-
         data.altitudeHold and 1 or 0,
-
         data.rollStabilizer and 1 or 0,
-
         data.accelerationBoosters and 1 or 0,
 
         data.boosterNorth and 1 or 0,
-
         data.boosterEast and 1 or 0,
-
         data.boosterSouth and 1 or 0,
-
         data.boosterWest and 1 or 0,
 
-        data.spoiler
+        data.spoiler,
+        data.absoluteSpeed
 
     )
 
@@ -320,7 +329,10 @@ function onTick()
             input.getNumber(INPUT.AP_TARGET_Y),
 
         spoiler =
-            input.getNumber(INPUT.SPOILER)
+            input.getNumber(INPUT.SPOILER),
+
+        absoluteSpeed =
+            input.getNumber(INPUT.ABSOLUTE_SPEED)
 
     }
 
