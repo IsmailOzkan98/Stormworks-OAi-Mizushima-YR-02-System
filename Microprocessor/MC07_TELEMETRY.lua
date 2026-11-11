@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 07: TELEMETRY
--- VERSION: 1.1.0
+-- VERSION: 1.0.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -56,9 +56,7 @@ local INPUT = {
     BOOSTER_NORTH = 8,
     BOOSTER_EAST = 9,
     BOOSTER_SOUTH = 10,
-    BOOSTER_WEST = 11,
-
-    TELEMETRY_ENABLE = 12
+    BOOSTER_WEST = 11
 
 }
 
@@ -68,6 +66,8 @@ local INPUT = {
 --------------------------------------------------
 
 local TELEMETRY = {
+
+    ENABLED = true,
 
     PORT = 8080,
 
@@ -113,9 +113,7 @@ local FLIGHT_STAGES = {
 
 local function sendTelemetry(data)
 
-    if not data.telemetryEnabled then
-
-        TELEMETRY.tick = 0
+    if not TELEMETRY.ENABLED then
 
         return
 
@@ -384,11 +382,6 @@ function onTick()
     data.boosterWest =
 
         input.getBool(INPUT.BOOSTER_WEST)
-
-
-    data.telemetryEnabled =
-
-    input.getBool(INPUT.TELEMETRY_ENABLE)
 
 
     --------------------------------------------------
