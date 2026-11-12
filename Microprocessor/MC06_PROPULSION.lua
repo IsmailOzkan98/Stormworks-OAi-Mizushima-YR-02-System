@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 06: PROPULSION
--- VERSION: 1.0.1
+-- VERSION: 1.1.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -25,7 +25,9 @@ local INPUT = {
     MAIN_BOOSTER = 1,
     DIRECTIONAL_BOOSTER_TRIGGER = 2,
     BOTTOM_BOOSTERS = 3,
-    ACCELERATION_BOOSTERS = 4
+    ACCELERATION_BOOSTERS = 4,
+
+    AFTERBURNER = 5
 
 }
 
@@ -45,7 +47,9 @@ local OUTPUT = {
     BOOSTER_NORTH = 5,
     BOOSTER_EAST = 6,
     BOOSTER_SOUTH = 7,
-    BOOSTER_WEST = 8
+    BOOSTER_WEST = 8,
+
+    AFTERBURNER = 10
 
 }
 
@@ -425,6 +429,9 @@ function onTick()
 
         input.getBool(INPUT.ACCELERATION_BOOSTERS)
 
+    local afterburner =
+        input.getBool(INPUT.AFTERBURNER)
+
 
     -- DIRECTIONAL BOOSTERS
 
@@ -535,6 +542,14 @@ function onTick()
 
         boosterOutputs.west
 
+    )
+
+
+    -- AFTERBURNER
+
+    output.setBool(
+        OUTPUT.AFTERBURNER,
+        afterburner
     )
 
 end

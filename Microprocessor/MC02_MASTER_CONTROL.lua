@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 02: MASTER CONTROL
--- VERSION: 1.0.0
+-- VERSION: 1.1.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -34,7 +34,9 @@ local INPUT = {
 
     AUTOPILOT = 9,
     
-    START_STATUS = 10
+    START_STATUS = 10,
+
+    AFTERBURNER = 11
 }
 
 local INPUT_NUM = {
@@ -68,7 +70,9 @@ local OUTPUT = {
     ALTITUDE_HOLD = 8,
     AUTOPILOT = 9,
 
-    START_STATUS = 10
+    START_STATUS = 10,
+
+    AFTERBURNER = 11
 }
 
 local OUTPUT_NUM = {
