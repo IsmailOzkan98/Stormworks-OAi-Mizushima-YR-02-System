@@ -20,19 +20,20 @@
 
 -- NUMBER INPUTS
 
+-- NUMBER INPUTS
+-- MC01 DIRECT OUTPUT MAPPING
+
 local IN_PROTOCOL    = 1
 local IN_LOCAL_ID    = 2
 local IN_TX_COUNTER  = 3
 local IN_VERSION     = 4
 local IN_STATE       = 5
 local IN_RX_AGE      = 6
-local IN_FREQ_TX     = 7
-local IN_FREQ_RX     = 8
-
--- EXTERNAL NUMBER INPUTS
-
-local IN_TIMEOUT     = 9
-local IN_RX_COUNTER  = 10
+local IN_TX_DIAG     = 7
+local IN_FREQ_TX     = 8
+local IN_FREQ_RX     = 9
+local IN_TIMEOUT     = 10
+local IN_RX_COUNTER  = 11
 
 
 -- BOOL INPUTS
@@ -40,12 +41,12 @@ local IN_RX_COUNTER  = 10
 local IN_CONNECTED   = 1
 local IN_SEARCHING   = 2
 local IN_LINK_LOST   = 3
+local IN_AFH_ACTIVE  = 6
 
 -- EXTERNAL BOOL INPUTS
 
 local IN_ROLE        = 4
 local IN_AFH_ENABLED = 5
-local IN_AFH_ACTIVE  = 6
 
 
 -- ============================================================
