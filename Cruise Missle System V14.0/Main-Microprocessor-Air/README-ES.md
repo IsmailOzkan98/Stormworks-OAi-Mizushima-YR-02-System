@@ -284,6 +284,14 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC06 | Bool 9 | MC07 | Bool 7 | ACCELERATION_BOOSTER | Boolean | Estado de actuador | Estado de los propulsores de aceleración |
 | MC06 | Bool 10 | MC07 | Bool 12 | AFTERBURNER | Boolean | Estado de actuador | Estado de activación del Afterburner |
 
+## 4.11. Entradas de telemetría externas → MC07
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| MC01-ULS | Num 5 | MC07 | Num 19 | RX_TX_STATE | Number | Telemetría | Estado del enlace de comunicación |
+| MC01-ULS | Num 8 | MC07 | Num 20 | RX_TX_FREQUENCY_TX | Number | Telemetría | Frecuencia de transmisión |
+| MC01-ULS | Num 9 | MC07 | Num 21 | RX_TX_FREQUENCY_RX | Number | Telemetría | Frecuencia de recepción |
+
 ---
 
 
@@ -327,6 +335,18 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | ABSOLUTE_SPEED | Sensor físico | Number | — | — | — | — | — | Num 18 |
 
 **Nota:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
+
+
+### Entradas externas de telemetría
+
+Las siguientes señales proceden de MC01-ULS y son recibidas por MC07.
+No corresponden a sensores físicos ni a parámetros de configuración del sistema.
+
+| Origen | Salida | Microcontrolador destino | Entrada | Señal | Tipo | Descripción |
+|---|---:|---|---:|---|---|---|
+| MC01-ULS | Num 5 | MC07 | Num 19 | RX_TX_STATE | Number | Estado del enlace de comunicación |
+| MC01-ULS | Num 8 | MC07 | Num 20 | RX_TX_FREQUENCY_TX | Number | Frecuencia de transmisión |
+| MC01-ULS | Num 9 | MC07 | Num 21 | RX_TX_FREQUENCY_RX | Number | Frecuencia de recepción |
 
 
 ## 5.1. Señales de entrada Boolean
@@ -730,6 +750,16 @@ No gobierna directamente los actuadores de vuelo.
 | Num 16 | AP_TARGET_Y | Number | Dato de navegación | MC05 Num 11 |
 | Num 17 | SPOILER | Number | Orden de control | MC06 Num 5 |
 | Num 18 | ABSOLUTE_SPEED | Number | Sensor físico | Sensor de velocidad absoluta; convertido a km/h en MC07 |
+| Num 19 | RX_TX_STATE | Number | Estado del enlace de comunicación | MC01-ULS Num 5 |
+| Num 20 | RX_TX_FREQUENCY_TX | Number | Frecuencia de transmisión | MC01-ULS Num 8 |
+| Num 21 | RX_TX_FREQUENCY_RX | Number | Frecuencia de recepción | MC01-ULS Num 9 |
+
+Las entradas RX-TX reciben información de telemetría procedente de MC01-ULS.
+MC07 utiliza estos valores para incorporarlos a la transmisión HTTP.
+
+- `RX_TX_STATE`: estado del enlace de comunicación.
+- `RX_TX_FREQUENCY_TX`: frecuencia de transmisión.
+- `RX_TX_FREQUENCY_RX`: frecuencia de recepción.
 
 
 ## 12.3. Entradas Boolean
