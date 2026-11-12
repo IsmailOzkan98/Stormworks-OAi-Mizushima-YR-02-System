@@ -284,6 +284,14 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC06 | Bool 9 | MC07 | Bool 7 | ACCELERATION_BOOSTER | Boolean | Estado de actuador | Estado de los propulsores de aceleración |
 | MC06 | Bool 10 | MC07 | Bool 12 | AFTERBURNER | Boolean | Estado de actuador | Estado de activación del Afterburner |
 
+## 4.11. Entradas de telemetría externas → MC07
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| MC01-ULS | Num 5 | MC07 | Num 19 | RX_TX_STATE | Number | Telemetría | Estado del enlace de comunicación |
+| MC01-ULS | Num 8 | MC07 | Num 20 | RX_TX_FREQUENCY_TX | Number | Telemetría | Frecuencia de transmisión |
+| MC01-ULS | Num 9 | MC07 | Num 21 | RX_TX_FREQUENCY_RX | Number | Telemetría | Frecuencia de recepción |
+
 ---
 
 
@@ -327,6 +335,18 @@ Los canales indicados corresponden a las entradas documentadas de cada controlad
 | ABSOLUTE_SPEED | Sensor físico | Number | — | — | — | — | — | Num 18 |
 
 **Nota:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
+
+
+### Entradas externas de telemetría
+
+Las siguientes señales proceden de MC01-ULS y son recibidas por MC07.
+No corresponden a sensores físicos ni a parámetros de configuración del sistema.
+
+| Origen | Salida | Microcontrolador destino | Entrada | Señal | Tipo | Descripción |
+|---|---:|---|---:|---|---|---|
+| MC01-ULS | Num 5 | MC07 | Num 19 | RX_TX_STATE | Number | Estado del enlace de comunicación |
+| MC01-ULS | Num 8 | MC07 | Num 20 | RX_TX_FREQUENCY_TX | Number | Frecuencia de transmisión |
+| MC01-ULS | Num 9 | MC07 | Num 21 | RX_TX_FREQUENCY_RX | Number | Frecuencia de recepción |
 
 
 ## 5.1. Señales de entrada Boolean
@@ -730,6 +750,16 @@ No gobierna directamente los actuadores de vuelo.
 | Num 16 | AP_TARGET_Y | Number | Dato de navegación | MC05 Num 11 |
 | Num 17 | SPOILER | Number | Orden de control | MC06 Num 5 |
 | Num 18 | ABSOLUTE_SPEED | Number | Sensor físico | Sensor de velocidad absoluta; convertido a km/h en MC07 |
+| Num 19 | RX_TX_STATE | Number | Estado del enlace de comunicación | MC01-ULS Num 5 |
+| Num 20 | RX_TX_FREQUENCY_TX | Number | Frecuencia de transmisión | MC01-ULS Num 8 |
+| Num 21 | RX_TX_FREQUENCY_RX | Number | Frecuencia de recepción | MC01-ULS Num 9 |
+
+Las entradas RX-TX reciben información de telemetría procedente de MC01-ULS.
+MC07 utiliza estos valores para incorporarlos a la transmisión HTTP.
+
+- `RX_TX_STATE`: estado del enlace de comunicación.
+- `RX_TX_FREQUENCY_TX`: frecuencia de transmisión.
+- `RX_TX_FREQUENCY_RX`: frecuencia de recepción.
 
 
 ## 12.3. Entradas Boolean
@@ -1077,5 +1107,103 @@ El objetivo es mantener un sistema de control de vuelo organizado, verificable y
 
 ---
 
+# 20. Estándar de programación de microcontroladores
+
+## MC Architecture Standard v1.0
+
+Todos los microcontroladores (MC) del proyecto **OAI MIZUSHIMA YR-02** deberán seguir una estructura de programación común, modular y organizada.
+
+Este estándar establece el orden y la organización que debe mantener el código de cada microcontrolador, garantizando la uniformidad de la arquitectura y facilitando su lectura, mantenimiento, ampliación e integración dentro del sistema.
+
+### 20.1. HEADER & DOCUMENTATION
+
+Identificación del microcontrolador mediante un encabezado que incluya:
+
+- Nombre del proyecto.
+- Identificador y nombre del microcontrolador.
+- Versión individual del módulo.
+- Versión global del sistema.
+- Descripción de su responsabilidad y propósito.
+
+### 20.2. INPUT CONFIGURATION
+
+Definición y asignación de todas las entradas utilizadas por el microcontrolador.
+
+Cada entrada deberá estar identificada con su correspondiente canal, nombre y tipo de señal, manteniendo la correspondencia con la tabla maestra de conexiones.
+
+### 20.3. OUTPUT CONFIGURATION
+
+Definición y asignación de todas las salidas utilizadas por el microcontrolador.
+
+Cada salida deberá estar identificada con su correspondiente canal, nombre y tipo de dato, respetando la arquitectura de conexiones establecida.
+
+### 20.4. SYSTEM CONFIGURATION
+
+Declaración y configuración de constantes, parámetros y valores necesarios para el funcionamiento del sistema.
+
+Esta sección debe centralizar los valores de configuración para evitar su dispersión por las diferentes funciones del código.
+
+### 20.5. SYSTEM STATE
+
+Declaración de las variables que representan el estado interno del microcontrolador.
+
+Incluye las variables de control, estados operativos, indicadores internos y cualquier otro dato necesario para conservar y gestionar el funcionamiento del módulo.
+
+### 20.6. GENERAL UTILITIES
+
+Implementación de funciones auxiliares reutilizables y operaciones generales.
+
+Por ejemplo:
+
+- Conversiones de valores.
+- Limitadores y saturaciones.
+- Cálculos matemáticos.
+- Funciones de validación.
+- Operaciones auxiliares comunes.
+
+### 20.7. SYSTEM FUNCTIONS
+
+Implementación de las funciones principales que ejecutan la lógica y las responsabilidades específicas del microcontrolador.
+
+Cada función deberá tener una responsabilidad claramente definida, evitando duplicidades y manteniendo una estructura modular.
+
+### 20.8. MAIN TICK
+
+Implementación de la función principal `onTick()`, encargada de coordinar la ejecución del microcontrolador en cada ciclo.
+
+Esta función debe organizar la secuencia de ejecución de las funciones del sistema y mantener el flujo de procesamiento establecido para el módulo.
+
+### 20.9. OUTPUT PROCESSING
+
+Procesamiento y actualización de todas las salidas del microcontrolador.
+
+Esta sección debe encargarse de transferir los resultados de la lógica interna a los canales de salida correspondientes, respetando los tipos de dato y las asignaciones establecidas.
+
+### 20.10. END OF MC
+
+Cierre del código y finalización de la estructura del microcontrolador.
+
+No deberán añadirse funciones o declaraciones fuera de las secciones establecidas por este estándar.
+
+---
+
+### Objetivo del estándar
+
+Mantener una arquitectura uniforme en todos los microcontroladores del proyecto **OAI MIZUSHIMA YR-02**, garantizando:
+
+1. Una organización común para todos los módulos.
+2. Una separación clara entre configuración, estado y lógica.
+3. Una identificación consistente de entradas y salidas.
+4. Una mayor facilidad de lectura y mantenimiento.
+5. Una ampliación ordenada de las funcionalidades.
+6. Una integración coherente entre los diferentes microcontroladores.
+
+**Normativa:** todo nuevo microcontrolador deberá adoptar el estándar MC Architecture Standard v1.0. Los módulos existentes deberán mantener esta estructura durante sus procesos de migración, actualización o reorganización.
+
+**---**
+
 **OAI MIZUSHIMA YR-02**  
-*Modular Flight Control System — System Version 14.0*
+*Modular Flight Control System*
+*MC Architecture Standard v1.0*
+
+
