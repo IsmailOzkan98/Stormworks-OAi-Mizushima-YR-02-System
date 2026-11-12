@@ -73,6 +73,9 @@ local INPUT_MY_ID = 10
 local INPUT_REMOTE_ID = 11
 local INPUT_ROLE = 12
 
+-- ADAPTIVE FREQUENCY HOPPING
+
+local INPUT_AFH_ENABLE = 13
 
 
 -- ============================================================
@@ -117,6 +120,11 @@ local DECIMAL_TOLERANCE = 0.1
 local ROLE_AIR = "AIR"
 local ROLE_GROUND = "GROUND"
 
+-- AFH CONFIGURATION
+
+local INPUT_AFH_MIN_FREQUENCY = 12
+local INPUT_AFH_MAX_FREQUENCY = 13
+
 -- SYSTEM CONFIGURATION
 
 local config = {
@@ -127,7 +135,10 @@ local config = {
     timeout = 180,
 
     frequency = 0,
-    frequencyDistance = 100
+    frequencyDistance = 100,
+
+    afhMinFrequency = 0,
+    afhMaxFrequency = 0
 }
 
 
@@ -160,6 +171,17 @@ local rxCounter = -1
 
 local frequencyTX = 0
 local frequencyRX = 0
+
+-- ADAPTIVE FREQUENCY HOPPING STATE
+
+local afhEnabled = false
+local afhActive = false
+
+local afhSeed = 0
+local afhHopIndex = 0
+
+local afhFrequencyA = 0
+local afhFrequencyB = 0
 
 
 -- ============================================================
@@ -204,6 +226,89 @@ local function isValidDecimal(value, converted)
 end
 
 
+-- ------------------------------------------------------------
+-- 6.4 AFH SEED GENERATION
+-- ------------------------------------------------------------
+
+local function generateAFHSeed()
+
+    return math.floor(
+        (config.protocol / 2) +
+        config.version +
+        config.frequencyDistance
+    )
+
+end
+
+
+-- ------------------------------------------------------------
+-- 6.5 AFH FREQUENCY GENERATOR
+-- ------------------------------------------------------------
+
+local function generateAFHNumbers(hopIndex)
+
+    local MODULO = 4294967296
+    local MULTIPLIER = 1664525
+    local INCREMENT = 1013904223
+
+    -- VALIDATE FREQUENCY RANGE
+
+    local minimum = config.afhMinFrequency
+    local maximum = config.afhMaxFrequency
+
+    if minimum < 0 or maximum < minimum then
+        return nil, nil
+    end
+
+    -- EACH RANDOM NUMBER USES HALF THE FREQUENCY RANGE
+
+    local partMin = math.ceil(minimum / 2)
+    local partMax = math.floor(maximum / 2)
+
+    local partRange = partMax - partMin + 1
+
+    if partRange <= 0 then
+        return nil, nil
+    end
+
+    -- INITIALIZE GENERATOR
+
+    local randomState = afhSeed % MODULO
+
+    local values = {}
+
+    local firstPosition = (hopIndex - 1) * 4
+    local lastPosition = hopIndex * 4
+
+    -- GENERATE DETERMINISTIC SEQUENCE
+
+    for position = 1, lastPosition do
+
+        randomState = (
+            MULTIPLIER * randomState + INCREMENT
+        ) % MODULO
+
+        if position > firstPosition then
+
+            local randomValue =
+                partMin + (randomState % partRange)
+
+            values[#values + 1] = randomValue
+
+        end
+
+    end
+
+    -- GENERATE TWO FREQUENCIES
+
+    local frequencyA = values[1] + values[2]
+    local frequencyB = values[3] + values[4]
+
+    return frequencyA, frequencyB
+
+end
+
+
 -- ============================================================
 -- 7. SYSTEM FUNCTIONS
 -- ============================================================
@@ -214,15 +319,37 @@ end
 
 local function readConfiguration()
 
-    config.protocol = input.getNumber(INPUT_PROTOCOL)
-    config.version = input.getNumber(INPUT_VERSION)
-    config.myID = input.getNumber(INPUT_MY_ID)
-    config.remoteID = input.getNumber(INPUT_REMOTE_ID)
-    config.timeout = input.getNumber(INPUT_TIMEOUT)
+    config.protocol = 
+      input.getNumber(INPUT_PROTOCOL)
+
+    config.version = 
+       input.getNumber(INPUT_VERSION)
+
+    config.myID = 
+        input.getNumber(INPUT_MY_ID)
+
+    config.remoteID = 
+        input.getNumber(INPUT_REMOTE_ID)
+
+    config.timeout = 
+        input.getNumber(INPUT_TIMEOUT)
 
     config.frequency = input.getNumber(INPUT_FREQUENCY)
+
     config.frequencyDistance =
         input.getNumber(INPUT_FREQUENCY_DISTANCE)
+
+    config.afhMinFrequency = 
+    input.getNumber(INPUT_AFH_MIN_FREQUENCY)
+
+    config.afhMaxFrequency = 
+        input.getNumber(INPUT_AFH_MAX_FREQUENCY)
+
+        -- AFH ENABLE SWITCH
+
+    afhEnabled = 
+        input.getBool(INPUT_AFH_ENABLE)
+
 
 end
 
@@ -241,6 +368,11 @@ local function initializeRole(newRole)
 
     rxAge = 0
     rxCounter = -1
+
+    -- RESET AFH STATE
+
+    afhActive = false
+    afhHopIndex = 0
 
     -- INITIALIZE HEARTBEAT SEQUENCE
 
@@ -314,6 +446,8 @@ local function updateFrequencies()
 
     end
 
+    -- NORMAL FREQUENCIES
+
     if activeRole == ROLE_AIR then
 
         frequencyTX =
@@ -329,6 +463,73 @@ local function updateFrequencies()
 
         frequencyRX =
             config.frequency + config.frequencyDistance
+
+    end
+
+    -- AFH DISABLED OR CONNECTION RESTORED
+
+    if not afhEnabled or state ~= STATE_LINK_LOST then
+
+        afhActive = false
+        afhHopIndex = 0
+
+        return
+
+    end
+
+    -- VALIDATE TIMEOUT
+
+    if config.timeout <= 0 then
+        return
+    end
+
+    -- CALCULATE HOP INDEX FROM RX AGE
+
+    local currentHop =
+        math.floor(rxAge / config.timeout)
+
+    if currentHop < 1 then
+        return
+    end
+
+    -- GENERATE NEW FREQUENCIES WHEN HOP CHANGES
+
+    if currentHop ~= afhHopIndex then
+
+        afhSeed = generateAFHSeed()
+
+        local frequencyA, frequencyB =
+            generateAFHNumbers(currentHop)
+
+        if frequencyA == nil or frequencyB == nil then
+
+            afhActive = false
+            return
+
+        end
+
+        afhFrequencyA = frequencyA
+        afhFrequencyB = frequencyB
+
+        afhHopIndex = currentHop
+
+    end
+
+    -- ACTIVATE AFH
+
+    afhActive = true
+
+    -- ASSIGN FREQUENCIES BY ROLE
+
+    if activeRole == ROLE_AIR then
+
+        frequencyTX = afhFrequencyA
+        frequencyRX = afhFrequencyB
+
+    elseif activeRole == ROLE_GROUND then
+
+        frequencyTX = afhFrequencyB
+        frequencyRX = afhFrequencyA
 
     end
 
@@ -464,6 +665,10 @@ function onTick()
     -- MONITOR CONNECTION
 
     monitorConnection()
+
+    -- UPDATE FREQUENCIES
+
+    updateFrequencies()  
 
     -- PREPARE HEARTBEAT
 
