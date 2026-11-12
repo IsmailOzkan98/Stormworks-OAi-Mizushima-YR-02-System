@@ -2,7 +2,7 @@
 -- ============================================================
 -- OAI MIZUSHIMA YR-02
 -- MC01: UNIVERSAL LINK SYSTEM
--- VERSION: 5.1.0
+-- VERSION: 5.1.1
 -- SYSTEM VERSION: 14.0
 --
 -- RESPONSIBILITY:
@@ -447,53 +447,79 @@ local function updateFrequencies()
 
     end
 
-    -- NORMAL FREQUENCIES
+    -- AFH DISABLED
 
-    if activeRole == ROLE_AIR then
-
-        frequencyTX =
-            config.frequency + config.frequencyDistance
-
-        frequencyRX =
-            config.frequency
-
-    elseif activeRole == ROLE_GROUND then
-
-        frequencyTX =
-            config.frequency
-
-        frequencyRX =
-            config.frequency + config.frequencyDistance
-
-    end
-
-    -- AFH DISABLED OR CONNECTION RESTORED
-
-    if not afhEnabled or state ~= STATE_LINK_LOST then
+    if not afhEnabled then
 
         afhActive = false
         afhHopIndex = 0
+
+        if activeRole == ROLE_AIR then
+
+            frequencyTX =
+                config.frequency + config.frequencyDistance
+
+            frequencyRX =
+                config.frequency
+
+        else
+
+            frequencyTX =
+                config.frequency
+
+            frequencyRX =
+                config.frequency + config.frequencyDistance
+
+        end
 
         return
 
     end
 
-    -- VALIDATE TIMEOUT
+    -- AFH HAS NOT BEEN ACTIVATED YET
+
+    if not afhActive then
+
+        if activeRole == ROLE_AIR then
+
+            frequencyTX =
+                config.frequency + config.frequencyDistance
+
+            frequencyRX =
+                config.frequency
+
+        else
+
+            frequencyTX =
+                config.frequency
+
+            frequencyRX =
+                config.frequency + config.frequencyDistance
+
+        end
+
+    end
+
+    -- WAIT FOR CONNECTION LOSS
+
+    if state ~= STATE_LINK_LOST then
+        return
+    end
 
     if config.timeout <= 0 then
         return
     end
 
-    -- CALCULATE HOP INDEX FROM RX AGE
+    -- CALCULATE HOP INDEX
 
     local currentHop =
         math.floor(rxAge / config.timeout)
 
-    if currentHop < 1 then
+    if currentHop <= 0 then
         return
     end
 
-    -- GENERATE NEW FREQUENCIES WHEN HOP CHANGES
+    -- GENERATE NEXT FREQUENCY PAIR
 
     if currentHop ~= afhHopIndex then
 
@@ -503,31 +529,25 @@ local function updateFrequencies()
             generateAFHNumbers(currentHop)
 
         if frequencyA == nil or frequencyB == nil then
-
-            afhActive = false
             return
-
         end
 
         afhFrequencyA = frequencyA
         afhFrequencyB = frequencyB
 
         afhHopIndex = currentHop
+        afhActive = true
 
     end
 
-    -- ACTIVATE AFH
-
-    afhActive = true
-
-    -- ASSIGN FREQUENCIES BY ROLE
+    -- ASSIGN PERSISTENT AFH FREQUENCIES
 
     if activeRole == ROLE_AIR then
 
         frequencyTX = afhFrequencyA
         frequencyRX = afhFrequencyB
 
-    elseif activeRole == ROLE_GROUND then
+    else
 
         frequencyTX = afhFrequencyB
         frequencyRX = afhFrequencyA
