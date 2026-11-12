@@ -1,6 +1,6 @@
 -- ============================================================
 -- OAI MIZUSHIMA YR-02
--- MC08: AIR LINK SYSTEM
+-- MC01: AIR LINK SYSTEM
 -- VERSION: 4.0.0
 -- SYSTEM VERSION: 14.0
 --

@@ -1,7 +1,7 @@
 
 -- ============================================================
 -- OAI MIZUSHIMA YR-02
--- MC08: GROUND LINK SYSTEM
+-- MC01: GROUND LINK SYSTEM
 -- VERSION: 4.0.0
 -- SYSTEM VERSION: 14.0
 --
