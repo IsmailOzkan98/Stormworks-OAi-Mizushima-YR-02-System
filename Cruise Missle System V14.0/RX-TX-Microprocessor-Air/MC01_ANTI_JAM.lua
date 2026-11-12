@@ -101,6 +101,11 @@ local OUTPUT_FREQUENCY_RX = 9
 local OUTPUT_CONNECTED = 1
 local OUTPUT_SEARCHING = 2
 local OUTPUT_LINK_LOST = 3
+
+-- DIAGNOSTIC OUTPUTS
+
+local OUTPUT_TIMEOUT = 10
+local OUTPUT_RX_COUNTER = 11
 local OUTPUT_AFH_ACTIVE = 6
 
 
@@ -775,6 +780,16 @@ processOutputs = function()
     output.setNumber(
         OUTPUT_TX_COUNTER,
         txCounter / COUNTER_SCALE
+    )
+
+    output.setNumber(
+        OUTPUT_TIMEOUT,
+        config.timeout
+    )
+
+    output.setNumber(
+        OUTPUT_RX_COUNTER,
+        rxCounter / COUNTER_SCALE
     )
 
 
