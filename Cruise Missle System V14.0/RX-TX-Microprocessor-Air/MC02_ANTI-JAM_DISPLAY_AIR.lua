@@ -1,658 +1,409 @@
 
 -- ============================================================
--- OAI MIZUSHIMA YR-02
--- MC02: UNIVERSAL LINK DIAGNOSTIC DISPLAY
--- VERSION: 3.0
+-- OAI MIZUSHIMA
+-- MC02: DIAGNOSTIC DISPLAY
+-- VERSION: 1.0.0
 -- SYSTEM VERSION: 14.0
--- STORMWORKS LUA
 --
--- DISPLAY: 9x5 (288x160)
+-- RESPONSIBILITY:
+-- Visual monitoring of MC01 Universal Link System.
 --
--- VISUAL STYLE:
--- MONOCHROME MILITARY TERMINAL
--- INSPIRED BY NIER:AUTOMATA
+-- DISPLAY:
+-- 9 x 5 BLOCKS (288 x 160)
 --
--- MC ARCHITECTURE STANDARD v1.0
 -- ============================================================
 
 
 -- ============================================================
--- 1. INPUT MAP
+-- 1. INPUT CONFIGURATION
 -- ============================================================
 
-local IN_PROTOCOL       = 1
-local IN_MY_ID          = 2
-local IN_TX_COUNTER     = 3
-local IN_VERSION        = 4
+-- NUMBER INPUTS
 
-local IN_STATE          = 5
-local IN_RX_AGE         = 6
-local IN_TX_DIAGNOSTIC  = 7
+local IN_PROTOCOL    = 1
+local IN_LOCAL_ID    = 2
+local IN_TX_COUNTER  = 3
+local IN_VERSION     = 4
+local IN_STATE       = 5
+local IN_RX_AGE      = 6
+local IN_FREQ_TX     = 7
+local IN_FREQ_RX     = 8
 
-local IN_FREQUENCY_TX   = 8
-local IN_FREQUENCY_RX   = 9
+-- EXTERNAL NUMBER INPUTS
 
-local IN_CONFIG_PROTOCOL = 10
-local IN_CONFIG_VERSION  = 11
-local IN_CONFIG_MY_ID    = 12
-local IN_CONFIG_REMOTE   = 13
-local IN_TIMEOUT         = 14
+local IN_TIMEOUT     = 9
+local IN_RX_COUNTER  = 10
 
-local IN_BASE_FREQUENCY = 15
-local IN_FREQUENCY_DISTANCE = 16
 
-local IN_RX_PROTOCOL = 17
-local IN_RX_REMOTE_ID = 18
-local IN_RX_COUNTER = 19
-local IN_RX_VERSION = 20
+-- BOOL INPUTS
 
-local IN_CONNECTED = 1
-local IN_SEARCHING = 2
-local IN_LOST = 3
-local IN_ROLE = 4
+local IN_CONNECTED   = 1
+local IN_SEARCHING   = 2
+local IN_LINK_LOST   = 3
+
+-- EXTERNAL BOOL INPUTS
+
+local IN_ROLE        = 4
+local IN_AFH_ENABLED = 5
+local IN_AFH_ACTIVE  = 6
 
 
 -- ============================================================
--- 2. SYSTEM VARIABLES
+-- 2. DISPLAY DATA
 -- ============================================================
 
-local protocol = 0
-local version = 0
+local data = {
+    protocol = 0,
+    localID = 0,
+    txCounter = 0,
+    rxCounter = 0,
+    version = 0,
 
-local myID = 0
-local remoteID = 0
+    state = 0,
+    rxAge = 0,
+    timeout = 0,
 
-local state = 0
-local rxAge = 0
-local timeout = 180
+    frequencyTX = 0,
+    frequencyRX = 0,
 
-local txCounter = 0
-local rxCounter = 0
+    connected = false,
+    searching = true,
+    linkLost = false,
 
-local frequencyTX = 0
-local frequencyRX = 0
+    roleAir = false,
 
-local baseFrequency = 0
-local frequencyDistance = 0
-
-local rxProtocol = 0
-local rxRemoteID = 0
-local rxVersion = 0
-
-local connected = false
-local searching = false
-local lost = false
-
-local role = "GROUND"
-
-local headerValid = false
-local decimalValid = false
-local heartbeatValid = false
-
-local lastRxCounter = -1
-local pulseTimer = 0
-local tick = 0
-
-local scanPosition = 5
-local warningBlink = false
-
-
--- ============================================================
--- 3. COLOR PALETTE
--- ============================================================
-
-local C = {
-    background = { 17, 17, 15 },
-    panel      = { 29, 28, 24 },
-    panel2     = { 42, 40, 34 },
-
-    border     = { 104, 97, 77 },
-    grid       = { 39, 37, 31 },
-
-    green      = { 164, 177, 128 },
-    greenDim   = { 91, 105, 69 },
-
-    cyan       = { 190, 181, 151 },
-    white      = { 225, 217, 193 },
-    grey       = { 142, 134, 113 },
-
-    amber      = { 207, 165, 91 },
-    red        = { 183, 81, 69 },
-
-    black      = { 0, 0, 0 }
+    afhEnabled = false,
+    afhActive = false
 }
 
 
 -- ============================================================
--- 4. UTILITIES
+-- 3. UTILITIES
 -- ============================================================
 
-local function setColor(c)
-    screen.setColor(c[1], c[2], c[3])
+local function integer(value)
+    return math.floor(value + 0.5)
 end
 
-local function txt(x, y, value, color)
-    setColor(color)
-    screen.drawText(x, y, tostring(value))
+
+local function numberText(value, decimals)
+    return string.format("%." .. decimals .. "f", value)
 end
 
-local function line(x1, y1, x2, y2, color)
-    setColor(color)
-    screen.drawLine(x1, y1, x2, y2)
+
+local function drawText(x, y, text, r, g, b)
+    screen.setColor(r, g, b)
+    screen.drawText(x, y, tostring(text))
 end
 
-local function rect(x, y, w, h, color)
-    setColor(color)
+
+local function drawPanel(x, y, w, h)
+
+    screen.setColor(13, 19, 27)
     screen.drawRectF(x, y, w, h)
-end
 
-local function outline(x, y, w, h, color)
-    setColor(color)
+    screen.setColor(42, 55, 68)
     screen.drawRect(x, y, w, h)
-end
-
-local function bar(x, y, w, h, ratio, color)
-
-    ratio = math.max(0, math.min(1, ratio))
-
-    rect(x, y, w, h, C.grid)
-
-    if ratio > 0 then
-        rect(x, y, math.max(1, math.floor(w * ratio)), h, color)
-    end
-
-end
-
--- FORMATTING WITHOUT STRING.FORMAT
-
-local function formatCounter(value)
-
-    local n = math.floor(value * 10 + 0.5) / 10
-
-    return tostring(n)
-
-end
-
-local function formatFrequency(value)
-
-    return tostring(math.floor(value + 0.5))
-
-end
-
-local function statusColor()
-
-    if connected then
-        return C.green
-    elseif lost then
-        return C.red
-    end
-
-    return C.amber
 
 end
 
 
 -- ============================================================
--- 5. GRAPHIC UTILITIES
--- ============================================================
-
-local function cornerFrame(x, y, w, h, color)
-
-    local s = 5
-
-    line(x, y, x+s, y, color)
-    line(x, y, x, y+s, color)
-
-    line(x+w-s, y, x+w, y, color)
-    line(x+w, y, x+w, y+s, color)
-
-    line(x, y+h-s, x, y+h, color)
-    line(x, y+h, x+s, y+h, color)
-
-    line(x+w-s, y+h, x+w, y+h, color)
-    line(x+w, y+h-s, x+w, y+h, color)
-
-end
-
-local function panel(x, y, w, h)
-
-    rect(x, y, w, h, C.panel)
-    outline(x, y, w, h, C.border)
-
-    cornerFrame(x, y, w, h, C.cyan)
-
-end
-
-local function sectionTitle(x, y, number, title)
-
-    txt(x, y, number, C.amber)
-    txt(x+17, y, title, C.white)
-
-end
-
-
--- ============================================================
--- 6. DATA ACQUISITION
--- ============================================================
-
-local function readData()
-
-    state = input.getNumber(IN_STATE)
-    rxAge = input.getNumber(IN_RX_AGE)
-
-    txCounter = input.getNumber(IN_TX_COUNTER)
-
-    frequencyTX = input.getNumber(IN_FREQUENCY_TX)
-    frequencyRX = input.getNumber(IN_FREQUENCY_RX)
-
-    protocol = input.getNumber(IN_CONFIG_PROTOCOL)
-    version = input.getNumber(IN_CONFIG_VERSION)
-
-    myID = input.getNumber(IN_CONFIG_MY_ID)
-    remoteID = input.getNumber(IN_CONFIG_REMOTE)
-
-    timeout = input.getNumber(IN_TIMEOUT)
-
-    baseFrequency = input.getNumber(IN_BASE_FREQUENCY)
-
-    frequencyDistance =
-        input.getNumber(IN_FREQUENCY_DISTANCE)
-
-    rxProtocol = input.getNumber(IN_RX_PROTOCOL)
-    rxRemoteID = input.getNumber(IN_RX_REMOTE_ID)
-
-    rxCounter = input.getNumber(IN_RX_COUNTER)
-    rxVersion = input.getNumber(IN_RX_VERSION)
-
-    connected = input.getBool(IN_CONNECTED)
-    searching = input.getBool(IN_SEARCHING)
-    lost = input.getBool(IN_LOST)
-
-    if input.getBool(IN_ROLE) then
-        role = "AIR"
-    else
-        role = "GROUND"
-    end
-
-    -- HEADER VALIDATION
-
-    headerValid =
-        rxProtocol == protocol and
-        rxRemoteID == remoteID and
-        rxVersion == version and
-        rxCounter > 0
-
-    -- DECIMAL VALIDATION
-
-    local converted =
-        math.floor(rxCounter * 10 + 0.5)
-
-    decimalValid =
-        math.abs(rxCounter * 10 - converted) < 0.1
-
-    -- HEARTBEAT VALIDATION
-
-    heartbeatValid =
-        connected and
-        headerValid and
-        decimalValid
-
-end
-
-
--- ============================================================
--- 7. ANIMATION SYSTEM
--- ============================================================
-
-local function updateHeartbeat()
-
-    tick = tick + 1
-
-    if pulseTimer > 0 then
-        pulseTimer = pulseTimer - 1
-    end
-
-    -- NEW RECEIVED HEARTBEAT
-
-    if rxCounter ~= lastRxCounter then
-
-        if headerValid and decimalValid and rxCounter > 0 then
-            pulseTimer = 20
-        end
-
-        lastRxCounter = rxCounter
-
-    end
-
-    -- SCAN ANIMATION
-
-    scanPosition = scanPosition + 1
-
-    if scanPosition > 283 then
-        scanPosition = 5
-    end
-
-    -- WARNING ANIMATION
-
-    warningBlink = math.floor(tick / 15) % 2 == 0
-
-end
-
-
--- ============================================================
--- 8. MAIN TICK
+-- 4. TICK PROCESSING
 -- ============================================================
 
 function onTick()
 
-    readData()
-    updateHeartbeat()
+    -- MC01 DATA
+
+    data.protocol =
+        input.getNumber(IN_PROTOCOL)
+
+    data.localID =
+        input.getNumber(IN_LOCAL_ID)
+
+    data.txCounter =
+        input.getNumber(IN_TX_COUNTER)
+
+    data.version =
+        input.getNumber(IN_VERSION)
+
+    data.state =
+        input.getNumber(IN_STATE)
+
+    data.rxAge =
+        input.getNumber(IN_RX_AGE)
+
+    data.frequencyTX =
+        input.getNumber(IN_FREQ_TX)
+
+    data.frequencyRX =
+        input.getNumber(IN_FREQ_RX)
+
+
+    -- EXTERNAL DATA
+
+    data.timeout =
+        input.getNumber(IN_TIMEOUT)
+
+    data.rxCounter =
+        input.getNumber(IN_RX_COUNTER)
+
+
+    -- CONNECTION STATUS
+
+    data.connected =
+        input.getBool(IN_CONNECTED)
+
+    data.searching =
+        input.getBool(IN_SEARCHING)
+
+    data.linkLost =
+        input.getBool(IN_LINK_LOST)
+
+
+    -- OPERATIONAL ROLE
+
+    data.roleAir =
+        input.getBool(IN_ROLE)
+
+
+    -- AFH STATUS
+
+    data.afhEnabled =
+        input.getBool(IN_AFH_ENABLED)
+
+    data.afhActive =
+        input.getBool(IN_AFH_ACTIVE)
 
 end
 
 
 -- ============================================================
--- 9. BACKGROUND
--- ============================================================
-
-local function drawBackground()
-
-    rect(0, 0, 288, 160, C.background)
-
-    -- VERTICAL GRID
-
-    for x = 0, 288, 24 do
-        line(x, 0, x, 160, C.grid)
-    end
-
-    -- HORIZONTAL GRID
-
-    for y = 20, 156, 16 do
-        line(0, y, 288, y, C.grid)
-    end
-
-    -- OUTER FRAME
-
-    outline(1, 1, 286, 158, C.border)
-
-    -- SCAN LINE
-
-    line(scanPosition, 19, scanPosition, 157, C.grid)
-
-end
-
-
--- ============================================================
--- 10. HEADER
--- ============================================================
-
-local function drawHeader()
-
-    rect(3, 2, 282, 14, C.panel2)
-
-    txt(7, 5, "OAI MIZUSHIMA", C.white)
-
-    txt(88, 5, "YR-02", C.amber)
-
-    txt(242, 5, "MC02", C.cyan)
-
-    line(3, 17, 285, 17, C.border)
-
-    -- SMALL DECORATIVE MARKERS
-
-    rect(226, 6, 3, 3, C.grey)
-    rect(231, 6, 3, 3, C.grey)
-
-end
-
-
--- ============================================================
--- 11. CONNECTION STATUS
--- ============================================================
-
-local function drawConnection()
-
-    panel(5, 21, 278, 22)
-
-    local color = statusColor()
-
-    rect(10, 27, 5, 10, color)
-
-    if connected then
-
-        txt(21, 25, "LINK ESTABLISHED", C.green)
-
-    elseif lost then
-
-        txt(21, 25, "LINK LOST", C.red)
-
-    else
-
-        txt(21, 25, "SEARCHING", C.amber)
-
-    end
-
-    txt(213, 25, role, C.cyan)
-
-    line(10, 39, 278, 39, C.grid)
-
-    txt(11, 34, "UNIT STATUS", C.grey)
-
-    txt(79, 34,
-        connected and "OPERATIONAL" or "STANDBY",
-        connected and C.green or C.amber)
-
-    txt(246, 34, "SYS", color)
-
-end
-
-
--- ============================================================
--- 12. HEARTBEAT MONITOR
--- ============================================================
-
-local function drawHeartbeat()
-
-    panel(5, 47, 278, 43)
-
-    sectionTitle(10, 50, "01", "HEARTBEAT MONITOR")
-
-    -- TRANSMISSION
-
-    txt(11, 64, "TX", C.grey)
-    txt(29, 63, formatCounter(txCounter), C.white)
-
-    -- RECEPTION
-
-    txt(105, 64, "RX", C.grey)
-    txt(123, 63, formatCounter(rxCounter), C.white)
-
-    -- PULSE INDICATOR
-
-    rect(230, 60, 43, 14, C.background)
-
-    local pulseColor = C.greenDim
-
-    if pulseTimer > 0 then
-        pulseColor = C.green
-    elseif not heartbeatValid then
-        pulseColor = C.red
-    end
-
-    if pulseTimer > 0 then
-
-        rect(233, 63, 7, 7, pulseColor)
-        rect(244, 63, 7, 7, pulseColor)
-        rect(255, 63, 7, 7, pulseColor)
-
-    else
-
-        rect(233, 63, 7, 7, C.grid)
-        rect(244, 63, 7, 7, pulseColor)
-        rect(255, 63, 7, 7, C.grid)
-
-    end
-
-    -- SYNC STATUS
-
-    line(10, 77, 278, 77, C.grid)
-
-    txt(11, 79, "SYNC", C.grey)
-
-    txt(43, 79,
-        heartbeatValid and "LOCKED" or "NO SYNC",
-        heartbeatValid and C.green or C.red)
-
-    txt(165, 79, "SEQUENCE", C.grey)
-
-    txt(225, 79,
-        headerValid and decimalValid and "VALID" or "ERROR",
-        headerValid and decimalValid and C.green or C.red)
-
-end
-
-
--- ============================================================
--- 13. LINK HEALTH
--- ============================================================
-
-local function drawLinkQuality()
-
-    panel(5, 94, 137, 36)
-
-    sectionTitle(10, 97, "02", "LINK HEALTH")
-
-    local ratio = 0
-
-    if timeout > 0 then
-        ratio = 1 - rxAge / timeout
-    end
-
-    ratio = math.max(0, math.min(1, ratio))
-
-    local color = C.green
-
-    if ratio < 0.5 then
-        color = C.amber
-    end
-
-    if lost or ratio <= 0 then
-        color = C.red
-    end
-
-    txt(11, 109,
-        tostring(math.floor(ratio * 100)) .. "%",
-        color)
-
-    bar(49, 113, 83, 5, ratio, color)
-
-    txt(11, 120, "RX AGE", C.grey)
-
-    txt(55, 120, formatCounter(rxAge / 60), C.white)
-
-end
-
-
--- ============================================================
--- 14. TIMEOUT MONITOR
--- ============================================================
-
-local function drawTimer()
-
-    panel(147, 94, 136, 36)
-
-    sectionTitle(152, 97, "03", "TIMEOUT")
-
-    local remaining = math.max(0, timeout - rxAge)
-
-    txt(153, 109, "LIMIT", C.grey)
-    txt(190, 109, tostring(timeout), C.white)
-
-    txt(153, 120, "AGE", C.grey)
-    txt(190, 120, tostring(math.floor(rxAge)), C.white)
-
-    txt(237, 109, "LEFT", C.grey)
-    txt(237, 120, tostring(math.floor(remaining)), C.amber)
-
-end
-
-
--- ============================================================
--- 15. FREQUENCY MONITOR
--- ============================================================
-
-local function drawFrequency()
-
-    panel(5, 134, 278, 21)
-
-    txt(10, 137, "04", C.amber)
-
-    txt(27, 137, "RF", C.white)
-
-    txt(50, 137, "TX", C.grey)
-    txt(66, 137, formatFrequency(frequencyTX), C.green)
-
-    txt(112, 137, "RX", C.grey)
-    txt(128, 137, formatFrequency(frequencyRX), C.cyan)
-
-    txt(207, 137, role, C.white)
-
-    txt(10, 147, "BASE", C.grey)
-    txt(39, 147, formatFrequency(baseFrequency), C.white)
-
-    txt(108, 147, "STEP", C.grey)
-    txt(138, 147, formatFrequency(frequencyDistance), C.white)
-
-    txt(225, 147, "YR-02", C.amber)
-
-end
-
-
--- ============================================================
--- 16. WARNING INDICATOR
--- ============================================================
-
-local function drawWarning()
-
-    if lost and warningBlink then
-
-        rect(0, 0, 288, 2, C.red)
-
-    elseif searching and warningBlink then
-
-        rect(0, 0, 288, 2, C.amber)
-
-    end
-
-end
-
-
--- ============================================================
--- 17. MAIN DRAW
+-- 5. DISPLAY RENDERING
 -- ============================================================
 
 function onDraw()
 
-    drawBackground()
+    local W = screen.getWidth()
+    local H = screen.getHeight()
 
-    drawHeader()
+    -- BACKGROUND
 
-    drawConnection()
+    screen.setColor(5, 9, 14)
+    screen.drawClear()
 
-    drawHeartbeat()
 
-    drawLinkQuality()
+    -- ========================================================
+    -- 5.1 HEADER
+    -- ========================================================
 
-    drawTimer()
+    screen.setColor(17, 29, 41)
+    screen.drawRectF(0, 0, W, 19)
 
-    drawFrequency()
+    drawText(
+        5, 5,
+        "OAI MIZUSHIMA / MC02",
+        180, 200, 215
+    )
 
-    drawWarning()
+    screen.setColor(42, 55, 68)
+    screen.drawLine(0, 19, W, 19)
+
+
+    -- ========================================================
+    -- 5.2 CONNECTION STATUS
+    -- ========================================================
+
+    drawPanel(5, 23, 72, 27)
+    drawPanel(82, 23, W - 87, 27)
+
+    drawText(10, 26, "ROLE", 120, 145, 165)
+
+    if data.roleAir then
+        drawText(10, 36, "AIR", 70, 190, 255)
+    else
+        drawText(10, 36, "GROUND", 70, 190, 255)
+    end
+
+
+    drawText(88, 26, "LINK STATUS", 120, 145, 165)
+
+    if data.connected then
+
+        drawText(88, 36, "CONNECTED", 70, 235, 125)
+
+    elseif data.linkLost then
+
+        drawText(88, 36, "LINK LOST", 255, 65, 65)
+
+    elseif data.searching then
+
+        drawText(88, 36, "SEARCHING", 255, 190, 65)
+
+    else
+
+        drawText(88, 36, "UNKNOWN", 170, 170, 170)
+
+    end
+
+
+    -- ========================================================
+    -- 5.3 COMMUNICATION
+    -- ========================================================
+
+    drawPanel(5, 54, 137, 46)
+    drawPanel(147, 54, W - 152, 46)
+
+
+    -- RX AGE
+
+    drawText(10, 58, "RX AGE", 120, 145, 165)
+
+    drawText(
+        10, 69,
+        integer(data.rxAge) .. " / " .. integer(data.timeout),
+        230, 235, 245
+    )
+
+    -- RX AGE PROGRESS BAR
+
+    local barX = 10
+    local barY = 87
+    local barW = 125
+    local barH = 6
+
+    screen.setColor(35, 45, 55)
+    screen.drawRectF(barX, barY, barW, barH)
+
+    local ratio = 0
+
+    if data.timeout > 0 then
+        ratio = math.min(
+            math.max(data.rxAge / data.timeout, 0),
+            1
+        )
+    end
+
+    local barColorR = 65
+    local barColorG = 210
+    local barColorB = 115
+
+    if ratio >= 0.75 then
+        barColorR = 255
+        barColorG = 170
+        barColorB = 45
+    end
+
+    if data.linkLost then
+        barColorR = 255
+        barColorG = 55
+        barColorB = 55
+    end
+
+    screen.setColor(barColorR, barColorG, barColorB)
+
+    screen.drawRectF(
+        barX,
+        barY,
+        math.floor(barW * ratio),
+        barH
+    )
+
+
+    -- HEARTBEAT COUNTERS
+
+    drawText(153, 58, "HEARTBEAT", 120, 145, 165)
+
+    drawText(153, 71, "TX", 100, 175, 225)
+
+    drawText(
+        170, 71,
+        numberText(data.txCounter, 1),
+        230, 235, 245
+    )
+
+    drawText(215, 71, "RX", 100, 175, 225)
+
+    drawText(
+        232, 71,
+        numberText(data.rxCounter, 1),
+        230, 235, 245
+    )
+
+
+    -- ========================================================
+    -- 5.4 FREQUENCY MONITOR
+    -- ========================================================
+
+    drawPanel(5, 104, 171, 45)
+
+    drawText(10, 108, "FREQUENCY MONITOR", 120, 145, 165)
+
+    drawText(10, 122, "TX", 100, 175, 225)
+
+    drawText(
+        35, 122,
+        integer(data.frequencyTX),
+        235, 235, 245
+    )
+
+    drawText(92, 122, "RX", 100, 175, 225)
+
+    drawText(
+        117, 122,
+        integer(data.frequencyRX),
+        235, 235, 245
+    )
+
+
+    -- ========================================================
+    -- 5.5 AFH STATUS
+    -- ========================================================
+
+    drawPanel(181, 104, W - 186, 45)
+
+    drawText(186, 108, "AFH STATUS", 120, 145, 165)
+
+    if data.afhActive then
+
+        drawText(186, 123, "ACTIVE", 70, 235, 125)
+
+    elseif data.afhEnabled then
+
+        drawText(186, 123, "STANDBY", 255, 190, 65)
+
+    else
+
+        drawText(186, 123, "DISABLED", 155, 165, 175)
+
+    end
+
+
+    -- ========================================================
+    -- 5.6 SYSTEM IDENTIFICATION
+    -- ========================================================
+
+    screen.setColor(42, 55, 68)
+    screen.drawLine(5, 154, W - 5, 154)
+
+    drawText(
+        5, 155,
+        "ID " .. integer(data.localID),
+        155, 175, 190
+    )
+
+    drawText(
+        75, 155,
+        "PROT " .. integer(data.protocol),
+        155, 175, 190
+    )
+
+    drawText(
+        170, 155,
+        "VER " .. numberText(data.version, 1),
+        155, 175, 190
+    )
 
 end
 
-
--- ============================================================
--- END MC02
--- OAI MIZUSHIMA YR-02
--- ============================================================

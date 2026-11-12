@@ -101,6 +101,7 @@ local OUTPUT_FREQUENCY_RX = 9
 local OUTPUT_CONNECTED = 1
 local OUTPUT_SEARCHING = 2
 local OUTPUT_LINK_LOST = 3
+local OUTPUT_AFH_ACTIVE = 6
 
 
 -- ============================================================
@@ -729,6 +730,11 @@ processOutputs = function()
     output.setBool(
         OUTPUT_LINK_LOST,
         state == STATE_LINK_LOST
+    )
+
+    output.setBool(
+        OUTPUT_AFH_ACTIVE,
+        afhActive
     )
 
 
