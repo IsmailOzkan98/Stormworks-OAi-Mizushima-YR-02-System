@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.2.1
+-- VERSION: 1.3.1
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -31,10 +31,12 @@ local INPUT = {
 
     ALTITUDE_GAIN = 9,
 
+    DESCENT_TARGET = 10,
 
     -- Boolean Inputs
 
-    ALTITUDE_HOLD   = 8
+    ALTITUDE_HOLD   = 8,
+    DESCENT_MODE = 9
 
 }
 
@@ -48,7 +50,8 @@ local OUTPUT = {
     ELEVATOR_RIGHT  = 3,
     ELEVATOR_LEFT = 4,
 
-    DESIRED_VERTICAL_SPEED  = 5
+    DESIRED_VERTICAL_SPEED  = 5,
+    ALTITUDE_TARGET = 6 -- output for mc07
 
 }
 
@@ -281,6 +284,25 @@ end
 
 function onTick()
 
+    local descentMode =
+
+    input.getBool(INPUT.DESCENT_MODE)
+
+
+    local selectedAltitudeTarget
+
+    if descentMode then
+
+        selectedAltitudeTarget =
+            input.getNumber(INPUT.DESCENT_TARGET)
+
+    else
+
+        selectedAltitudeTarget =
+            input.getNumber(INPUT.ALTITUDE_TARGET)
+
+    end
+
     -- READ PHYSICAL SENSORS AND PID PARAMETERS
 
     local data = {
@@ -288,8 +310,8 @@ function onTick()
         altitude =
             input.getNumber(INPUT.ALTITUDE),
 
-        altitudeTarget =
-            input.getNumber(INPUT.ALTITUDE_TARGET),
+        altitudeTarget = 
+            selectedAltitudeTarget,
 
         P =
             input.getNumber(INPUT.ALT_PID_P),
@@ -360,6 +382,16 @@ function onTick()
         OUTPUT.DESIRED_VERTICAL_SPEED,
 
         altitude.desiredVerticalSpeed
+
+    )
+
+    -- ALTITUDE TARGET OUTPUT
+
+    output.setNumber(
+
+        OUTPUT.ALTITUDE_TARGET,
+
+        altitude.altitudeError
 
     )
 
