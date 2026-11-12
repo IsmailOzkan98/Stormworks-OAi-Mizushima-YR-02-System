@@ -2,20 +2,23 @@
 -- ============================================================
 -- OAI MIZUSHIMA YR-02
 -- MC02: UNIVERSAL LINK DIAGNOSTIC DISPLAY
--- VERSION: 2.0
+-- VERSION: 3.0
 -- SYSTEM VERSION: 14.0
 -- STORMWORKS LUA
 --
 -- DISPLAY: 9x5 (288x160)
 --
+-- VISUAL STYLE:
+-- MONOCHROME MILITARY TERMINAL
+-- INSPIRED BY NIER:AUTOMATA
+--
 -- MC ARCHITECTURE STANDARD v1.0
 -- ============================================================
+
 
 -- ============================================================
 -- 1. INPUT MAP
 -- ============================================================
-
--- MC01 OUTPUTS
 
 local IN_PROTOCOL       = 1
 local IN_MY_ID          = 2
@@ -29,32 +32,25 @@ local IN_TX_DIAGNOSTIC  = 7
 local IN_FREQUENCY_TX   = 8
 local IN_FREQUENCY_RX   = 9
 
--- CONFIGURATION MIRROR
-
 local IN_CONFIG_PROTOCOL = 10
 local IN_CONFIG_VERSION  = 11
 local IN_CONFIG_MY_ID    = 12
 local IN_CONFIG_REMOTE   = 13
 local IN_TIMEOUT         = 14
 
--- FREQUENCY CONFIGURATION
-
 local IN_BASE_FREQUENCY = 15
 local IN_FREQUENCY_DISTANCE = 16
-
--- RECEIVED HEARTBEAT
 
 local IN_RX_PROTOCOL = 17
 local IN_RX_REMOTE_ID = 18
 local IN_RX_COUNTER = 19
 local IN_RX_VERSION = 20
 
--- BOOL INPUTS
-
 local IN_CONNECTED = 1
 local IN_SEARCHING = 2
 local IN_LOST = 3
 local IN_ROLE = 4
+
 
 -- ============================================================
 -- 2. SYSTEM VARIABLES
@@ -93,35 +89,39 @@ local headerValid = false
 local decimalValid = false
 local heartbeatValid = false
 
--- HEARTBEAT ANIMATION
-
 local lastRxCounter = -1
 local pulseTimer = 0
 local tick = 0
+
+local scanPosition = 5
+local warningBlink = false
+
 
 -- ============================================================
 -- 3. COLOR PALETTE
 -- ============================================================
 
 local C = {
-    background = { 5, 10, 11 },
-    panel      = { 11, 20, 20 },
-    panel2     = { 15, 28, 27 },
+    background = { 17, 17, 15 },
+    panel      = { 29, 28, 24 },
+    panel2     = { 42, 40, 34 },
 
-    border     = { 35, 66, 59 },
-    grid       = { 17, 32, 30 },
+    border     = { 104, 97, 77 },
+    grid       = { 39, 37, 31 },
 
-    green      = { 0, 230, 130 },
-    greenDim   = { 0, 105, 70 },
+    green      = { 164, 177, 128 },
+    greenDim   = { 91, 105, 69 },
 
-    cyan       = { 40, 190, 210 },
-    white      = { 220, 235, 225 },
-    grey       = { 105, 130, 122 },
+    cyan       = { 190, 181, 151 },
+    white      = { 225, 217, 193 },
+    grey       = { 142, 134, 113 },
 
-    amber      = { 255, 180, 40 },
-    red        = { 255, 55, 45 },
+    amber      = { 207, 165, 91 },
+    red        = { 183, 81, 69 },
+
     black      = { 0, 0, 0 }
 }
+
 
 -- ============================================================
 -- 4. UTILITIES
@@ -158,17 +158,25 @@ local function bar(x, y, w, h, ratio, color)
     rect(x, y, w, h, C.grid)
 
     if ratio > 0 then
-        rect(x, y, math.max(1, w * ratio), h, color)
+        rect(x, y, math.max(1, math.floor(w * ratio)), h, color)
     end
 
 end
 
+-- FORMATTING WITHOUT STRING.FORMAT
+
 local function formatCounter(value)
-    return string.format("%.1f", value)
+
+    local n = math.floor(value * 10 + 0.5) / 10
+
+    return tostring(n)
+
 end
 
 local function formatFrequency(value)
-    return string.format("%.0f", value)
+
+    return tostring(math.floor(value + 0.5))
+
 end
 
 local function statusColor()
@@ -183,13 +191,51 @@ local function statusColor()
 
 end
 
+
 -- ============================================================
--- 5. DATA ACQUISITION
+-- 5. GRAPHIC UTILITIES
+-- ============================================================
+
+local function cornerFrame(x, y, w, h, color)
+
+    local s = 5
+
+    line(x, y, x+s, y, color)
+    line(x, y, x, y+s, color)
+
+    line(x+w-s, y, x+w, y, color)
+    line(x+w, y, x+w, y+s, color)
+
+    line(x, y+h-s, x, y+h, color)
+    line(x, y+h, x+s, y+h, color)
+
+    line(x+w-s, y+h, x+w, y+h, color)
+    line(x+w, y+h-s, x+w, y+h, color)
+
+end
+
+local function panel(x, y, w, h)
+
+    rect(x, y, w, h, C.panel)
+    outline(x, y, w, h, C.border)
+
+    cornerFrame(x, y, w, h, C.cyan)
+
+end
+
+local function sectionTitle(x, y, number, title)
+
+    txt(x, y, number, C.amber)
+    txt(x+17, y, title, C.white)
+
+end
+
+
+-- ============================================================
+-- 6. DATA ACQUISITION
 -- ============================================================
 
 local function readData()
-
-    -- MC01 DIAGNOSTICS
 
     state = input.getNumber(IN_STATE)
     rxAge = input.getNumber(IN_RX_AGE)
@@ -199,8 +245,6 @@ local function readData()
     frequencyTX = input.getNumber(IN_FREQUENCY_TX)
     frequencyRX = input.getNumber(IN_FREQUENCY_RX)
 
-    -- CONFIGURATION MIRROR
-
     protocol = input.getNumber(IN_CONFIG_PROTOCOL)
     version = input.getNumber(IN_CONFIG_VERSION)
 
@@ -209,14 +253,10 @@ local function readData()
 
     timeout = input.getNumber(IN_TIMEOUT)
 
-    -- FREQUENCY CONFIGURATION
-
     baseFrequency = input.getNumber(IN_BASE_FREQUENCY)
 
     frequencyDistance =
         input.getNumber(IN_FREQUENCY_DISTANCE)
-
-    -- RECEIVED PACKET
 
     rxProtocol = input.getNumber(IN_RX_PROTOCOL)
     rxRemoteID = input.getNumber(IN_RX_REMOTE_ID)
@@ -224,13 +264,9 @@ local function readData()
     rxCounter = input.getNumber(IN_RX_COUNTER)
     rxVersion = input.getNumber(IN_RX_VERSION)
 
-    -- CONNECTION FLAGS
-
     connected = input.getBool(IN_CONNECTED)
     searching = input.getBool(IN_SEARCHING)
     lost = input.getBool(IN_LOST)
-
-    -- ROLE
 
     if input.getBool(IN_ROLE) then
         role = "AIR"
@@ -263,8 +299,9 @@ local function readData()
 
 end
 
+
 -- ============================================================
--- 6. HEARTBEAT MONITOR
+-- 7. ANIMATION SYSTEM
 -- ============================================================
 
 local function updateHeartbeat()
@@ -275,7 +312,7 @@ local function updateHeartbeat()
         pulseTimer = pulseTimer - 1
     end
 
-    -- DETECT NEW RECEIVED HEARTBEAT
+    -- NEW RECEIVED HEARTBEAT
 
     if rxCounter ~= lastRxCounter then
 
@@ -287,110 +324,152 @@ local function updateHeartbeat()
 
     end
 
+    -- SCAN ANIMATION
+
+    scanPosition = scanPosition + 1
+
+    if scanPosition > 283 then
+        scanPosition = 5
+    end
+
+    -- WARNING ANIMATION
+
+    warningBlink = math.floor(tick / 15) % 2 == 0
+
 end
 
+
 -- ============================================================
--- 7. MAIN TICK
+-- 8. MAIN TICK
 -- ============================================================
 
 function onTick()
 
     readData()
-
     updateHeartbeat()
 
 end
 
+
 -- ============================================================
--- 8. DISPLAY COMPONENTS
+-- 9. BACKGROUND
 -- ============================================================
 
--- ------------------------------------------------------------
--- HEADER
--- ------------------------------------------------------------
+local function drawBackground()
 
-local function drawHeader()
+    rect(0, 0, 288, 160, C.background)
 
-    rect(0, 0, 288, 17, C.panel2)
+    -- VERTICAL GRID
 
-    txt(5, 2, "OAI MIZUSHIMA", C.green)
-    txt(88, 2, "YR-02", C.cyan)
+    for x = 0, 288, 24 do
+        line(x, 0, x, 160, C.grid)
+    end
 
-    txt(242, 2, "MC02", C.white)
+    -- HORIZONTAL GRID
 
-    line(3, 16, 285, 16, C.border)
+    for y = 20, 156, 16 do
+        line(0, y, 288, y, C.grid)
+    end
+
+    -- OUTER FRAME
+
+    outline(1, 1, 286, 158, C.border)
+
+    -- SCAN LINE
+
+    line(scanPosition, 19, scanPosition, 157, C.grid)
 
 end
 
--- ------------------------------------------------------------
--- CONNECTION STATUS
--- ------------------------------------------------------------
+
+-- ============================================================
+-- 10. HEADER
+-- ============================================================
+
+local function drawHeader()
+
+    rect(3, 2, 282, 14, C.panel2)
+
+    txt(7, 5, "OAI MIZUSHIMA", C.white)
+
+    txt(88, 5, "YR-02", C.amber)
+
+    txt(242, 5, "MC02", C.cyan)
+
+    line(3, 17, 285, 17, C.border)
+
+    -- SMALL DECORATIVE MARKERS
+
+    rect(226, 6, 3, 3, C.grey)
+    rect(231, 6, 3, 3, C.grey)
+
+end
+
+
+-- ============================================================
+-- 11. CONNECTION STATUS
+-- ============================================================
 
 local function drawConnection()
 
+    panel(5, 21, 278, 22)
+
     local color = statusColor()
 
-    rect(4, 20, 280, 23, C.panel)
-    outline(4, 20, 280, 23, C.border)
-
-    -- STATUS INDICATOR
+    rect(10, 27, 5, 10, color)
 
     if connected then
 
-        rect(9, 26, 5, 11, C.green)
-
-        txt(19, 24, "LINK ESTABLISHED", C.green)
+        txt(21, 25, "LINK ESTABLISHED", C.green)
 
     elseif lost then
 
-        rect(9, 26, 5, 11, C.red)
-
-        txt(19, 24, "LINK LOST", C.red)
+        txt(21, 25, "LINK LOST", C.red)
 
     else
 
-        rect(9, 26, 5, 11, C.amber)
-
-        txt(19, 24, "SEARCHING", C.amber)
+        txt(21, 25, "SEARCHING", C.amber)
 
     end
 
-    -- ROLE
+    txt(213, 25, role, C.cyan)
 
-    txt(213, 24, role, C.cyan)
+    line(10, 39, 278, 39, C.grid)
 
-    txt(19, 34,
+    txt(11, 34, "UNIT STATUS", C.grey)
+
+    txt(79, 34,
         connected and "OPERATIONAL" or "STANDBY",
-        C.grey)
+        connected and C.green or C.amber)
 
     txt(246, 34, "SYS", color)
 
 end
 
--- ------------------------------------------------------------
--- HEARTBEAT MONITOR
--- ------------------------------------------------------------
+
+-- ============================================================
+-- 12. HEARTBEAT MONITOR
+-- ============================================================
 
 local function drawHeartbeat()
 
-    rect(4, 47, 280, 43, C.panel)
-    outline(4, 47, 280, 43, C.border)
+    panel(5, 47, 278, 43)
 
-    txt(9, 50, "HEARTBEAT MONITOR", C.cyan)
+    sectionTitle(10, 50, "01", "HEARTBEAT MONITOR")
 
-    -- TX HEARTBEAT
+    -- TRANSMISSION
 
-    txt(10, 63, "TX", C.grey)
+    txt(11, 64, "TX", C.grey)
+    txt(29, 63, formatCounter(txCounter), C.white)
 
-    txt(27, 62, formatCounter(txCounter), C.green)
+    -- RECEPTION
 
-    -- RX HEARTBEAT
+    txt(105, 64, "RX", C.grey)
+    txt(123, 63, formatCounter(rxCounter), C.white)
 
-    txt(104, 63, "RX", C.grey)
+    -- PULSE INDICATOR
 
-    txt(121, 62, formatCounter(rxCounter), C.white)
-
-    -- HEARTBEAT PULSE
+    rect(230, 60, 43, 14, C.background)
 
     local pulseColor = C.greenDim
 
@@ -400,60 +479,48 @@ local function drawHeartbeat()
         pulseColor = C.red
     end
 
-    rect(231, 59, 43, 16, C.grid)
-
-    -- ANIMATED PULSE
-
     if pulseTimer > 0 then
 
-        local radius = 2 + (pulseTimer % 5)
-
-        setColor(pulseColor)
-        screen.drawCircleF(244, 67, radius)
-
-        rect(255, 65, 13, 3, C.green)
+        rect(233, 63, 7, 7, pulseColor)
+        rect(244, 63, 7, 7, pulseColor)
+        rect(255, 63, 7, 7, pulseColor)
 
     else
 
-        setColor(pulseColor)
-        screen.drawCircleF(244, 67, 2)
+        rect(233, 63, 7, 7, C.grid)
+        rect(244, 63, 7, 7, pulseColor)
+        rect(255, 63, 7, 7, C.grid)
 
     end
 
     -- SYNC STATUS
 
-    txt(10, 78, "SYNC", C.grey)
+    line(10, 77, 278, 77, C.grid)
 
-    if heartbeatValid then
+    txt(11, 79, "SYNC", C.grey)
 
-        txt(43, 78, "LOCKED", C.green)
+    txt(43, 79,
+        heartbeatValid and "LOCKED" or "NO SYNC",
+        heartbeatValid and C.green or C.red)
 
-    else
+    txt(165, 79, "SEQUENCE", C.grey)
 
-        txt(43, 78, "NO SYNC", C.red)
-
-    end
-
-    txt(170, 78, "SEQUENCE", C.grey)
-
-    if headerValid and decimalValid then
-        txt(226, 78, "VALID", C.green)
-    else
-        txt(226, 78, "ERROR", C.red)
-    end
+    txt(225, 79,
+        headerValid and decimalValid and "VALID" or "ERROR",
+        headerValid and decimalValid and C.green or C.red)
 
 end
 
--- ------------------------------------------------------------
--- LINK QUALITY
--- ------------------------------------------------------------
+
+-- ============================================================
+-- 13. LINK HEALTH
+-- ============================================================
 
 local function drawLinkQuality()
 
-    rect(4, 94, 137, 36, C.panel)
-    outline(4, 94, 137, 36, C.border)
+    panel(5, 94, 137, 36)
 
-    txt(9, 97, "LINK HEALTH", C.cyan)
+    sectionTitle(10, 97, "02", "LINK HEALTH")
 
     local ratio = 0
 
@@ -473,103 +540,100 @@ local function drawLinkQuality()
         color = C.red
     end
 
-    txt(9, 108, string.format("%d%%", math.floor(ratio * 100)), color)
+    txt(11, 109,
+        tostring(math.floor(ratio * 100)) .. "%",
+        color)
 
-    bar(49, 113, 84, 6, ratio, color)
+    bar(49, 113, 83, 5, ratio, color)
 
-    txt(9, 120, "RX AGE", C.grey)
+    txt(11, 120, "RX AGE", C.grey)
 
-    txt(51, 120, string.format("%.1f", rxAge / 60), C.white)
+    txt(55, 120, formatCounter(rxAge / 60), C.white)
 
 end
 
--- ------------------------------------------------------------
--- CONNECTION TIMER
--- ------------------------------------------------------------
+
+-- ============================================================
+-- 14. TIMEOUT MONITOR
+-- ============================================================
 
 local function drawTimer()
 
-    rect(147, 94, 137, 36, C.panel)
-    outline(147, 94, 137, 36, C.border)
+    panel(147, 94, 136, 36)
 
-    txt(152, 97, "TIMEOUT MONITOR", C.cyan)
+    sectionTitle(152, 97, "03", "TIMEOUT")
 
-    txt(152, 109, "LIMIT", C.grey)
+    local remaining = math.max(0, timeout - rxAge)
 
+    txt(153, 109, "LIMIT", C.grey)
     txt(190, 109, tostring(timeout), C.white)
 
-    txt(152, 120, "AGE", C.grey)
-
+    txt(153, 120, "AGE", C.grey)
     txt(190, 120, tostring(math.floor(rxAge)), C.white)
 
-    local remaining = timeout - rxAge
-
-    if remaining < 0 then
-        remaining = 0
-    end
-
     txt(237, 109, "LEFT", C.grey)
-
     txt(237, 120, tostring(math.floor(remaining)), C.amber)
 
 end
 
--- ------------------------------------------------------------
--- FREQUENCY MONITOR
--- ------------------------------------------------------------
+
+-- ============================================================
+-- 15. FREQUENCY MONITOR
+-- ============================================================
 
 local function drawFrequency()
 
-    rect(4, 134, 280, 22, C.panel)
-    outline(4, 134, 280, 22, C.border)
+    panel(5, 134, 278, 21)
 
-    txt(9, 137, "RF", C.cyan)
+    txt(10, 137, "04", C.amber)
 
-    txt(30, 137, "TX", C.grey)
+    txt(27, 137, "RF", C.white)
 
-    txt(44, 137, formatFrequency(frequencyTX), C.green)
+    txt(50, 137, "TX", C.grey)
+    txt(66, 137, formatFrequency(frequencyTX), C.green)
 
-    txt(108, 137, "RX", C.grey)
+    txt(112, 137, "RX", C.grey)
+    txt(128, 137, formatFrequency(frequencyRX), C.cyan)
 
-    txt(122, 137, formatFrequency(frequencyRX), C.cyan)
+    txt(207, 137, role, C.white)
 
-    -- ROLE INDICATOR
-
-    txt(208, 137, role, C.white)
-
-    txt(9, 147, "BASE", C.grey)
-
+    txt(10, 147, "BASE", C.grey)
     txt(39, 147, formatFrequency(baseFrequency), C.white)
 
     txt(108, 147, "STEP", C.grey)
-
     txt(138, 147, formatFrequency(frequencyDistance), C.white)
 
-    txt(224, 147, "YR-02", C.green)
+    txt(225, 147, "YR-02", C.amber)
 
 end
 
+
 -- ============================================================
--- 9. MAIN DRAW
+-- 16. WARNING INDICATOR
+-- ============================================================
+
+local function drawWarning()
+
+    if lost and warningBlink then
+
+        rect(0, 0, 288, 2, C.red)
+
+    elseif searching and warningBlink then
+
+        rect(0, 0, 288, 2, C.amber)
+
+    end
+
+end
+
+
+-- ============================================================
+-- 17. MAIN DRAW
 -- ============================================================
 
 function onDraw()
 
-    -- BACKGROUND
-
-    rect(0, 0, 288, 160, C.background)
-
-    -- SUBTLE GRID
-
-    for x = 0, 288, 16 do
-        line(x, 0, x, 160, C.grid)
-    end
-
-    -- DISPLAY FRAME
-
-    outline(1, 1, 286, 158, C.border)
-
-    -- DISPLAY COMPONENTS
+    drawBackground()
 
     drawHeader()
 
@@ -583,12 +647,12 @@ function onDraw()
 
     drawFrequency()
 
-    -- BOTTOM STATUS LINE
-
-    line(4, 159, 284, 159, C.greenDim)
+    drawWarning()
 
 end
 
+
 -- ============================================================
 -- END MC02
+-- OAI MIZUSHIMA YR-02
 -- ============================================================
