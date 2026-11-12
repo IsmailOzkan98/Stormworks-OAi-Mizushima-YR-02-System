@@ -332,6 +332,19 @@ function number(data, key, decimals = 1) {
         : "--";
 }
 
+
+function getRxTxState(state) {
+
+    const states = {
+        0: "SEARCHING",
+        1: "CONNECTED",
+        2: "LINK LOST"
+    };
+
+    return states[Number(state)] ?? "UNKNOWN";
+}
+
+
 function isActive(data, key) {
     return data[key] === "1" ||
         data[key] === 1 ||
@@ -475,12 +488,32 @@ function updateInterface(data) {
 
     // FLIGHT SEQUENCE
 
+
     const stage = data.stage || "UNKNOWN";
     const status = (data.status || "IDLE").toUpperCase();
 
     setValue("stage", stage);
     setValue("state", data.state ?? "--");
     setValue("timer", data.timer ?? "--");
+
+
+    // RX-TX LINK STATUS
+
+    setValue(
+        "rxTxState",
+        getRxTxState(data.rx_tx_state)
+    );
+
+    setValue(
+        "rxTxFrequencyTX",
+        number(data, "rx_tx_frequency_tx", 2)
+    );
+
+    setValue(
+        "rxTxFrequencyRX",
+        number(data, "rx_tx_frequency_rx", 2)
+    );
+
 
     const statusElement = document.getElementById("flightStatus");
 
