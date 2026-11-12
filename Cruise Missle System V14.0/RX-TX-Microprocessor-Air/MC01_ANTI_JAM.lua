@@ -23,7 +23,7 @@
 -- GROUND
 --
 -- ROLE SELECTION:
--- property.getText("MyText")
+-- BOOL 4 = ROLE SELECTOR
 --
 -- CONNECTION STATE:
 -- 0 = SEARCHING
