@@ -1,7 +1,70 @@
 
--- GROUND LINK SYSTEM
+-- ============================================================
+-- OAI MIZUSHIMA YR-02
+-- MC08: GROUND LINK SYSTEM
+-- VERSION: 4.0.0
+-- SYSTEM VERSION: 14.0
+--
+-- RESPONSIBILITY:
+-- Establish and monitor the communication link between
+-- GROUND and AIR controllers through a heartbeat protocol.
+--
+-- MC ARCHITECTURE STANDARD v1.0
+-- ============================================================
+
+
+-- ============================================================
+-- 1. HEADER & DOCUMENTATION
+-- ============================================================
+
 -- GROUND ID = 2
 -- AIR ID = 1
+--
+-- STATE:
+-- 0 = SEARCHING
+-- 1 = CONNECTED
+-- 2 = LINK_LOST
+--
+-- HEARTBEAT:
+-- Internal integer representation.
+-- 10 = 1.0
+
+
+-- ============================================================
+-- 2. INPUT CONFIGURATION
+-- ============================================================
+
+local INPUT_PROTOCOL = 1
+local INPUT_REMOTE_ID = 2
+local INPUT_COUNTER = 3
+local INPUT_VERSION = 4
+
+
+-- ============================================================
+-- 3. OUTPUT CONFIGURATION
+-- ============================================================
+
+-- NUMBER OUTPUTS
+
+local OUTPUT_PROTOCOL = 1
+local OUTPUT_MY_ID = 2
+local OUTPUT_COUNTER = 3
+local OUTPUT_VERSION = 4
+
+local OUTPUT_STATE = 5
+local OUTPUT_RX_AGE = 6
+local OUTPUT_TX_COUNTER = 7
+
+-- BOOL OUTPUTS
+
+local OUTPUT_CONNECTED = 1
+local OUTPUT_SEARCHING = 2
+local OUTPUT_LINK_LOST = 3
+
+
+-- ============================================================
+-- 4. SYSTEM CONFIGURATION
+-- ============================================================
 
 local PROTOCOL = 7319
 local VERSION = 1
@@ -11,84 +74,199 @@ local REMOTE_ID = 1
 
 local TIMEOUT = 180
 
-local state = 0
--- 0 SEARCHING
--- 1 CONNECTED
--- 2 LINK_LOST
+local COUNTER_MIN = 10
+local COUNTER_MAX = 999
 
--- HEARTBEAT
--- Internal integer: 10 = 1.0
+local COUNTER_SCALE = 10
+local DECIMAL_TOLERANCE = 0.1
+
+
+-- ============================================================
+-- 5. SYSTEM STATE
+-- ============================================================
+
+local STATE_SEARCHING = 0
+local STATE_CONNECTED = 1
+local STATE_LINK_LOST = 2
+
+local state = STATE_SEARCHING
+
+-- TRANSMISSION STATE
+
 local txCounter = 0
 local expectedRx = 10
+
+-- RECEPTION STATE
 
 local rxAge = 0
 local rxCounter = -1
 
+
+-- ============================================================
+-- 6. GENERAL UTILITIES
+-- ============================================================
+
 local function nextCounter(value)
-    if value >= 999 then
-        return 10
+
+    if value >= COUNTER_MAX then
+        return COUNTER_MIN
     end
 
     return value + 1
+
 end
 
-function onTick()
 
-    -- RECEIVE AIR HEARTBEAT
-    rxAge = rxAge + 1
+local function convertToIntegerTenths(value)
 
-    local protocol = input.getNumber(1)
-    local remoteID = input.getNumber(2)
-    local counter = input.getNumber(3)
-    local version = input.getNumber(4)
+    return math.floor(value * COUNTER_SCALE + 0.5)
 
-    -- VALIDATE PACKET
+end
+
+
+local function isValidDecimal(value, converted)
+
+    return math.abs(value * COUNTER_SCALE - converted)
+        < DECIMAL_TOLERANCE
+
+end
+
+
+-- ============================================================
+-- 7. SYSTEM FUNCTIONS
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 7.1 RECEIVE HEARTBEAT
+-- ------------------------------------------------------------
+
+local function receiveHeartbeat()
+
+    local protocol = input.getNumber(INPUT_PROTOCOL)
+    local remoteID = input.getNumber(INPUT_REMOTE_ID)
+    local counter = input.getNumber(INPUT_COUNTER)
+    local version = input.getNumber(INPUT_VERSION)
+
     local validHeader =
         protocol == PROTOCOL and
         remoteID == REMOTE_ID and
         version == VERSION and
         counter > 0
 
-    if validHeader then
-
-        -- Convert decimal to integer tenths
-        local received = math.floor(counter * 10 + 0.5)
-
-        local validDecimal =
-            math.abs(counter * 10 - received) < 0.1
-
-        -- Only accept the exact expected number
-        if validDecimal and received == expectedRx then
-
-            rxCounter = received
-            rxAge = 0
-
-            -- Respond with next number
-            txCounter = nextCounter(received)
-            expectedRx = nextCounter(txCounter)
-
-            state = 1
-        end
+    if not validHeader then
+        return
     end
 
-    -- CONNECTION TIMEOUT
-    if state == 1 and rxAge >= TIMEOUT then
-        state = 2
+    local received = convertToIntegerTenths(counter)
+
+    local validDecimal =
+        isValidDecimal(counter, received)
+
+    if not validDecimal then
+        return
     end
 
-    -- TRANSMIT HEARTBEAT
-    output.setNumber(1, PROTOCOL)
-    output.setNumber(2, MY_ID)
-    output.setNumber(3, txCounter / 10)
-    output.setNumber(4, VERSION)
+    if received ~= expectedRx then
+        return
+    end
 
-    -- OUTPUT DIAGNOSTICS
-    output.setBool(1, state == 1)
-    output.setBool(2, state == 0)
-    output.setBool(3, state == 2)
+    -- ACCEPT HEARTBEAT
 
-    output.setNumber(5, state)
-    output.setNumber(6, rxAge)
-    output.setNumber(7, txCounter / 10)
+    rxCounter = received
+    rxAge = 0
+
+    -- UPDATE TRANSMISSION SEQUENCE
+
+    txCounter = nextCounter(received)
+    expectedRx = nextCounter(txCounter)
+
+    state = STATE_CONNECTED
 
 end
+
+
+-- ------------------------------------------------------------
+-- 7.2 CONNECTION MONITORING
+-- ------------------------------------------------------------
+
+local function monitorConnection()
+
+    if state == STATE_CONNECTED and rxAge >= TIMEOUT then
+        state = STATE_LINK_LOST
+    end
+
+end
+
+
+-- ------------------------------------------------------------
+-- 7.3 HEARTBEAT TRANSMISSION
+-- ------------------------------------------------------------
+
+local function prepareHeartbeat()
+
+    -- Transmission values are processed
+    -- in OUTPUT PROCESSING.
+
+end
+
+
+-- ============================================================
+-- 8. MAIN TICK
+-- ============================================================
+
+function onTick()
+
+    -- UPDATE RECEPTION AGE
+
+    rxAge = rxAge + 1
+
+    -- RECEIVE AIR HEARTBEAT
+
+    receiveHeartbeat()
+
+    -- MONITOR CONNECTION
+
+    monitorConnection()
+
+    -- PREPARE TRANSMISSION
+
+    prepareHeartbeat()
+
+    -- PROCESS OUTPUTS
+
+    processOutputs()
+
+end
+
+
+-- ============================================================
+-- 9. OUTPUT PROCESSING
+-- ============================================================
+
+function processOutputs()
+
+    -- HEARTBEAT TRANSMISSION
+
+    output.setNumber(OUTPUT_PROTOCOL, PROTOCOL)
+    output.setNumber(OUTPUT_MY_ID, MY_ID)
+    output.setNumber(OUTPUT_COUNTER, txCounter / COUNTER_SCALE)
+    output.setNumber(OUTPUT_VERSION, VERSION)
+
+    -- CONNECTION DIAGNOSTICS
+
+    output.setBool(OUTPUT_CONNECTED, state == STATE_CONNECTED)
+    output.setBool(OUTPUT_SEARCHING, state == STATE_SEARCHING)
+    output.setBool(OUTPUT_LINK_LOST, state == STATE_LINK_LOST)
+
+    -- NUMERICAL DIAGNOSTICS
+
+    output.setNumber(OUTPUT_STATE, state)
+    output.setNumber(OUTPUT_RX_AGE, rxAge)
+    output.setNumber(OUTPUT_TX_COUNTER, txCounter / COUNTER_SCALE)
+
+end
+
+
+-- ============================================================
+-- 10. END OF MC
+-- ============================================================
