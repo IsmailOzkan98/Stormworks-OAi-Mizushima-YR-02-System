@@ -1,431 +1,94 @@
 
--- OAI MIZUSHIMA YR-02
--- MC 08-1: ANTI-JAM GROUND
--- VERSION: 2.1.0
--- SYSTEM VERSION: 14.0
--- REWORKED FROM v2.0.0
---
--- RESPONSIBILITY:
---   Ground communication management
---   Independent frequency planning
---   Triple transmitter control
---   Vehicle heartbeat monitoring
---   Communication status validation
+-- GROUND LINK SYSTEM
+-- GROUND ID = 2
+-- AIR ID = 1
 
-
---------------------------------------------------
--- 01. INPUT CONFIGURATION
---------------------------------------------------
-
-local INPUT = {
-
-    FREQUENCY_MIN = 1,
-    FREQUENCY_MAX = 2,
-
-    ENABLE = 1,
-
-    STATUS_FIRST = 3,
-    STATUS_HEARTBEAT = 2,
-    STATUS_LINK = 3,
-    STATUS_EMERGENCY = 4,
-    STATUS_CONTROL_VALID = 5
-
-}
-
-
---------------------------------------------------
--- 02. OUTPUT CONFIGURATION
---------------------------------------------------
-
-local OUTPUT = {
-
-    CONTROL_FIRST = 1,
-    FREQUENCY_FIRST = 9,
-
-    HEARTBEAT = 1,
-    ENABLE = 2
-
-}
-
-
---------------------------------------------------
--- 03. SYSTEM STATE
---------------------------------------------------
-
-local SYSTEM = {
-
-    enabled = false,
-
-    vehicleLink = false,
-    statusValid = false,
-
-    heartbeat = false,
-
-    controlSequence = 0,
-    lastStatusSequence = -1,
-
-    statusTimer = 60,
-
-    frequencyMin = 100,
-    frequencyMax = 100000,
-
-    frequencies = {0, 0, 0, 0},
-
-    remoteLink = false,
-    remoteEmergency = false,
-    remoteControlValid = false,
-
-    tick = 0
-
-}
-
-
---------------------------------------------------
--- 04. GENERAL UTILITIES
---------------------------------------------------
-
-local MAGIC = 27183
+local PROTOCOL = 7319
 local VERSION = 1
 
-local SEND_RATE = 30
-local LINK_TIMEOUT = 60
+local MY_ID = 2
+local REMOTE_ID = 1
 
-local SEQUENCE_MODULO = 1000000
-local SEQUENCE_HALF = 500000
+local TIMEOUT = 180
 
+local state = 0
+-- 0 SEARCHING
+-- 1 CONNECTED
+-- 2 LINK_LOST
 
-local function checksum(data, count)
+-- HEARTBEAT
+-- Internal integer: 10 = 1.0
+local txCounter = 0
+local expectedRx = 10
 
-    local sum = 0
+local rxAge = 0
+local rxCounter = -1
 
-    for i = 1, count do
-        sum = sum + math.floor(data[i])
+local function nextCounter(value)
+    if value >= 999 then
+        return 10
     end
 
-    return sum % 65536
-
+    return value + 1
 end
-
-
-local function validSequence(sequence)
-
-    return sequence >= 0
-        and sequence < SEQUENCE_MODULO
-        and sequence == math.floor(sequence)
-
-end
-
-
-local function isNewSequence(sequence, previous)
-
-    if previous < 0 then
-        return true
-    end
-
-    local difference =
-        (sequence - previous) % SEQUENCE_MODULO
-
-    return difference > 0
-        and difference < SEQUENCE_HALF
-
-end
-
-
---------------------------------------------------
--- 05. FREQUENCY MANAGEMENT
---------------------------------------------------
-
-local function updateFrequencyPlan()
-
-    local minimum = SYSTEM.frequencyMin
-    local maximum = SYSTEM.frequencyMax
-
-    if minimum < 100
-        or minimum > 100000
-        or maximum < 100
-        or maximum > 100000
-        or maximum - minimum < 4
-        or minimum ~= math.floor(minimum)
-        or maximum ~= math.floor(maximum) then
-
-        for i = 1, 4 do
-            SYSTEM.frequencies[i] = 0
-        end
-
-        return false
-
-    end
-
-    local span = maximum - minimum
-
-    for i = 1, 4 do
-
-        SYSTEM.frequencies[i] =
-            minimum + math.floor(span * (i - 1) / 4)
-
-    end
-
-    return true
-
-end
-
-
---------------------------------------------------
--- 06. COMMUNICATION PROTOCOL
---------------------------------------------------
-
-local function writeControl()
-
-    local packet = {
-
-        MAGIC,
-        VERSION,
-        SYSTEM.controlSequence,
-
-        SYSTEM.frequencies[1],
-        SYSTEM.frequencies[2],
-        SYSTEM.frequencies[3],
-        SYSTEM.frequencies[4]
-
-    }
-
-    for i = 1, 7 do
-        output.setNumber(OUTPUT.CONTROL_FIRST + i - 1, packet[i])
-    end
-
-    output.setNumber(
-        OUTPUT.CONTROL_FIRST + 7,
-        checksum(packet, 7)
-    )
-
-    output.setBool(OUTPUT.HEARTBEAT, SYSTEM.heartbeat)
-    output.setBool(OUTPUT.ENABLE, SYSTEM.enabled)
-
-end
-
-
-local function readVehicleStatus()
-
-    local packet = {}
-
-    for i = 1, 9 do
-        packet[i] = input.getNumber(INPUT.STATUS_FIRST + i - 1)
-    end
-
-    local heartbeat =
-        input.getBool(INPUT.STATUS_HEARTBEAT)
-
-    local remoteLink =
-        input.getBool(INPUT.STATUS_LINK)
-
-    local remoteEmergency =
-        input.getBool(INPUT.STATUS_EMERGENCY)
-
-    local remoteControlValid =
-        input.getBool(INPUT.STATUS_CONTROL_VALID)
-
-
-    -- PACKET IDENTIFICATION
-
-    if packet[1] ~= MAGIC
-        or packet[2] ~= VERSION then
-
-        return nil
-
-    end
-
-
-    -- PACKET INTEGRITY
-
-    if packet[9] ~= checksum(packet, 8) then
-        return nil
-    end
-
-
-    -- SEQUENCE VALIDATION
-
-    if not validSequence(packet[3])
-        or not validSequence(packet[4]) then
-
-        return nil
-
-    end
-
-    if not isNewSequence(
-        packet[3],
-        SYSTEM.lastStatusSequence
-    ) then
-
-        return nil
-
-    end
-
-
-    -- HEARTBEAT VALIDATION
-
-    if heartbeat ~= (packet[3] % 2 == 1) then
-        return nil
-    end
-
-
-    -- FREQUENCY VALIDATION
-
-    for i = 5, 8 do
-
-        if packet[i] < SYSTEM.frequencyMin
-            or packet[i] > SYSTEM.frequencyMax
-            or packet[i] ~= math.floor(packet[i]) then
-
-            return nil
-
-        end
-
-    end
-
-
-    SYSTEM.lastStatusSequence = packet[3]
-
-    return {
-
-        link = remoteLink,
-        emergency = remoteEmergency,
-        controlValid = remoteControlValid
-
-    }
-
-end
-
-
---------------------------------------------------
--- 07. LINK MANAGEMENT
---------------------------------------------------
-
-local function updateVehicleLink(status)
-
-    SYSTEM.statusTimer =
-        math.min(SYSTEM.statusTimer + 1, LINK_TIMEOUT)
-
-    if status then
-
-        SYSTEM.statusTimer = 0
-
-        SYSTEM.remoteLink = status.link
-        SYSTEM.remoteEmergency = status.emergency
-        SYSTEM.remoteControlValid = status.controlValid
-
-    end
-
-    SYSTEM.statusValid =
-        SYSTEM.statusTimer < LINK_TIMEOUT
-
-    SYSTEM.vehicleLink =
-        SYSTEM.statusValid
-        and SYSTEM.remoteLink
-        and SYSTEM.remoteControlValid
-        and not SYSTEM.remoteEmergency
-
-    if not SYSTEM.statusValid then
-
-        SYSTEM.remoteLink = false
-        SYSTEM.remoteEmergency = false
-        SYSTEM.remoteControlValid = false
-
-    end
-
-end
-
-
---------------------------------------------------
--- 08. OUTPUT MANAGEMENT
---------------------------------------------------
-
-local function writeFrequencies()
-
-    for i = 1, 4 do
-
-        output.setNumber(
-            OUTPUT.FREQUENCY_FIRST + i - 1,
-            SYSTEM.frequencies[i]
-        )
-
-    end
-
-end
-
-
---------------------------------------------------
--- 09. MAIN TICK
---------------------------------------------------
 
 function onTick()
 
-    SYSTEM.tick = SYSTEM.tick + 1
+    -- RECEIVE AIR HEARTBEAT
+    rxAge = rxAge + 1
 
+    local protocol = input.getNumber(1)
+    local remoteID = input.getNumber(2)
+    local counter = input.getNumber(3)
+    local version = input.getNumber(4)
 
-    -- READ INPUTS
+    -- VALIDATE PACKET
+    local validHeader =
+        protocol == PROTOCOL and
+        remoteID == REMOTE_ID and
+        version == VERSION and
+        counter > 0
 
-    SYSTEM.frequencyMin =
-        input.getNumber(INPUT.FREQUENCY_MIN)
+    if validHeader then
 
-    SYSTEM.frequencyMax =
-        input.getNumber(INPUT.FREQUENCY_MAX)
+        -- Convert decimal to integer tenths
+        local received = math.floor(counter * 10 + 0.5)
 
-    SYSTEM.enabled =
-        input.getBool(INPUT.ENABLE)
+        local validDecimal =
+            math.abs(counter * 10 - received) < 0.1
 
+        -- Only accept the exact expected number
+        if validDecimal and received == expectedRx then
 
-    -- FREQUENCY PLAN
+            rxCounter = received
+            rxAge = 0
 
-    local rangeValid = updateFrequencyPlan()
+            -- Respond with next number
+            txCounter = nextCounter(received)
+            expectedRx = nextCounter(txCounter)
 
-    SYSTEM.enabled =
-        SYSTEM.enabled and rangeValid
-
-
-    -- CONTROL SEQUENCE
-
-    if SYSTEM.tick % SEND_RATE == 0 then
-
-        SYSTEM.controlSequence =
-            (SYSTEM.controlSequence + 1) % SEQUENCE_MODULO
-
-        SYSTEM.heartbeat =
-            SYSTEM.controlSequence % 2 == 1
-
+            state = 1
+        end
     end
 
-
-    -- VEHICLE STATUS
-
-    if SYSTEM.enabled then
-
-        updateVehicleLink(readVehicleStatus())
-
-    else
-
-        SYSTEM.vehicleLink = false
-        SYSTEM.statusValid = false
-
-        SYSTEM.remoteLink = false
-        SYSTEM.remoteEmergency = false
-        SYSTEM.remoteControlValid = false
-
-        SYSTEM.statusTimer = LINK_TIMEOUT
-        SYSTEM.lastStatusSequence = -1
-
+    -- CONNECTION TIMEOUT
+    if state == 1 and rxAge >= TIMEOUT then
+        state = 2
     end
 
+    -- TRANSMIT HEARTBEAT
+    output.setNumber(1, PROTOCOL)
+    output.setNumber(2, MY_ID)
+    output.setNumber(3, txCounter / 10)
+    output.setNumber(4, VERSION)
 
-    -- TRANSMITTER CONTROL
+    -- OUTPUT DIAGNOSTICS
+    output.setBool(1, state == 1)
+    output.setBool(2, state == 0)
+    output.setBool(3, state == 2)
 
-    writeControl()
-
-
-    -- FREQUENCY OUTPUTS
-
-    writeFrequencies()
+    output.setNumber(5, state)
+    output.setNumber(6, rxAge)
+    output.setNumber(7, txCounter / 10)
 
 end
-
-
--- END OF MC 08-1
