@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.3.1
+-- VERSION: 1.4.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -51,7 +51,6 @@ local OUTPUT = {
     ELEVATOR_LEFT = 4,
 
     DESIRED_VERTICAL_SPEED  = 5,
-    ALTITUDE_TARGET = 6 -- output for mc07
 
 }
 
@@ -385,15 +384,6 @@ function onTick()
 
     )
 
-    -- ALTITUDE TARGET OUTPUT
-
-    output.setNumber(
-
-        OUTPUT.ALTITUDE_TARGET,
-
-        altitude.altitudeError
-
-    )
 
 end
 

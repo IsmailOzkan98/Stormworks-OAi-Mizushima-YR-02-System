@@ -1,11 +1,11 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 08: DESCENT PROFILE
--- VERSION: 1.0.0
+-- VERSION: 1.1.0
 -- SYSTEM VERSION: 14.0
 --
 -- RESPONSIBILITY:
---   Progressive descent profile generation
+--   Dynamic helicopter descent profile generation
 
 
 --------------------------------------------------
@@ -16,8 +16,11 @@ local INPUT = {
 
     -- Numerical Inputs
 
-    ALTITUDE = 1,    --sensor
-    AP_DISTANCE = 2, --output MC05 Num 7
+    ALTITUDE = 1,
+    AP_DISTANCE = 2,
+
+    HORIZONTAL_SPEED = 3,
+    MAX_DESCENT_SPEED = 4,
 
     -- Boolean Inputs
 
@@ -32,7 +35,7 @@ local INPUT = {
 
 local OUTPUT = {
 
-    DESCENT_TARGET = 1 --output MC04 Num 10
+    DESCENT_TARGET = 1 
 
 }
 
@@ -45,9 +48,9 @@ local CONFIG = {
 
     FINAL_ALTITUDE = 1,
 
-    START_DISTANCE = 1500,
-
     CURVE_EXPONENT = 3,
+
+    DISTANCE_MARGIN = 1.20,
 
     ARRIVAL_RADIUS = 20
 
@@ -68,6 +71,8 @@ local SYSTEM = {
 
     initialAltitude = 100,
 
+    startDistance = 0,
+
     descentTarget = 100
 
 }
@@ -85,12 +90,59 @@ end
 
 
 --------------------------------------------------
--- 06. DESCENT PROFILE
+-- 06. DESCENT DISTANCE CALCULATION
+--------------------------------------------------
+
+local function calculateStartDistance(data)
+
+    local altitudeDifference = math.max(
+
+        0,
+
+        data.altitude - CONFIG.FINAL_ALTITUDE
+
+    )
+
+    local horizontalSpeed = math.abs(
+
+        data.horizontalSpeed
+
+    )
+
+    local maxDescentSpeed = data.maxDescentSpeed
+
+
+    if maxDescentSpeed <= 0 then
+
+        return 0
+
+    end
+
+
+    local requiredDistance =
+
+        altitudeDifference *
+
+        horizontalSpeed *
+
+        CONFIG.CURVE_EXPONENT /
+
+        maxDescentSpeed
+
+
+    return requiredDistance * CONFIG.DISTANCE_MARGIN
+
+end
+
+
+--------------------------------------------------
+-- 07. DESCENT PROFILE
 --------------------------------------------------
 
 local function updateDescent(data, enabled)
 
     local risingEdge =
+
         enabled and not SYSTEM.previousEnable
 
     SYSTEM.previousEnable = enabled
@@ -104,6 +156,8 @@ local function updateDescent(data, enabled)
 
         SYSTEM.descentCompleted = false
 
+        SYSTEM.startDistance = 0
+
         SYSTEM.descentTarget = data.altitude
 
         return SYSTEM.descentTarget
@@ -111,11 +165,13 @@ local function updateDescent(data, enabled)
     end
 
 
-    -- CAPTURE INITIAL ALTITUDE
+    -- CAPTURE INITIAL CONDITIONS
 
     if risingEdge then
 
         SYSTEM.initialAltitude = data.altitude
+
+        SYSTEM.startDistance = calculateStartDistance(data)
 
         SYSTEM.descentStarted = true
 
@@ -151,11 +207,24 @@ local function updateDescent(data, enabled)
     end
 
 
+    -- WAIT FOR DESCENT START DISTANCE
+
+    if SYSTEM.startDistance <= 0
+
+        or data.distance >= SYSTEM.startDistance then
+
+        SYSTEM.descentTarget = SYSTEM.initialAltitude
+
+        return SYSTEM.descentTarget
+
+    end
+
+
     -- PROGRESSIVE DESCENT CURVE
 
     local x = clamp(
 
-        data.distance / CONFIG.START_DISTANCE,
+        data.distance / SYSTEM.startDistance,
 
         0,
 
@@ -164,7 +233,7 @@ local function updateDescent(data, enabled)
     )
 
 
-   local curve = (1 - x) ^ CONFIG.CURVE_EXPONENT
+    local curve = 1 - (1 - x) ^ CONFIG.CURVE_EXPONENT
 
 
     SYSTEM.descentTarget =
@@ -192,7 +261,7 @@ end
 
 
 --------------------------------------------------
--- 07. MAIN TICK
+-- 08. MAIN TICK
 --------------------------------------------------
 
 function onTick()
@@ -203,7 +272,13 @@ function onTick()
             input.getNumber(INPUT.ALTITUDE),
 
         distance =
-            input.getNumber(INPUT.AP_DISTANCE)
+            input.getNumber(INPUT.AP_DISTANCE),
+
+        horizontalSpeed =
+            input.getNumber(INPUT.HORIZONTAL_SPEED),
+
+        maxDescentSpeed =
+            input.getNumber(INPUT.MAX_DESCENT_SPEED)
 
     }
 
