@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 07: TELEMETRY
--- VERSION: 1.3.0
+-- VERSION: 1.4.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -15,6 +15,8 @@
 --------------------------------------------------
 
 local INPUT = {
+
+    -- NUMERIC INPUTS
 
     SEQUENCE_STATE = 1,
     SEQUENCE_TIMER = 2,
@@ -44,6 +46,9 @@ local INPUT = {
 
     ABSOLUTE_SPEED = 18,
 
+
+    -- BOOLEAN INPUTS
+
     RUNNING = 1,
     COMPLETED = 2,
 
@@ -60,7 +65,12 @@ local INPUT = {
     BOOSTER_SOUTH = 10,
     BOOSTER_WEST = 11,
 
-    AFTERBURNER = 12
+    AFTERBURNER = 12,
+
+    -- RX-TX
+    RX-TX_STATE = 19,
+    RX-TX_FREQUENCY_TX = 20,
+    RX-TX_FREQUENCY_RX = 21
 
 }
 
@@ -210,7 +220,11 @@ local function sendTelemetry(data)
         .. "&north=%d&east=%d&south=%d&west=%d"
 
         -- FLIGHT CONTROL
-        .. "&afterburner=%d&spoiler=%.2f&absolute_speed=%.2f",
+        .. "&afterburner=%d&spoiler=%.2f&absolute_speed=%.2f"
+        
+        -- RX-TX LINK
+        .. "&rx_tx_state=%.1f&rx_tx_frequency_tx=%.2f&rx_tx_frequency_rx=%.2f",
+
 
         stage,
         data.sequenceState,
@@ -252,7 +266,11 @@ local function sendTelemetry(data)
         data.afterburner and 1 or 0,
 
         data.spoiler,
-        data.absoluteSpeed
+        data.absoluteSpeed,
+
+        data.rxTxState,
+        data.rxTxFrequencyTX,
+        data.rxTxFrequencyRX
 
     )
 
@@ -336,7 +354,19 @@ function onTick()
             input.getNumber(INPUT.SPOILER),
 
         absoluteSpeed =
-            input.getNumber(INPUT.ABSOLUTE_SPEED) * 3.6 
+            input.getNumber(INPUT.ABSOLUTE_SPEED) * 3.6 ,
+
+
+        -- RX-TX
+
+        rxTxState =
+            input.getNumber(INPUT.RX_TX_STATE),
+
+        rxTxFrequencyTX =
+            input.getNumber(INPUT.RX_TX_FREQUENCY_TX),
+
+        rxTxFrequencyRX =
+            input.getNumber(INPUT.RX_TX_FREQUENCY_RX)
 
     }
 
