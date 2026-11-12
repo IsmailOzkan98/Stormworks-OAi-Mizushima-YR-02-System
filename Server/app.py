@@ -57,6 +57,10 @@ telemetry = {
 
     "absolute_speed": 0,
 
+    "rx_tx_state": 0,
+    "rx_tx_frequency_tx": 0,
+    "rx_tx_frequency_rx": 0,
+
     "timestamp": 0
 }
 
