@@ -34,6 +34,8 @@ local INPUT = {
 
     ROLL_STABLE_TIME = 8,
 
+    DESCENT_DISTANCE_TARGET = 9,
+
     ALTITUDE_STABLE_TIME = 10,
     ALT_HOLD_DELAY = 11, -- Altitude hold delay in seconds
     VERTICAL_SPEED = 12,
@@ -142,6 +144,9 @@ local function readInputs()
 
         rollStableTime =
             input.getNumber(INPUT.ROLL_STABLE_TIME),
+
+        descent_dist_target =
+            input.getNumber(INPUT.DESCENT_DISTANCE_TARGET),
 
         altHoldDelay =
             input.getNumber(INPUT.ALT_HOLD_DELAY),
@@ -355,7 +360,21 @@ local FLIGHT_PROGRAM = {
 
         set = {
             autopilot = true,
-            afterburner = true,
+            afterburner = true  
+        },
+
+        wait = {
+            type = "descent_dist_target"
+        }
+    },
+
+
+    -- STEP 10: DESCENT ENABLE
+
+    {
+        name = "DESCENT_ENABLE",
+
+        set = {
             descentEnable = true
         },
 
@@ -364,8 +383,7 @@ local FLIGHT_PROGRAM = {
         }
     },
 
-
-    -- STEP 10: AUTOPILOT OFF
+    -- STEP 11: AUTOPILOT OFF
 
     {
         name = "AUTOPILOT_COMPLETE",
@@ -559,6 +577,21 @@ local function checkSequenceCondition(data, wait)
         local distance = math.sqrt(x*x + y*y)
 
         return distance < data.cutoffDistance
+
+    end
+
+    
+    -- DESCENT DISTANCE TARGET
+
+    if wait.type == "descent_dist_target" then
+
+        local x = data.targetX - data.sensorX
+
+        local y = data.targetY - data.sensorY
+
+        local distance = math.sqrt(x*x + y*y)
+
+        return distance < data.descent_dist_target
 
     end
 
