@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 08: DESCENT PROFILE
--- VERSION: 1.2.0
+-- VERSION: 1.3.2
 -- SYSTEM VERSION: 14.0
 --
 -- RESPONSIBILITY:
@@ -24,6 +24,10 @@ local INPUT = {
     MAX_DESCENT_SPEED = 4,
 
     DESTINATION_ALTITUDE = 5,
+
+    PROFILE_EXPONENT = 6,
+
+    ARRIVAL_RADIUS = 7,
 
     -- Boolean Inputs
 
@@ -49,13 +53,6 @@ local OUTPUT = {
 -- 03. SYSTEM CONFIGURATION
 --------------------------------------------------
 
-local CONFIG = {
-
-    PROFILE_EXPONENT = 3,
-
-    ARRIVAL_RADIUS = 20
-
-}
 
 
 --------------------------------------------------
@@ -105,36 +102,28 @@ end
 local function calculateStartDistance(
 
     altitudeDifference,
-
     horizontalSpeed,
-
-    maxDescentSpeed
+    maxDescentSpeed,
+    profileExponent
 
 )
 
     if altitudeDifference <= 0
-
         or horizontalSpeed <= 0
-
         or maxDescentSpeed <= 0 then
 
         return 0
 
     end
 
-
     return
 
-        CONFIG.PROFILE_EXPONENT *
-
+        profileExponent *
         altitudeDifference *
-
         horizontalSpeed /
-
         maxDescentSpeed
 
 end
-
 
 --------------------------------------------------
 -- 07. DESCENT PROFILE
@@ -212,7 +201,9 @@ local function updateDescent(data, enabled)
 
             SYSTEM.initialHorizontalSpeed,
 
-            SYSTEM.profileMaxDescentSpeed
+            SYSTEM.profileMaxDescentSpeed,
+
+            data.profileExponent
 
         )
 
@@ -254,7 +245,9 @@ local function updateDescent(data, enabled)
 
             SYSTEM.initialHorizontalSpeed,
 
-            SYSTEM.profileMaxDescentSpeed
+            SYSTEM.profileMaxDescentSpeed,
+
+            data.profileExponent
 
         )
 
@@ -265,7 +258,7 @@ local function updateDescent(data, enabled)
     -- ARRIVAL DETECTION
     --------------------------------------------------
 
-    if data.distance <= CONFIG.ARRIVAL_RADIUS then
+    if data.distance <= data.arrivalRadius then
 
         SYSTEM.descentCompleted = true
 
@@ -343,7 +336,7 @@ local function updateDescent(data, enabled)
     --------------------------------------------------
 
     local descentProgress =
-        remainingFraction ^ CONFIG.PROFILE_EXPONENT
+        remainingFraction ^ data.profileExponent
 
     SYSTEM.descentTarget =
         SYSTEM.initialAltitude -
@@ -366,17 +359,13 @@ local function updateDescent(data, enabled)
     local desiredDescentSpeed =
         SYSTEM.profileMaxDescentSpeed *
         speedRatio *
-        remainingFraction ^ (CONFIG.PROFILE_EXPONENT - 1)
+        remainingFraction ^ (data.profileExponent - 1)
 
     desiredDescentSpeed = clamp(
         desiredDescentSpeed,
         0,
         SYSTEM.profileMaxDescentSpeed
     )
-
--- NEGATIVE VALUE: DESCENT COMMAND
-SYSTEM.descentSpeedTarget = -desiredDescentSpeed
-
 
     -- DESCENT SPEED MUST BE NEGATIVE
 
@@ -415,7 +404,13 @@ function onTick()
             input.getNumber(INPUT.MAX_DESCENT_SPEED),
 
         destinationAltitude =
-            input.getNumber(INPUT.DESTINATION_ALTITUDE)
+            input.getNumber(INPUT.DESTINATION_ALTITUDE),
+
+        profileExponent =
+            input.getNumber(INPUT.PROFILE_EXPONENT),
+
+        arrivalRadius =
+            input.getNumber(INPUT.ARRIVAL_RADIUS)
 
     }
 

@@ -50,7 +50,9 @@ local OUTPUT = {
     ELEVATOR_RIGHT = 3,
     ELEVATOR_LEFT = 4,
 
-    DESIRED_VERTICAL_SPEED = 5
+    DESIRED_VERTICAL_SPEED = 5,
+
+    ALTITUDE_TARGET = 6
 
 }
 
@@ -497,6 +499,14 @@ function onTick()
         OUTPUT.DESIRED_VERTICAL_SPEED,
 
         altitude.desiredVerticalSpeed
+
+    )
+
+    output.setNumber(
+
+        OUTPUT.ALTITUDE_TARGET,
+
+        selectedAltitudeTarget
 
     )
 
