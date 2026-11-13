@@ -67,6 +67,8 @@ local INPUT = {
 
     AFTERBURNER = 12,
 
+    DESCENT_ENABLE = 13,
+
     -- RX-TX
     RX_TX_STATE = 19,
     RX_TX_FREQUENCY_TX = 20,
@@ -116,7 +118,9 @@ local FLIGHT_STAGES = {
 
     [9] = "AUTOPILOT",
 
-    [10] = "AUTOPILOT_COMPLETE"
+    [10] = "DESCENT_ENABLE",
+
+    [11] = "AUTOPILOT_COMPLETE"
 
 }
 
@@ -214,7 +218,7 @@ local function sendTelemetry(data)
         .. "&target_x=%.2f&target_y=%.2f"
 
         -- SYSTEMS
-        .. "&main=%d&alt_hold=%d&roll_stab=%d&accel=%d"
+        .. "&main=%d&alt_hold=%d&roll_stab=%d&accel=%d&descent=%d"
 
         -- DIRECTIONAL BOOSTERS
         .. "&north=%d&east=%d&south=%d&west=%d"
@@ -257,6 +261,7 @@ local function sendTelemetry(data)
         data.altitudeHold and 1 or 0,
         data.rollStabilizer and 1 or 0,
         data.accelerationBoosters and 1 or 0,
+        data.descentEnable and 1 or 0,
 
         data.boosterNorth and 1 or 0,
         data.boosterEast and 1 or 0,
@@ -433,6 +438,10 @@ function onTick()
     data.afterburner =
 
         input.getBool(INPUT.AFTERBURNER)
+
+    data.descentEnable =
+
+        input.getBool(INPUT.DESCENT_ENABLE)
 
 
     --------------------------------------------------

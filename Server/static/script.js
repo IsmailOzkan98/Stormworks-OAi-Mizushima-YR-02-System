@@ -120,6 +120,7 @@ const systems = [
     ["roll_stab", "rollStab", "ROLL STABILIZER"],
     ["accel", "accel", "THROTTLE CONTROL"],
     ["afterburner", "afterburner", "AFTERBURNER"],
+    ["descent", "descent", "DESCENT ENABLE"],
 
     ["north", "north", "NORTH BOOSTER"],
     ["east", "east", "EAST BOOSTER"],

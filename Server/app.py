@@ -45,6 +45,7 @@ telemetry = {
     "alt_hold": 0,
     "roll_stab": 0,
     "accel": 0,
+    "descent": 0,
 
     "north": 0,
     "east": 0,
