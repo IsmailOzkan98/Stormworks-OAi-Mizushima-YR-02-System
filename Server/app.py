@@ -3,8 +3,130 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 from threading import Lock
 import time
+import json
+import os
 
 app = Flask(__name__)
+
+import json
+import os
+
+CONFIG_FILE = "/app/recorder_config.json"
+
+def load_recorder_config():
+    try:
+        with open(CONFIG_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except Exception as e:
+        app.logger.error(f"Error loading recorder config: {e}")
+        return {"fields": {}}
+
+recorder_config = load_recorder_config()
+
+# ==========================================
+# FLIGHT DATA RECORDER
+# ==========================================
+
+LOG_DIR = "/app/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+recording_lock = Lock()
+
+recording = False
+recording_file = None
+recording_filename = None
+
+
+def start_recording():
+
+    global recording
+    global recording_file
+    global recording_filename
+
+    with recording_lock:
+
+        if recording:
+            return False, "Already recording"
+
+        recording_filename = os.path.join(
+            LOG_DIR,
+            f"flight_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
+
+        recording_file = open(
+            recording_filename,
+            "w",
+            encoding="utf-8"
+        )
+
+        # JSON array
+        recording_file.write("[\n")
+        recording_file.flush()
+
+        recording = True
+
+        return True, recording_filename
+
+
+def stop_recording():
+
+    global recording
+    global recording_file
+    global recording_filename
+
+    with recording_lock:
+
+        if not recording:
+            return False, "Not recording"
+
+        recording_file.write("\n]\n")
+        recording_file.flush()
+        recording_file.close()
+
+        filename = recording_filename
+
+        recording = False
+        recording_file = None
+        recording_filename = None
+
+        return True, filename
+
+
+def save_flight_event(data):
+
+    with recording_lock:
+
+        if not recording or recording_file is None:
+            return
+
+        # Leer los campos permitidos en el CFG
+        fields = recorder_config.get("fields", {})
+        
+
+        # Filtrar la telemetría
+        filtered_data = {
+            key: value
+            for key, value in data.items()
+            if fields.get(key, False)
+        }
+
+        event = {
+            "recorded_at": datetime.now().astimezone().isoformat(
+                timespec="milliseconds"
+            ),
+            "telemetry": filtered_data
+        }
+
+        line = json.dumps(
+            event,
+            ensure_ascii=False
+        )
+
+        if recording_file.tell() > 2:
+            recording_file.write(",\n")
+
+        recording_file.write(line)
+        recording_file.flush()
 
 # ==========================================
 # OAI MIZUSHIMA YR-02 - TELEMETRY SERVER
@@ -104,6 +226,9 @@ def receive_telemetry():
                     telemetry[key] = value
 
             telemetry["timestamp"] = time.time()
+            recording_snapshot = telemetry.copy()
+
+        save_flight_event(recording_snapshot)
 
         return "OK", 200
 
@@ -146,6 +271,56 @@ def health():
         "time": datetime.now().isoformat()
     })
 
+
+# ==========================================
+# RECORDER API
+# ==========================================
+
+@app.route("/api/recorder/start", methods=["POST"])
+def api_start_recording():
+
+    success, result = start_recording()
+
+    if not success:
+        return jsonify({
+            "recording": recording,
+            "message": result
+        }), 409
+
+    return jsonify({
+        "recording": True,
+        "filename": os.path.basename(result)
+    })
+
+
+@app.route("/api/recorder/stop", methods=["POST"])
+def api_stop_recording():
+
+    success, result = stop_recording()
+
+    if not success:
+        return jsonify({
+            "recording": False,
+            "message": result
+        }), 409
+
+    return jsonify({
+        "recording": False,
+        "filename": os.path.basename(result)
+    })
+
+
+@app.route("/api/recorder", methods=["GET"])
+def api_recorder_status():
+
+    with recording_lock:
+        return jsonify({
+            "recording": recording,
+            "filename": (
+                os.path.basename(recording_filename)
+                if recording_filename else None
+            )
+        })
 
 # ==========================================
 # START SERVER

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flight Data Analyzer</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b1220;
+            --panel: #111c2e;
+            --panel2: #17243a;
+            --line: #293a52;
+            --text: #e8eef7;
+            --muted: #91a3ba;
+            --accent: #57c7ff;
+            --good: #65d6a3;
+            --danger: #ff7373
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: auto;
+            padding: 28px 20px 50px
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .18em
+        }
+
+        .top h1 {
+            font-size: clamp(24px, 4vw, 36px);
+            margin: 3px 0 0;
+            letter-spacing: .03em
+        }
+
+        .sub {
+            color: var(--muted);
+            margin: 4px 0 0
+        }
+
+        .status {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 7px 12px;
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px
+        }
+
+        .drop {
+            border: 1px dashed #49627e;
+            border-radius: 12px;
+            padding: 26px 16px;
+            text-align: center;
+            background: #0e1929;
+            transition: .15s
+        }
+
+        .drop.over {
+            border-color: var(--accent);
+            background: #10263a
+        }
+
+        .drop strong {
+            display: block;
+            font-size: 16px
+        }
+
+        .drop p {
+            margin: 5px 0 13px;
+            color: var(--muted)
+        }
+
+        button,
+        .filelabel {
+            background: var(--accent);
+            color: #06111c;
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 14px;
+            font-weight: 750;
+            cursor: pointer;
+            display: inline-block
+        }
+
+        button.secondary {
+            background: var(--panel2);
+            color: var(--text);
+            border: 1px solid var(--line)
+        }
+
+        input[type=file] {
+            display: none
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px
+        }
+
+        .stat {
+            background: var(--panel2);
+            border-radius: 10px;
+            padding: 12px
+        }
+
+        .stat small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .08em
+        }
+
+        .stat strong {
+            font-size: 19px
+        }
+
+        .sectionhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .sectionhead h2 {
+            font-size: 16px;
+            margin: 0
+        }
+
+        .search {
+            max-width: 220px;
+            width: 100%;
+            background: #0c1727;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 9px 10px
+        }
+
+        .fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 190px;
+            overflow: auto
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border: 1px solid var(--line);
+            background: #0d1828;
+            border-radius: 8px;
+            color: #dce7f5;
+            font-size: 12px;
+            cursor: pointer
+        }
+
+        .field input {
+            accent-color: var(--accent)
+        }
+
+        .chartbox {
+            background: #0c1727;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 300px
+        }
+
+        .chartbox canvas {
+            display: block;
+            width: 100%;
+            height: 340px
+        }
+
+        .empty {
+            min-height: 260px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--muted);
+            padding: 24px
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 4px 0;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .swatch {
+            width: 18px;
+            height: 3px;
+            border-radius: 3px;
+            display: inline-block
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 10px 2px 0
+        }
+
+        .error {
+            color: var(--danger);
+            margin-top: 10px;
+            white-space: pre-wrap
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        @media(max-width:650px) {
+            .wrap {
+                padding: 18px 12px 35px
+            }
+
+            .top {
+                align-items: flex-start;
+                flex-direction: column
+            }
+
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .panel {
+                padding: 13px
+            }
+
+            .chartbox canvas {
+                height: 280px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="top">
+            <div>
+                <div class="eyebrow">OAI MIZUSHIMA YR-02 · TOOL</div>
+                <h1>FLIGHT DATA ANALYZER</h1>
+                <p class="sub">Visor local de grabaciones JSON · no necesita conexión</p>
+            </div>
+            <div class="status" id="status">SIN ARCHIVO</div>
+        </header>
+        <section class="panel">
+            <div class="drop" id="drop"><strong>Abre una grabación JSON</strong>
+                <p>Arrastra aquí tu archivo o selecciónalo desde el ordenador.</p><label class="filelabel"
+                    for="file">Seleccionar archivo</label><input id="file" type="file" accept=".json,application/json">
+            </div>
+            <div class="toolbar"><button class="secondary" id="clear">Limpiar</button><span class="hint"
+                    id="filename">Formato esperado: array de eventos con recorded_at y telemetry.</span></div>
+            <div class="error" id="error"></div>
+            <div class="stats">
+                <div class="stat"><small>Muestras</small><strong id="samples">—</strong></div>
+                <div class="stat"><small>Duración</small><strong id="duration">—</strong></div>
+                <div class="stat"><small>Variables</small><strong id="count">—</strong></div>
+            </div>
+        </section>
+        <section class="panel">
+            <div class="sectionhead">
+                <h2>Variables a representar</h2><input class="search" id="search" placeholder="Filtrar variables…"
+                    disabled>
+            </div>
+            <div class="fields" id="fields"><span class="hint">Carga un JSON para detectar sus variables.</span></div>
+            <div class="toolbar"><button class="secondary" id="selectAll" disabled>Seleccionar todas</button><button
+                    class="secondary" id="selectNone" disabled>Quitar selección</button><span class="hint">Puedes elegir
+                    varias variables para dibujarlas juntas.</span></div>
+        </section>
+        <section class="panel">
+            <div class="sectionhead">
+                <h2>Gráfica de telemetría</h2><span class="hint" id="chartInfo">Esperando datos</span>
+            </div>
+            <div class="chartbox">
+                <div class="empty" id="empty">Carga un archivo JSON y selecciona las variables que quieras visualizar.
+                </div><canvas id="chart" class="hidden"></canvas>
+                <div class="legend" id="legend"></div>
+            </div>
+            <p class="note">El eje horizontal representa el tiempo (o el número de muestra si no hay fechas). Cada
+                variable se normaliza visualmente para facilitar la comparación entre magnitudes distintas; sus valores
+                originales aparecen al pasar el cursor por la gráfica.</p>
+        </section>
+    </div>
+    <script>
+        (() => {
+            const $ = id => document.getElementById(id);
+            const colors = ['#57c7ff', '#65d6a3', '#ffbd69', '#c69cff', '#ff7d91', '#f1e66b', '#70d5d0', '#b0b9c8', '#ff9f50', '#8fa8ff'];
+            let rows = [], variables = [], selected = new Set(), fileName = '';
+            const file = $('file'), drop = $('drop'), canvas = $('chart'), ctx = canvas.getContext('2d');
+            function setStatus(t) { $('status').textContent = t }
+            function parseRecords(json) {
+                let arr = Array.isArray(json) ? json : (Array.isArray(json.events) ? json.events : (Array.isArray(json.data) ? json.data : null));
+                if (!arr) throw new Error('El JSON debe contener un array de eventos.');
+                return arr.map((item, i) => {
+                    const telemetry = item && item.telemetry && typeof item.telemetry === 'object' ? item.telemetry : item;
+                    if (!telemetry || typeof telemetry !== 'object') return null;
+                    const time = item.recorded_at ?? item.timestamp ?? telemetry.recorded_at ?? telemetry.timestamp ?? null;
+                    const parsed = time == null ? NaN : (typeof time === 'number' ? (time < 1e12 ? time * 1000 : time) : Date.parse(time));
+                    const values = {};
+                    for (const [k, v] of Object.entries(telemetry)) if (typeof v === 'number' && Number.isFinite(v)) values[k] = v;
+                    return { time: Number.isFinite(parsed) ? parsed : null, values, index: i };
+                }).filter(Boolean);
+            }
+            function loadText(text, name) {
+                $('error').textContent = '';
+                try {
+                    const parsed = JSON.parse(text); rows = parseRecords(parsed); if (!rows.length) throw new Error('No se encontraron muestras en el archivo.');
+                    const keys = new Set(); rows.forEach(r => Object.keys(r.values).forEach(k => keys.add(k)));
+                    variables = [...keys].sort((a, b) => a.localeCompare(b)); selected = new Set(variables.slice(0, Math.min(3, variables.length))); fileName = name;
+                    $('filename').textContent = name; $('samples').textContent = rows.length.toLocaleString('es-ES'); $('count').textContent = variables.length;
+                    const times = rows.map(r => r.time).filter(t => t !== null); $('duration').textContent = times.length > 1 ? formatDuration(Math.max(...times) - Math.min(...times)) : '—';
+                    $('search').disabled = false; $('selectAll').disabled = false; $('selectNone').disabled = false;
+                    renderFields(); draw(); setStatus('JSON CARGADO');
+                } catch (e) { rows = []; variables = []; selected.clear(); renderFields(); draw(); setStatus('ERROR'); $('error').textContent = 'No se pudo leer el archivo: ' + e.message; }
+            }
+            function formatDuration(ms) { let s = Math.max(0, Math.round(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h ? `${h} h ${m} min` : (m ? `${m} min ${sec} s` : `${sec} s`) }
+            function renderFields() {
+                const q = $('search').value.toLowerCase(); $('fields').innerHTML = '';
+                const visible = variables.filter(v => v.toLowerCase().includes(q));
+                if (!visible.length) { $('fields').textContent = variables.length ? 'No hay coincidencias.' : 'Carga un JSON para detectar sus variables.'; return }
+                visible.forEach(v => { const label = document.createElement('label'); label.className = 'field'; const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = selected.has(v); cb.addEventListener('change', () => { cb.checked ? selected.add(v) : selected.delete(v); draw() }); const span = document.createElement('span'); span.textContent = v; label.append(cb, span); $('fields').append(label) });
+            }
+            function niceTime(r, i) { if (r.time !== null) return new Date(r.time).toLocaleTimeString('es-ES', { hour12: false }); return String(i + 1) }
+            function draw() {
+                const chosen = [...selected].filter(v => variables.includes(v)); $('legend').innerHTML = '';
+                if (!rows.length || !chosen.length) { canvas.classList.add('hidden'); $('empty').classList.remove('hidden'); $('empty').textContent = !rows.length ? 'Carga un archivo JSON y selecciona las variables que quieras visualizar.' : 'Selecciona al menos una variable para dibujar la gráfica.'; $('chartInfo').textContent = 'Sin gráfica'; return }
+                $('empty').classList.add('hidden'); canvas.classList.remove('hidden'); $('chartInfo').textContent = chosen.length + ' variable(s) · ' + rows.length + ' muestras';
+                const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1; canvas.width = Math.max(1, Math.floor(rect.width * dpr)); canvas.height = Math.max(1, Math.floor(rect.height * dpr)); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                const W = rect.width, H = rect.height, L = 64, R = 18, T = 20, B = 42, plotW = W - L - R, plotH = H - T - B;
+                ctx.clearRect(0, 0, W, H); ctx.font = '11px system-ui'; ctx.lineWidth = 1; ctx.strokeStyle = '#293a52'; ctx.fillStyle = '#91a3ba';
+                for (let j = 0; j <= 4; j++) { let y = T + plotH * j / 4; ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(W - R, y); ctx.stroke(); ctx.fillText((100 - j * 25) + '%', 8, y + 4) }
+                const n = rows.length; const xAt = i => L + (n <= 1 ? 0 : i / (n - 1)) * plotW;
+                chosen.forEach((key, si) => {
+                    const vals = rows.map(r => r.values[key]).filter(v => Number.isFinite(v)); if (!vals.length) return;
+                    let min = Math.min(...vals), max = Math.max(...vals); if (min === max) { min -= 1; max += 1 }
+                    const yAt = v => T + plotH - (v - min) / (max - min) * plotH;
+                    ctx.beginPath(); ctx.strokeStyle = colors[si % colors.length]; ctx.lineWidth = 2; let started = false;
+                    rows.forEach((r, i) => { const v = r.values[key]; if (!Number.isFinite(v)) { started = false; return } const x = xAt(i), y = yAt(v); if (!started) { ctx.moveTo(x, y); started = true } else ctx.lineTo(x, y) }); ctx.stroke();
+                    const item = document.createElement('span'), sw = document.createElement('i'); sw.className = 'swatch'; sw.style.background = colors[si % colors.length]; item.append(sw, document.createTextNode(key)); $('legend').append(item);
+                });
+                ctx.fillStyle = '#91a3ba'; ctx.textAlign = 'left'; ctx.fillText(niceTime(rows[0], 0), L, H - 13); ctx.textAlign = 'right'; ctx.fillText(niceTime(rows[n - 1], n - 1), W - R, H - 13); ctx.textAlign = 'left';
+                // Hover readout: nearest sample and original, unscaled values.
+                canvas.onmousemove = e => { const r = canvas.getBoundingClientRect(), x = e.clientX - r.left; const i = Math.max(0, Math.min(n - 1, Math.round((x - L) / plotW * (n - 1)))); const sample = rows[i]; const details = chosen.map(k => Number.isFinite(sample.values[k]) ? `${k}: ${sample.values[k]}` : `${k}: —`).join('  |  '); $('chartInfo').textContent = `Muestra ${i + 1}/${n} · ${niceTime(sample, i)} · ${details}` };
+                canvas.onmouseleave = () => { $('chartInfo').textContent = chosen.length + ' variable(s) · ' + rows.length + ' muestras' };
+            }
+            file.addEventListener('change', e => { const f = e.target.files[0]; if (f) { const reader = new FileReader(); reader.onload = () => loadText(reader.result, f.name); reader.onerror = () => { $('error').textContent = 'No se pudo leer el archivo.' }; reader.readAsText(f) } file.value = '' });
+            ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over') }));['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over') }));
+            drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) { if (!f.name.toLowerCase().endsWith('.json')) { $('error').textContent = 'Selecciona un archivo .json'; return } const reader = new FileReader(); reader.onload = () => loadText(reader.result, f.name); reader.readAsText(f) } });
+            $('search').addEventListener('input', renderFields); $('selectAll').addEventListener('click', () => { selected = new Set(variables); renderFields(); draw() }); $('selectNone').addEventListener('click', () => { selected.clear(); renderFields(); draw() });
+            $('clear').addEventListener('click', () => { rows = []; variables = []; selected.clear(); $('filename').textContent = 'Formato esperado: array de eventos con recorded_at y telemetry.'; $('samples').textContent = $('duration').textContent = $('count').textContent = '—'; $('search').value = ''; $('search').disabled = true; $('selectAll').disabled = $('selectNone').disabled = true; $('error').textContent = ''; renderFields(); draw(); setStatus('SIN ARCHIVO') });
+            window.addEventListener('resize', () => { if (rows.length) draw() });
+        })();
+    </script>
+</body>
+
+</html>

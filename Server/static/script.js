@@ -1705,5 +1705,195 @@ window.addEventListener(
 
 
 /* ============================================================
+   19. FLIGHT DATA RECORDER CONTROL
+   ============================================================ */
+
+const recorderStartButton =
+    document.getElementById("startRecording");
+
+const recorderStopButton =
+    document.getElementById("stopRecording");
+
+const recorderStatusElement =
+    document.getElementById("recorderStatus");
+
+
+/* ------------------------------------------------------------
+   UPDATE RECORDER INTERFACE
+   ------------------------------------------------------------ */
+
+function updateRecorderInterface(recording, filename = null) {
+
+    recorderStartButton.disabled = recording;
+    recorderStopButton.disabled = !recording;
+
+    if (recording) {
+
+        recorderStatusElement.textContent =
+            "● RECORDING " + (filename || "");
+
+        recorderStatusElement.classList.add("recording");
+
+    } else {
+
+        recorderStatusElement.textContent =
+            "RECORDER STANDBY";
+
+        recorderStatusElement.classList.remove("recording");
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   START RECORDING
+   ------------------------------------------------------------ */
+
+async function startFlightRecording() {
+
+    recorderStartButton.disabled = true;
+
+    try {
+
+        const response = await fetch(
+            "/api/recorder/start",
+            {
+                method: "POST"
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Start failed");
+        }
+
+        updateRecorderInterface(
+            true,
+            result.filename
+        );
+
+        logEvent(
+            "Flight data recording started: " + result.filename,
+            "activation"
+        );
+
+    } catch (error) {
+
+        updateRecorderInterface(false);
+
+        logEvent(
+            "Recorder start error: " + error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   STOP RECORDING
+   ------------------------------------------------------------ */
+
+async function stopFlightRecording() {
+
+    recorderStopButton.disabled = true;
+
+    try {
+
+        const response = await fetch(
+            "/api/recorder/stop",
+            {
+                method: "POST"
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Stop failed");
+        }
+
+        updateRecorderInterface(false);
+
+        logEvent(
+            "Flight data recording saved: " + result.filename,
+            "activation"
+        );
+
+    } catch (error) {
+
+        logEvent(
+            "Recorder stop error: " + error.message,
+            "error"
+        );
+
+        await refreshRecorderStatus();
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   GET CURRENT RECORDER STATUS
+   ------------------------------------------------------------ */
+
+async function refreshRecorderStatus() {
+
+    try {
+
+        const response = await fetch(
+            "/api/recorder",
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) return;
+
+        const result = await response.json();
+
+        updateRecorderInterface(
+            result.recording,
+            result.filename
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Recorder status error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   BUTTON EVENTS
+   ------------------------------------------------------------ */
+
+recorderStartButton.addEventListener(
+    "click",
+    startFlightRecording
+);
+
+recorderStopButton.addEventListener(
+    "click",
+    stopFlightRecording
+);
+
+
+/* ------------------------------------------------------------
+   INITIAL RECORDER STATUS
+   ------------------------------------------------------------ */
+
+refreshRecorderStatus();
+
+/* ============================================================
    18. END OF FLIGHT TELEMETRY MONITOR
    ============================================================ */
