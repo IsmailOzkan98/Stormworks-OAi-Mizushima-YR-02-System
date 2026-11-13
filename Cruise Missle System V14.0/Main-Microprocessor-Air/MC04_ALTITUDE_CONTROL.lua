@@ -1,13 +1,12 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.4.0
+-- VERSION: 1.5.0
 -- SYSTEM VERSION: 14.0
--- MIGRATED FROM v13.1.0
---
 --
 -- RESPONSIBILITY:
 --   Altitude PID control and elevator management
+--   Independent descent vertical speed control
 
 
 --------------------------------------------------
@@ -18,24 +17,25 @@ local INPUT = {
 
     -- Numerical Inputs
 
-    ALTITUDE        = 1,
+    ALTITUDE = 1,
     ALTITUDE_TARGET = 2,
 
-    ALT_PID_P       = 3,
-    ALT_PID_I       = 4,
-    ALT_PID_D       = 5,
+    ALT_PID_P = 3,
+    ALT_PID_I = 4,
+    ALT_PID_D = 5,
 
-    VERTICAL_SPEED  = 6,
+    VERTICAL_SPEED = 6,
     MAX_CLIMB_SPEED = 7,
     MAX_DESCENT_SPEED = 8,
 
     ALTITUDE_GAIN = 9,
 
     DESCENT_TARGET = 10,
+    DESCENT_SPEED_TARGET = 11,
 
     -- Boolean Inputs
 
-    ALTITUDE_HOLD   = 8,
+    ALTITUDE_HOLD = 8,
     DESCENT_MODE = 9
 
 }
@@ -47,10 +47,10 @@ local INPUT = {
 
 local OUTPUT = {
 
-    ELEVATOR_RIGHT  = 3,
+    ELEVATOR_RIGHT = 3,
     ELEVATOR_LEFT = 4,
 
-    DESIRED_VERTICAL_SPEED  = 5,
+    DESIRED_VERTICAL_SPEED = 5
 
 }
 
@@ -63,12 +63,14 @@ local CONFIG = {
 
     TICK_RATE = 60,
 
-    CONTROL_MIN = -0.45,
+    CONTROL_MIN = -1,
     CONTROL_MAX = 0.45,
 
     INTEGRAL_LIMIT = 10,
 
-    CONTROL_RATE = 0.005
+    CLIMB_CONTROL_RATE = 0.005,
+
+    DESCENT_CONTROL_RATE = 0.020
 
 }
 
@@ -79,9 +81,19 @@ local CONFIG = {
 
 local SYSTEM = {
 
+    -- NORMAL ALTITUDE PID
+
     integral = 0,
 
     previousVerticalSpeed = 0,
+
+    -- INDEPENDENT DESCENT PID
+
+    descentIntegral = 0,
+
+    descentPreviousVerticalSpeed = 0,
+
+    -- COMMON ELEVATOR OUTPUT
 
     altitudeControlSmooth = 0
 
@@ -103,7 +115,7 @@ end
 -- 06. ALTITUDE HOLD PID CONTROLLER
 --------------------------------------------------
 
-local function updateAltitudeController(data, enabled)
+local function updateAltitudeController(data, enabled, descentMode)
 
     local dt = 1 / CONFIG.TICK_RATE
 
@@ -120,24 +132,64 @@ local function updateAltitudeController(data, enabled)
 
     if enabled then
 
-        -- OUTER ALTITUDE LOOP
+        --------------------------------------------------
+        -- OUTER LOOP
+        --------------------------------------------------
 
-        desiredVerticalSpeed = clamp(
+        if descentMode then
 
-            altitudeError * data.altitudeGain,
+            -- DESCENT SPEED REFERENCE FROM MC08
 
-            -data.maxDescentSpeed,
+            desiredVerticalSpeed = data.descentSpeedTarget
 
-            data.maxClimbSpeed
+        else
 
-        )
+            -- ORIGINAL ALTITUDE HOLD LOGIC
+            -- CLIMB BEHAVIOUR PRESERVED
+
+            desiredVerticalSpeed = clamp(
+
+                altitudeError * data.altitudeGain,
+
+                -data.maxDescentSpeed,
+
+                data.maxClimbSpeed
+
+            )
+
+        end
 
 
-        -- INNER VERTICAL SPEED LOOP
+        --------------------------------------------------
+        -- INNER VERTICAL SPEED PID
+        --------------------------------------------------
 
         speedError =
 
             desiredVerticalSpeed - data.verticalSpeed
+
+
+        -- SELECT INDEPENDENT PID MEMORY
+
+        local integral
+
+        local previousVerticalSpeed
+
+        if descentMode then
+
+            integral = SYSTEM.descentIntegral
+
+            previousVerticalSpeed =
+                SYSTEM.descentPreviousVerticalSpeed
+
+        else
+
+            integral = SYSTEM.integral
+
+            previousVerticalSpeed =
+                SYSTEM.previousVerticalSpeed
+
+        end
 
 
         local proportional =
@@ -148,7 +200,7 @@ local function updateAltitudeController(data, enabled)
         local verticalAcceleration =
 
             (data.verticalSpeed -
-            SYSTEM.previousVerticalSpeed) / dt
+            previousVerticalSpeed) / dt
 
 
         local derivativeTerm =
@@ -156,11 +208,13 @@ local function updateAltitudeController(data, enabled)
             -data.D * verticalAcceleration
 
 
+        --------------------------------------------------
         -- INTEGRAL / ANTI-WINDUP
+        --------------------------------------------------
 
         local candidateIntegral = clamp(
 
-            SYSTEM.integral + speedError * dt,
+            integral + speedError * dt,
 
             -CONFIG.INTEGRAL_LIMIT,
 
@@ -203,7 +257,20 @@ local function updateAltitudeController(data, enabled)
                 and speedError > 0
             ) then
 
-            SYSTEM.integral = candidateIntegral
+            integral = candidateIntegral
+
+        end
+
+
+        -- SAVE PID MEMORY SEPARATELY
+
+        if descentMode then
+
+            SYSTEM.descentIntegral = integral
+
+        else
+
+            SYSTEM.integral = integral
 
         end
 
@@ -211,7 +278,7 @@ local function updateAltitudeController(data, enabled)
         altitudeControl = clamp(
 
             outputWithoutIntegral +
-            data.I * SYSTEM.integral,
+            data.I * integral,
 
             CONFIG.CONTROL_MIN,
 
@@ -220,16 +287,31 @@ local function updateAltitudeController(data, enabled)
         )
 
 
-        SYSTEM.previousVerticalSpeed =
+        -- UPDATE DERIVATIVE MEMORY
 
-            data.verticalSpeed
+        if descentMode then
+
+            SYSTEM.descentPreviousVerticalSpeed =
+                data.verticalSpeed
+
+        else
+
+            SYSTEM.previousVerticalSpeed =
+                data.verticalSpeed
+
+        end
+
 
     else
 
         SYSTEM.integral = 0
 
         SYSTEM.previousVerticalSpeed =
+            data.verticalSpeed
 
+        SYSTEM.descentIntegral = 0
+
+        SYSTEM.descentPreviousVerticalSpeed =
             data.verticalSpeed
 
         SYSTEM.altitudeControlSmooth = 0
@@ -237,7 +319,36 @@ local function updateAltitudeController(data, enabled)
     end
 
 
-    -- ELEVATOR SMOOTHING
+    --------------------------------------------------
+    -- 07. ELEVATOR SMOOTHING
+    --------------------------------------------------
+
+    local controlRate
+
+
+    if descentMode then
+
+        -- INDEPENDENT DESCENT RESPONSE
+
+        controlRate = CONFIG.DESCENT_CONTROL_RATE
+
+    else
+
+        -- ORIGINAL NORMAL RESPONSE
+        -- CLIMB LOGIC UNCHANGED
+
+        if altitudeControl > SYSTEM.altitudeControlSmooth then
+
+            controlRate = CONFIG.CLIMB_CONTROL_RATE
+
+        else
+
+            controlRate = CONFIG.DESCENT_CONTROL_RATE
+
+        end
+
+    end
+
 
     local difference =
 
@@ -253,9 +364,8 @@ local function updateAltitudeController(data, enabled)
 
             difference,
 
-            -CONFIG.CONTROL_RATE,
-
-            CONFIG.CONTROL_RATE
+            -controlRate,
+            controlRate
 
         )
 
@@ -278,14 +388,14 @@ end
 
 
 --------------------------------------------------
--- 07. MAIN TICK
+-- 08. MAIN TICK
 --------------------------------------------------
 
 function onTick()
 
     local descentMode =
 
-    input.getBool(INPUT.DESCENT_MODE)
+        input.getBool(INPUT.DESCENT_MODE)
 
 
     local selectedAltitudeTarget
@@ -302,6 +412,7 @@ function onTick()
 
     end
 
+
     -- READ PHYSICAL SENSORS AND PID PARAMETERS
 
     local data = {
@@ -309,7 +420,7 @@ function onTick()
         altitude =
             input.getNumber(INPUT.ALTITUDE),
 
-        altitudeTarget = 
+        altitudeTarget =
             selectedAltitudeTarget,
 
         P =
@@ -331,7 +442,10 @@ function onTick()
             input.getNumber(INPUT.MAX_DESCENT_SPEED),
 
         altitudeGain =
-            input.getNumber(INPUT.ALTITUDE_GAIN)
+            input.getNumber(INPUT.ALTITUDE_GAIN),
+
+        descentSpeedTarget =
+            input.getNumber(INPUT.DESCENT_SPEED_TARGET)
 
     }
 
@@ -349,7 +463,9 @@ function onTick()
 
         data,
 
-        altitudeHoldEnabled
+        altitudeHoldEnabled,
+
+        descentMode
 
     )
 
@@ -383,7 +499,6 @@ function onTick()
         altitude.desiredVerticalSpeed
 
     )
-
 
 end
 
