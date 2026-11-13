@@ -360,6 +360,23 @@ h1 span {
 
 /* DIAGNOSTICS */
 
+/* DIAGNOSTIC GRID */
+
+.diagnostic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+}
+
+.diagnostic-grid .diagnostic-row {
+    min-width: 0;
+    gap: 5px;
+}
+
+.diagnostic-grid .diagnostic-row > span:first-child {
+    font-size: 10px;
+}
+
 .diagnostics-panel {
     padding: 12px;
     background: var(--panel);
