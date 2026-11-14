@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 04: ALTITUDE CONTROL
--- VERSION: 1.5.0
+-- VERSION: 1.5.1
 -- SYSTEM VERSION: 14.0
 --
 -- RESPONSIBILITY:
@@ -18,7 +18,7 @@ local INPUT = {
     -- Numerical Inputs
 
     ALTITUDE = 1,
-    ALTITUDE_TARGET = 2,
+    ALTITUDE_SETPOINT = 2,
 
     ALT_PID_P = 3,
     ALT_PID_I = 4,
@@ -410,7 +410,7 @@ function onTick()
     else
 
         selectedAltitudeTarget =
-            input.getNumber(INPUT.ALTITUDE_TARGET)
+            input.getNumber(INPUT.ALTITUDE_SETPOINT)
 
     end
 

@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 01: FLIGHT SEQUENCE
--- VERSION: 1.3.0
+-- VERSION: 1.3.1
 --
 -- ORIGINAL LOGIC: V13.1.0
 -- MODULAR EXTRACTION
@@ -30,11 +30,11 @@ local INPUT = {
     REAL_RPS = 5,
 
     ALTITUDE = 6,
-    ALTITUDE_TARGET = 7,
+    ALTITUDE_SETPOINT = 7,
 
     ROLL_STABLE_TIME = 8,
 
-    DESCENT_DISTANCE_TARGET = 9,
+    DESCENT_DISTANCE_TRIGGER = 9,
 
     ALTITUDE_STABLE_TIME = 10,
     ALT_HOLD_DELAY = 11, -- Altitude hold delay in seconds
@@ -139,14 +139,14 @@ local function readInputs()
         altitude =
             input.getNumber(INPUT.ALTITUDE),
 
-        altitudeTarget =
-            input.getNumber(INPUT.ALTITUDE_TARGET),
+        altitudeSetpoint =
+            input.getNumber(INPUT.ALTITUDE_SETPOINT),
 
         rollStableTime =
             input.getNumber(INPUT.ROLL_STABLE_TIME),
 
-        descent_dist_target =
-            input.getNumber(INPUT.DESCENT_DISTANCE_TARGET),
+        descent_dist_trigger =
+            input.getNumber(INPUT.DESCENT_DISTANCE_TRIGGER),
 
         altHoldDelay =
             input.getNumber(INPUT.ALT_HOLD_DELAY),
@@ -364,7 +364,7 @@ local FLIGHT_PROGRAM = {
         },
 
         wait = {
-            type = "descent_dist_target"
+            type = "descent_dist_trigger"
         }
     },
 
@@ -513,7 +513,7 @@ local function checkSequenceCondition(data, wait)
     elseif wait.type == "altitude" then
 
         local altitudeStable =
-            math.abs(data.altitudeTarget - data.altitude)
+            math.abs(data.altitudeSetpoint - data.altitude)
             <= MARGINS.ALTITUDE
 
 
@@ -583,7 +583,7 @@ local function checkSequenceCondition(data, wait)
     
     -- DESCENT DISTANCE TARGET
 
-    if wait.type == "descent_dist_target" then
+    if wait.type == "descent_dist_trigger" then
 
         local x = data.targetX - data.sensorX
 
@@ -591,7 +591,7 @@ local function checkSequenceCondition(data, wait)
 
         local distance = math.sqrt(x*x + y*y)
 
-        return distance < data.descent_dist_target
+        return distance < data.descent_dist_trigger
 
     end
 
