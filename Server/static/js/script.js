@@ -24,6 +24,7 @@
 let missionBarModule = null;
 let pendingMissionData = null;
 let systemDiagnosticsModule = null;
+let missionMonitorModule = null;
 
 // Event Log estará disponible cuando se inicialice.
 // Mientras tanto, los eventos se mostrarán en consola.
@@ -958,10 +959,13 @@ function setConnection(
         detail
     );
 
-    setValue(
-        "monitorConnection",
-        online ? "ONLINE" : "OFFLINE"
+    if (missionMonitorModule) {
+
+    missionMonitorModule.updateMissionMonitorConnectionData(
+        online
     );
+
+}
 
 
     // CONNECTION CHANGE DETECTION
@@ -1007,10 +1011,9 @@ function updateConnectionStatus() {
             "Esperando telemetría..."
         );
 
-        setValue(
-            "telemetryAge",
-            "--"
-        );
+        if (missionMonitorModule) {
+            missionMonitorModule.updateMissionMonitorPacketAge(null);
+        }
 
         return;
 
@@ -1042,15 +1045,13 @@ function updateConnectionStatus() {
     );
 
 
-    setValue(
-        "telemetryAge",
+    if (missionMonitorModule) {
 
-        Math.max(
-            0,
-            Math.round(age)
-        ) + " ms"
+        missionMonitorModule.updateMissionMonitorPacketAge(
+            Math.max(0, Math.round(age))
+        );
 
-    );
+    }
 
 }
 
@@ -1131,6 +1132,10 @@ function updateInterface(data) {
 
     if (missionBarModule) {
         missionBarModule.updateMissionBarData(data);
+    }
+
+    if (missionMonitorModule) {
+        missionMonitorModule.updateMissionMonitorData(data);
     }
 
     if (systemDiagnosticsModule) {
@@ -1455,6 +1460,7 @@ async function loadModuleConfiguration() {
                 eventLog: false,
                 flightRecorder: false,
                 missionBar: false,
+                missionMonitor: false,
                 systemDiagnostics: false
             }
         };
@@ -1562,6 +1568,67 @@ async function initializeMissionBar(enabled) {
 
         console.error(
             "[MISSION BAR] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+/* ------------------------------------------------------------
+   INITIALIZE MISSION MONITOR
+   ------------------------------------------------------------ */
+
+async function initializeMissionMonitor(enabled) {
+
+    if (!enabled) {
+
+        console.info("[MISSION MONITOR] Disabled by configuration.");
+        return;
+
+    }
+
+    try {
+
+        const module = await import(
+            "./modules/missionMonitor/missionMonitor.js"
+        );
+
+        const container = document.getElementById(
+            "missionMonitorContainer"
+        );
+
+        const initialized = await module.initMissionMonitor(
+            container
+        );
+
+        if (initialized) {
+
+            missionMonitorModule = module;
+
+            if (pendingMissionData) {
+
+                module.updateMissionMonitorData(
+                    pendingMissionData
+                );
+
+            }
+
+            module.updateMissionMonitorConnectionData(
+                previousConnection === true
+            );
+
+            logEvent(
+                "Mission Monitor initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[MISSION MONITOR] Initialization failed:",
             error
         );
 
@@ -1702,6 +1769,10 @@ async function initializeModules() {
 
     await initializeMissionBar(
         modules.missionBar === true
+    );
+
+    await initializeMissionMonitor(
+        modules.missionMonitor === true
     );
 
     await initializeFlightRecorder(
