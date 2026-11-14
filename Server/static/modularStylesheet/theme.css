@@ -159,6 +159,16 @@ h1 span {
 }
 
 /* =========================================
+   RECORDER PANEL
+========================================= */
+
+.recorder-panel {
+    background: var(--paper-light);
+    border: 1px solid var(--border);
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+/* =========================================
    SECTION HEADINGS
 ========================================= */
 

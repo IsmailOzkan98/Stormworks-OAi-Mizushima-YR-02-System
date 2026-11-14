@@ -38,56 +38,16 @@
         </div>
     </header>
 
-    <!-- MISSION STATUS -->
+    <section class="mission-layout">
 
-    <section class="mission-bar">
-        <div class="mission-stage">
-            <span class="micro-label">CURRENT FLIGHT OPERATION</span>
-            <strong id="stage">ESPERANDO DATOS</strong>
-        </div>
+        <!-- MISSION STATUS -->
+        <section class="mission-bar mission-status-bar"></section>
 
-            <div class="mission-data">
 
-                <div>
-                    <span class="micro-label">RX-TX STATE</span>
-                    <strong id="rxTxState">--</strong>
-                </div>
+        <!-- FLIGHT RECORDER -->
+        <section class="recorder-panel">
 
-                <div>
-                    <span class="micro-label">TX FREQUENCY</span>
-                    <strong id="rxTxFrequencyTX">--</strong>
-                </div>
-
-                <div>
-                    <span class="micro-label">RX FREQUENCY</span>
-                    <strong id="rxTxFrequencyRX">--</strong>
-                </div>
-
-                <div>
-                    <span class="micro-label">SEQUENCE</span>
-                    <strong id="state">--</strong>
-                </div>
-
-                <div>
-                    <span class="micro-label">EXECUTION TICKS</span>
-                    <strong id="timer">--</strong>
-                </div>
-
-                <div>
-                    <span class="micro-label">FLIGHT STATUS</span>
-                    <strong id="flightStatus" class="state-pill idle">IDLE</strong>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- RECORD CONTROL -->
-    <section class="mission-bar">
-
-            <span class="micro-label">FLIGHT RECORDER</span>
+            <span class="micro-label">TELEMETRY RECORDER</span>
 
             <div class="recorder-buttons">
 
@@ -105,7 +65,9 @@
             <span id="recorderStatus" class="recorder-status">
                 RECORDER STANDBY
             </span>
-    
+
+        </section>
+
     </section>
     
 

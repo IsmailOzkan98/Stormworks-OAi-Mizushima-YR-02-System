@@ -87,6 +87,20 @@ h1 {
     font-size: 10px;
 }
 
+
+/* =========================================
+   MISSION LAYOUT
+========================================= */
+
+
+.mission-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 9fr) minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+
 /* =========================================
    MISSION BAR
 ========================================= */
@@ -130,6 +144,26 @@ h1 {
 .state-pill {
     padding: 3px 9px;
     font-size: 12px !important;
+}
+
+
+/* =========================================
+   RECORDER PANEL
+========================================= */
+
+
+.recorder-panel {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    min-height: 68px;
+    margin-top: 10px;
+    padding: 9px 18px;
 }
 
 /* =========================================

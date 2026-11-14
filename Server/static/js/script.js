@@ -16,6 +16,8 @@
 
    ============================================================ */
 
+let missionBarModule = null;
+let pendingMissionData = null;
 
 /* ============================================================
    01. SYSTEM CONFIGURATION
@@ -168,20 +170,6 @@ function number(data, key, decimals = 1) {
 
 }
 
-
-// Convert RX/TX state into readable text.
-
-function getRxTxState(state) {
-
-    const states = {
-        0: "SEARCHING",
-        1: "CONNECTED",
-        2: "LINK LOST"
-    };
-
-    return states[Number(state)] ?? "UNKNOWN";
-
-}
 
 
 // Read system activation state.
@@ -1274,105 +1262,11 @@ function updateInterface(data) {
         (data.status || "IDLE").toUpperCase();
 
 
-    setValue(
-        "stage",
-        stage
-    );
+    pendingMissionData = data;
 
-    setValue(
-        "state",
-        data.state ?? "--"
-    );
-
-    setValue(
-        "timer",
-        data.timer ?? "--"
-    );
-
-
-    // RX-TX LINK STATUS
-
-    setValue(
-        "rxTxState",
-        getRxTxState(data.rx_tx_state)
-    );
-
-
-    setValue(
-        "rxTxFrequencyTX",
-        number(data, "rx_tx_frequency_tx", 2)
-    );
-
-    setValue(
-        "rxTxFrequencyRX",
-        number(data, "rx_tx_frequency_rx", 2)
-    );
-
-
-    // FLIGHT STATUS
-
-    const statusElement =
-        document.getElementById("flightStatus");
-
-
-    if (statusElement) {
-
-        statusElement.textContent = status;
-
-        statusElement.className =
-            "state-pill " +
-
-            (
-                status === "RUNNING"
-                    ? "running"
-
-                    : status === "COMPLETED"
-                        ? "completed"
-
-                        : "idle"
-            );
-
+    if (missionBarModule) {
+        missionBarModule.updateMissionBarData(data);
     }
-
-
-    setValue(
-        "monitorFlight",
-        status
-    );
-
-
-    // STAGE CHANGE
-
-    if (
-        previousStage !== null &&
-        previousStage !== stage
-    ) {
-
-        logEvent(
-            `Flight stage changed: ${stage}`,
-            "phase-event"
-        );
-
-    }
-
-
-    // STATUS CHANGE
-
-    if (
-        previousStatus !== null &&
-        previousStatus !== status
-    ) {
-
-        logEvent(
-            `Flight status changed: ${status}`,
-            "phase-event"
-        );
-
-    }
-
-
-    previousStage = stage;
-    previousStatus = status;
 
 
     /* --------------------------------------------------------
@@ -1901,20 +1795,55 @@ refreshRecorderStatus();
 
 
 /* ============================================================
-   19. New Architecture
+   20. MODULAR ARCHITECTURE
    ============================================================ */
 
-/* ============================================================
-   PROJECT DATA MODULE
-   ============================================================ */
+
+/* ------------------------------------------------------------
+   20.1 PROJECT DATA MODULE
+   ------------------------------------------------------------ */
 
 import("./modules/projectData/projectData.js")
     .then(({ initProjectData }) => {
+
         initProjectData();
+
     })
     .catch(error => {
+
         console.error(
             "[PROJECT DATA] Module initialization failed:",
             error
         );
+
+    });
+
+
+/* ------------------------------------------------------------
+   20.2 MISSION BAR MODULE
+   ------------------------------------------------------------ */
+
+import("./modules/missionBar/missionBar.js")
+    .then(async module => {
+
+        missionBarModule = module;
+
+        await module.initMissionBar();
+
+        if (pendingMissionData) {
+
+            module.updateMissionBarData(
+                pendingMissionData
+            );
+
+        }
+
+    })
+    .catch(error => {
+
+        console.error(
+            "[MISSION BAR] Module initialization failed:",
+            error
+        );
+
     });
