@@ -16,6 +16,11 @@
 
    ============================================================ */
 
+import {
+    initEventLog,
+    logEvent
+} from "./modules/eventLog/eventLog.js";
+
 let missionBarModule = null;
 let pendingMissionData = null;
 
@@ -904,66 +909,6 @@ function setIndicator(id, active) {
 }
 
 
-/* ============================================================
-   11. EVENT LOGGING
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   11.1 LOG EVENT
-   ------------------------------------------------------------ */
-
-function logEvent(
-    message,
-    type = "normal"
-) {
-
-    const log =
-        document.getElementById("eventLog");
-
-    if (!log) return;
-
-
-    const entry =
-        document.createElement("div");
-
-    entry.className =
-        `event-entry ${type}`;
-
-
-    const time =
-        document.createElement("span");
-
-    time.className = "event-time";
-
-    time.textContent =
-        new Date().toLocaleTimeString();
-
-
-    const content =
-        document.createElement("span");
-
-    content.textContent = message;
-
-
-    entry.append(
-        time,
-        content
-    );
-
-    log.prepend(entry);
-
-
-    // MAXIMUM 30 EVENTS
-
-    while (log.children.length > 30) {
-
-        log.lastElementChild.remove();
-
-    }
-
-}
-
 
 /* ============================================================
    12. CONNECTION MANAGEMENT
@@ -1550,10 +1495,12 @@ async function updateTelemetry() {
    17. APPLICATION INITIALIZATION
    ============================================================ */
 
+// INITIALIZE EVENT LOG
 
-/* ------------------------------------------------------------
-   17.1 INITIALIZATION EVENT
-   ------------------------------------------------------------ */
+initEventLog();
+
+
+// INITIALIZATION EVENT
 
 logEvent(
     "Flight monitoring initialized.",
@@ -1561,16 +1508,12 @@ logEvent(
 );
 
 
-/* ------------------------------------------------------------
-   17.2 INITIAL TELEMETRY REQUEST
-   ------------------------------------------------------------ */
+// START TELEMETRY
 
 updateTelemetry();
 
 
-/* ------------------------------------------------------------
-   17.3 TELEMETRY REFRESH LOOP
-   ------------------------------------------------------------ */
+// START REFRESH LOOP
 
 setInterval(
     updateTelemetry,
@@ -1578,9 +1521,7 @@ setInterval(
 );
 
 
-/* ------------------------------------------------------------
-   17.4 CONNECTION MONITOR LOOP
-   ------------------------------------------------------------ */
+// START CONNECTION MONITOR
 
 setInterval(
     updateConnectionStatus,
@@ -1588,9 +1529,7 @@ setInterval(
 );
 
 
-/* ------------------------------------------------------------
-   17.5 GRAPH RESIZE HANDLER
-   ------------------------------------------------------------ */
+// GRAPH RESIZE HANDLER
 
 window.addEventListener(
     "resize",
@@ -1668,7 +1607,9 @@ import("./modules/missionBar/missionBar.js")
 import("./modules/flightRecorder/flightRecorder.js")
     .then(module => {
 
-        module.initFlightRecorder();
+        module.initFlightRecorder({
+            onEvent: logEvent
+        });
 
     })
     .catch(error => {
