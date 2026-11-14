@@ -16,13 +16,22 @@
 
    ============================================================ */
 
-import {
-    initEventLog,
-    logEvent
-} from "./modules/eventLog/eventLog.js";
+
+/* ============================================================
+   MODULE MANAGEMENT
+   ============================================================ */
 
 let missionBarModule = null;
 let pendingMissionData = null;
+
+// Event Log estará disponible cuando se inicialice.
+// Mientras tanto, los eventos se mostrarán en consola.
+
+let logEvent = (message, type = "normal") => {
+
+    console.log(`[${type.toUpperCase()}]`, message);
+
+};
 
 /* ============================================================
    01. SYSTEM CONFIGURATION
@@ -1491,21 +1500,251 @@ async function updateTelemetry() {
 }
 
 
+
 /* ============================================================
-   17. APPLICATION INITIALIZATION
+   17. MODULE INITIALIZATION SYSTEM
    ============================================================ */
 
-// INITIALIZE EVENT LOG
 
-initEventLog();
+/* ------------------------------------------------------------
+   17.1 LOAD GLOBAL CONFIGURATION
+   ------------------------------------------------------------ */
+
+async function loadModuleConfiguration() {
+
+    try {
+
+        const response = await fetch(
+            "/static/config.json",
+            { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `Configuration HTTP ${response.status}`
+            );
+        }
+
+        return await response.json();
+
+    } catch (error) {
+
+        console.error(
+            "[MODULE MANAGER] Configuration error:",
+            error
+        );
+
+        // Safe fallback: all modules disabled.
+        return {
+            modules: {
+                eventLog: false,
+                flightRecorder: false,
+                missionBar: false
+            }
+        };
+
+    }
+
+}
 
 
-// INITIALIZATION EVENT
+/* ------------------------------------------------------------
+   17.2 INITIALIZE EVENT LOG
+   ------------------------------------------------------------ */
 
-logEvent(
-    "Flight monitoring initialized.",
-    "system-event"
-);
+async function initializeEventLog(enabled) {
+
+    if (!enabled) {
+
+        console.info("[EVENT LOG] Disabled by configuration.");
+        return;
+
+    }
+
+    try {
+
+        const { initEventLog } = await import(
+            "./modules/eventLog/eventLog.js"
+        );
+
+        const container = document.getElementById(
+            "eventLogContainer"
+        );
+
+        const eventLogger = initEventLog(container);
+
+        if (typeof eventLogger === "function") {
+
+            logEvent = eventLogger;
+
+            logEvent(
+                "Flight monitoring initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[EVENT LOG] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   17.3 INITIALIZE MISSION BAR
+   ------------------------------------------------------------ */
+
+async function initializeMissionBar(enabled) {
+
+    if (!enabled) {
+
+        console.info("[MISSION BAR] Disabled by configuration.");
+        return;
+
+    }
+
+    try {
+
+        const module = await import(
+            "./modules/missionBar/missionBar.js"
+        );
+
+        const container = document.getElementById(
+            "missionBarContainer"
+        );
+
+        const initialized = await module.initMissionBar(
+            container
+        );
+
+        if (initialized) {
+
+            missionBarModule = module;
+
+            if (pendingMissionData) {
+
+                module.updateMissionBarData(
+                    pendingMissionData
+                );
+
+            }
+
+            logEvent(
+                "Mission Bar initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[MISSION BAR] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   17.4 INITIALIZE FLIGHT RECORDER
+   ------------------------------------------------------------ */
+
+async function initializeFlightRecorder(enabled) {
+
+    if (!enabled) {
+
+        console.info(
+            "[FLIGHT RECORDER] Disabled by configuration."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const module = await import(
+            "./modules/flightRecorder/flightRecorder.js"
+        );
+
+        const container = document.getElementById(
+            "flightRecorderContainer"
+        );
+
+        const initialized = await module.initFlightRecorder(
+            container,
+            {
+                onEvent: logEvent
+            }
+        );
+
+        if (initialized) {
+
+            logEvent(
+                "Flight Recorder initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[FLIGHT RECORDER] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   17.5 INITIALIZE ALL MODULES
+   ------------------------------------------------------------ */
+
+async function initializeModules() {
+
+    const configuration =
+        await loadModuleConfiguration();
+
+    const modules =
+        configuration.modules || {};
+
+    // Initialize Event Log first so other modules
+    // can send notifications to it.
+
+    await initializeEventLog(
+        modules.eventLog === true
+    );
+
+    await initializeMissionBar(
+        modules.missionBar === true
+    );
+
+    await initializeFlightRecorder(
+        modules.flightRecorder === true
+    );
+
+}
+
+
+/* ============================================================
+   18. APPLICATION INITIALIZATION
+   ============================================================ */
+
+// INITIALIZE MODULES
+
+initializeModules();
 
 
 // START TELEMETRY
@@ -1537,19 +1776,12 @@ window.addEventListener(
 );
 
 
-
 /* ============================================================
-   18. END OF FLIGHT TELEMETRY MONITOR
+   END OF FLIGHT TELEMETRY MONITOR
    ============================================================ */
 
 
-
-/* ============================================================
-   20. MODULAR ARCHITECTURE
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
+   /* ------------------------------------------------------------
    20.1 PROJECT DATA MODULE
    ------------------------------------------------------------ */
 
@@ -1569,54 +1801,3 @@ import("./modules/projectData/projectData.js")
     });
 
 
-/* ------------------------------------------------------------
-   20.2 MISSION BAR MODULE
-   ------------------------------------------------------------ */
-
-import("./modules/missionBar/missionBar.js")
-    .then(async module => {
-
-        missionBarModule = module;
-
-        await module.initMissionBar();
-
-        if (pendingMissionData) {
-
-            module.updateMissionBarData(
-                pendingMissionData
-            );
-
-        }
-
-    })
-    .catch(error => {
-
-        console.error(
-            "[MISSION BAR] Module initialization failed:",
-            error
-        );
-
-    });
-
-
-
-/* ------------------------------------------------------------
-   20.3 FLIGHT RECORDER MODULE
-   ------------------------------------------------------------ */
-
-import("./modules/flightRecorder/flightRecorder.js")
-    .then(module => {
-
-        module.initFlightRecorder({
-            onEvent: logEvent
-        });
-
-    })
-    .catch(error => {
-
-        console.error(
-            "[FLIGHT RECORDER] Module initialization failed:",
-            error
-        );
-
-    });

@@ -3,18 +3,7 @@
    OAI MIZUSHIMA YR-02
    FLIGHT DATA RECORDER MODULE
 
-   VERSION: 1.0.0
-
-   RESPONSIBILITY:
-   Flight data recording control, status monitoring,
-   recorder interface and event notifications.
-
-   API:
-   - initFlightRecorder()
-   - startFlightRecording()
-   - stopFlightRecording()
-   - refreshRecorderStatus()
-
+   VERSION: 1.1.0
    ============================================================ */
 
 
@@ -30,14 +19,17 @@ const RECORDER_API = "/api/recorder";
    ============================================================ */
 
 let initialized = false;
-
 let recording = false;
-
 let currentFilename = null;
 
+let container = null;
 let startButton = null;
 let stopButton = null;
 let statusElement = null;
+
+let onEvent = (message, type = "normal") => {
+    console.log("[FLIGHT RECORDER]", message);
+};
 
 
 /* ============================================================
@@ -45,17 +37,7 @@ let statusElement = null;
    ============================================================ */
 
 function notify(message, type = "normal") {
-
-    if (typeof window.logEvent === "function") {
-
-        window.logEvent(message, type);
-
-    } else {
-
-        console.log("[FLIGHT RECORDER]", message);
-
-    }
-
+    onEvent(message, type);
 }
 
 
@@ -63,35 +45,20 @@ function notify(message, type = "normal") {
    04. RECORDER INTERFACE
    ============================================================ */
 
-function updateRecorderInterface(
-    isRecording,
-    filename = null
-) {
+function updateRecorderInterface(isRecording, filename = null) {
 
     recording = Boolean(isRecording);
-
     currentFilename = filename || null;
 
-
-    // BUTTON STATES
-
     if (startButton) {
-
         startButton.disabled = recording;
-
     }
 
     if (stopButton) {
-
         stopButton.disabled = !recording;
-
     }
 
-
-    // STATUS DISPLAY
-
     if (!statusElement) return;
-
 
     if (recording) {
 
@@ -102,13 +69,10 @@ function updateRecorderInterface(
 
     } else {
 
-        statusElement.textContent =
-            "RECORDER STANDBY";
-
+        statusElement.textContent = "RECORDER STANDBY";
         statusElement.classList.remove("recording");
 
     }
-
 }
 
 
@@ -121,45 +85,28 @@ export async function startFlightRecording() {
     if (recording) return;
 
     if (startButton) {
-
         startButton.disabled = true;
-
     }
-
 
     try {
 
         const response = await fetch(
             `${RECORDER_API}/start`,
-            {
-                method: "POST"
-            }
+            { method: "POST" }
         );
-
 
         const result = await response.json();
 
-
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Start failed"
-            );
-
+            throw new Error(result.message || "Start failed");
         }
 
-
-        updateRecorderInterface(
-            true,
-            result.filename
-        );
-
+        updateRecorderInterface(true, result.filename);
 
         notify(
-            "Flight data recording started: " + result.filename,
+            "Flight data recording started: " + (result.filename || ""),
             "activation"
         );
-
 
     } catch (error) {
 
@@ -171,7 +118,6 @@ export async function startFlightRecording() {
         );
 
     }
-
 }
 
 
@@ -184,42 +130,28 @@ export async function stopFlightRecording() {
     if (!recording) return;
 
     if (stopButton) {
-
         stopButton.disabled = true;
-
     }
-
 
     try {
 
         const response = await fetch(
             `${RECORDER_API}/stop`,
-            {
-                method: "POST"
-            }
+            { method: "POST" }
         );
-
 
         const result = await response.json();
 
-
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Stop failed"
-            );
-
+            throw new Error(result.message || "Stop failed");
         }
-
 
         updateRecorderInterface(false);
 
-
         notify(
-            "Flight data recording saved: " + result.filename,
+            "Flight data recording saved: " + (result.filename || ""),
             "activation"
         );
-
 
     } catch (error) {
 
@@ -231,7 +163,6 @@ export async function stopFlightRecording() {
         await refreshRecorderStatus();
 
     }
-
 }
 
 
@@ -245,23 +176,17 @@ export async function refreshRecorderStatus() {
 
         const response = await fetch(
             RECORDER_API,
-            {
-                cache: "no-store"
-            }
+            { cache: "no-store" }
         );
-
 
         if (!response.ok) return;
 
-
         const result = await response.json();
-
 
         updateRecorderInterface(
             result.recording,
             result.filename
         );
-
 
     } catch (error) {
 
@@ -271,53 +196,91 @@ export async function refreshRecorderStatus() {
         );
 
     }
-
 }
 
 
 /* ============================================================
-   08. MODULE INITIALIZATION
+   08. MODULE INTERFACE
    ============================================================ */
 
-export async function initFlightRecorder() {
+function createRecorderInterface() {
 
-    if (initialized) return;
+    container.innerHTML = `
+        <section class="recorder-panel">
 
-    initialized = true;
+            <span class="micro-label">TELEMETRY RECORDER</span>
+
+            <div class="recorder-buttons">
+
+                <button
+                    id="startRecording"
+                    class="recorder-btn start"
+                    type="button"
+                >
+                    <span class="recorder-dot"></span>
+                    START
+                </button>
+
+                <button
+                    id="stopRecording"
+                    class="recorder-btn stop"
+                    type="button"
+                    disabled
+                >
+                    STOP
+                </button>
+
+            </div>
+
+            <span
+                id="recorderStatus"
+                class="recorder-status"
+            >
+                RECORDER STANDBY
+            </span>
+
+        </section>
+    `;
+
+    startButton = container.querySelector("#startRecording");
+    stopButton = container.querySelector("#stopRecording");
+    statusElement = container.querySelector("#recorderStatus");
+}
 
 
-    // DOM REFERENCES
+/* ============================================================
+   09. MODULE INITIALIZATION
+   ============================================================ */
 
-    startButton =
-        document.getElementById("startRecording");
+export async function initFlightRecorder(targetContainer, options = {}) {
 
-    stopButton =
-        document.getElementById("stopRecording");
+    if (initialized) return true;
 
-    statusElement =
-        document.getElementById("recorderStatus");
+    if (!targetContainer) {
 
+        console.error(
+            "[FLIGHT RECORDER] Container not found."
+        );
 
-    // VALIDATE INTERFACE
+        return false;
+    }
 
-    if (
-        !startButton ||
-        !stopButton ||
-        !statusElement
-    ) {
+    container = targetContainer;
+
+    if (typeof options.onEvent === "function") {
+        onEvent = options.onEvent;
+    }
+
+    createRecorderInterface();
+
+    if (!startButton || !stopButton || !statusElement) {
 
         console.error(
             "[FLIGHT RECORDER] Required DOM elements not found."
         );
 
-        initialized = false;
-
-        return;
-
+        return false;
     }
-
-
-    // BUTTON EVENTS
 
     startButton.addEventListener(
         "click",
@@ -329,19 +292,18 @@ export async function initFlightRecorder() {
         stopFlightRecording
     );
 
-
-    // INITIAL STATUS
+    initialized = true;
 
     await refreshRecorderStatus();
 
+    notify("Flight Recorder initialized.", "system-event");
 
-    console.log(
-        "[FLIGHT RECORDER] Module initialized."
-    );
+    console.log("[FLIGHT RECORDER] Module initialized.");
 
+    return true;
 }
 
 
 /* ============================================================
-   END OF FLIGHT RECORDER MODULE
+   END OF MODULE
    ============================================================ */

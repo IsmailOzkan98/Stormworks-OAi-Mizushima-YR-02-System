@@ -1,0 +1,8 @@
+
+{
+    "modules": {
+        "eventLog": true,
+        "flightRecorder": true,
+        "missionBar": true
+    }
+}

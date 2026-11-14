@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/structure.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/responsive.css') }}">
-    <script  type="module" src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 
 <body>
@@ -40,33 +40,11 @@
 
     <section class="mission-layout">
 
-        <!-- MISSION STATUS -->
-        <section class="mission-bar mission-status-bar"></section>
+        <!-- MISSION BAR MODULE -->
+        <div id="missionBarContainer"></div>
 
-
-        <!-- FLIGHT RECORDER -->
-        <section class="recorder-panel">
-
-            <span class="micro-label">TELEMETRY RECORDER</span>
-
-            <div class="recorder-buttons">
-
-                <button id="startRecording" class="recorder-btn start">
-                    <span class="recorder-dot"></span>
-                    START
-                </button>
-
-                <button id="stopRecording" class="recorder-btn stop" disabled>
-                    STOP
-                </button>
-
-            </div>
-
-            <span id="recorderStatus" class="recorder-status">
-                RECORDER STANDBY
-            </span>
-
-        </section>
+        <!-- FLIGHT RECORDER MODULE -->
+        <div id="flightRecorderContainer"></div>
 
     </section>
     
@@ -79,34 +57,10 @@
 
         <section class="column">
 
-            <!-- 01 EVENT RECORDER -->
+            
+            <!-- EVENT LOG MODULE -->
+            <div id="eventLogContainer"></div>
 
-            <div class="section-heading">
-                <span>01</span> EVENT RECORDER
-            </div>
-
-            <div class="event-panel">
-
-                <div class="event-header">
-                    <span>FLIGHT EVENT LOG</span>
-                    <span>LIVE</span>
-                </div>
-
-                <div class="event-list" id="eventLog">
-
-                    <div class="event-entry system-event">
-                        <span class="event-time">SYSTEM</span>
-                        <span>Monitoring system initialized.</span>
-                    </div>
-
-                    <div class="event-entry">
-                        <span class="event-time">SYSTEM</span>
-                        <span>Waiting for telemetry packets...</span>
-                    </div>
-
-                </div>
-
-            </div>
 
             <!-- 02 SYSTEM DIAGNOSTICS -->
 
@@ -488,6 +442,6 @@
         <span>DATA ACCESS</span>
     </footer>
 
-</section>
+
 </body>
 </html>
