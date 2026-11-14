@@ -3,6 +3,7 @@
     "modules": {
         "eventLog": true,
         "flightRecorder": true,
-        "missionBar": true
+        "missionBar": true,
+        "systemDiagnostics": true
     }
 }

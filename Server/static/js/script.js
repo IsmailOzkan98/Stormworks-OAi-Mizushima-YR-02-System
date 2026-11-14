@@ -23,6 +23,7 @@
 
 let missionBarModule = null;
 let pendingMissionData = null;
+let systemDiagnosticsModule = null;
 
 // Event Log estará disponible cuando se inicialice.
 // Mientras tanto, los eventos se mostrarán en consola.
@@ -1107,96 +1108,6 @@ function pulseDirection(
 }
 
 
-/* ============================================================
-   14. SYSTEM DIAGNOSTICS
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   14.1 UPDATE DIAGNOSTICS
-   ------------------------------------------------------------ */
-
-function updateDiagnostics(data) {
-
-    systems.forEach(([key, indicatorId, label]) => {
-
-
-        // CURRENT STATE
-
-        const active =
-            isActive(data, key);
-
-
-        // DIRECTIONAL BOOSTERS
-
-        if (directions.includes(key)) {
-
-            pulseDirection(
-                indicatorId,
-                active
-            );
-
-        } else {
-
-            setIndicator(
-                indicatorId,
-                active
-            );
-
-        }
-
-
-        // STATUS TEXT
-
-        const statusElement =
-            document.getElementById(
-                indicatorId + "Status"
-            );
-
-
-        if (statusElement) {
-
-            statusElement.textContent =
-                active ? "ACTIVE" : "OFFLINE";
-
-            statusElement.classList.toggle(
-                "active-text",
-                active
-            );
-
-        }
-
-
-        // STATE CHANGE DETECTION
-
-        const previous =
-            previousSnapshot[key];
-
-
-        if (
-            previous !== undefined &&
-            previous !== active
-        ) {
-
-            logEvent(
-
-                `${label}: ${active ? "ACTIVATED" : "DEACTIVATED"}.`,
-
-                active
-                    ? "activation"
-                    : "deactivation"
-
-            );
-
-        }
-
-
-        previousSnapshot[key] = active;
-
-    });
-
-}
-
 
 /* ============================================================
    15. MAIN INTERFACE UPDATE
@@ -1220,6 +1131,10 @@ function updateInterface(data) {
 
     if (missionBarModule) {
         missionBarModule.updateMissionBarData(data);
+    }
+
+    if (systemDiagnosticsModule) {
+        systemDiagnosticsModule.updateSystemDiagnostics(data);
     }
 
 
@@ -1539,7 +1454,8 @@ async function loadModuleConfiguration() {
             modules: {
                 eventLog: false,
                 flightRecorder: false,
-                missionBar: false
+                missionBar: false,
+                systemDiagnostics: false
             }
         };
 
@@ -1708,6 +1624,29 @@ async function initializeFlightRecorder(enabled) {
 }
 
 
+async function initializeSystemDiagnostics(enabled) {
+    if (!enabled) return;
+
+    try {
+        const { initSystemDiagnostics } = await import(
+            "./modules/systemDiagnostics/systemDiagnostics.js"
+        );
+
+        const container = document.getElementById(
+            "systemDiagnosticsContainer"
+        );
+
+        systemDiagnosticsModule = await initSystemDiagnostics(container);
+
+        if (systemDiagnosticsModule) {
+            logEvent("System Diagnostics module initialized.", "success");
+        }
+
+    } catch (error) {
+        console.error("[SYSTEM DIAGNOSTICS] Initialization failed:", error);
+    }
+}
+
 /* ------------------------------------------------------------
    17.5 INITIALIZE ALL MODULES
    ------------------------------------------------------------ */
@@ -1733,6 +1672,10 @@ async function initializeModules() {
 
     await initializeFlightRecorder(
         modules.flightRecorder === true
+    );
+
+    await initializeSystemDiagnostics(
+        modules.systemDiagnostics === true
     );
 
 }
