@@ -10,7 +10,7 @@
 | Plataforma | Stormworks: Build and Rescue |
 | Arquitectura | Modular Microcontroller Flight Control System |
 | Lenguaje | Lua |
-| Microcontroladores | MC01–MC07 |
+| Microcontroladores | MC01–MC08 |
 
 ---
 
@@ -18,7 +18,7 @@
 
 El **OAI MIZUSHIMA YR-02** es un sistema modular de control de vuelo desarrollado para Stormworks.
 
-La arquitectura divide las funciones de control en siete microcontroladores independientes. Cada módulo tiene una responsabilidad específica y se comunica con los demás mediante conexiones Composite.
+La arquitectura divide las funciones de control en ocho microcontroladores independientes. Cada módulo tiene una responsabilidad específica y se comunica con los demás mediante conexiones Composite.
 
 El objetivo de esta arquitectura es mantener las funciones de vuelo separadas, facilitar el mantenimiento y permitir que cada módulo pueda modificarse y comprobarse individualmente.
 
@@ -29,10 +29,11 @@ El objetivo de esta arquitectura es mantener las funciones de vuelo separadas, f
 | MC01 | FLIGHT SEQUENCE | Gestión de misión y secuencia de vuelo |
 | MC02 | MASTER CONTROL | Distribución de órdenes generales |
 | MC03 | FLIGHT CONTROL | Estabilización de roll |
-| MC04 | ALTITUDE CONTROL | Control de altitud mediante PID |
+| MC04 | ALTITUDE CONTROL | Control de altitud mediante PID y gestión del descenso |
 | MC05 | NAVIGATION | Navegación y cálculo de rumbo |
 | MC06 | PROPULSION | Gestión de propulsores y spoiler |
 | MC07 | TELEMETRY | Supervisión y transmisión HTTP |
+| MC08 | ADAPTIVE DESCENT PROFILE | Cálculo adaptativo del perfil de descenso |
 
 MC07 es opcional. Su ausencia no debe impedir el funcionamiento de los controles principales de vuelo.
 
@@ -196,12 +197,14 @@ MC01 genera las órdenes generales y los valores de estado de la secuencia. MC02
 | MC01 | Bool 8 | MC02 | Bool 8 | ALTITUDE_HOLD | Boolean | Orden de control | Habilita el mantenimiento de altitud |
 | MC01 | Bool 9 | MC02 | Bool 9 | AUTOPILOT | Boolean | Orden de control | Habilita el piloto automático |
 | MC01 | Bool 10 | MC02 | Bool 10 | START_STATUS | Boolean | Estado | Estado relacionado con el inicio de la secuencia |
+| MC01 | Bool 11 | MC02 | Bool 11 | AFTERBURNER | Boolean | Orden de control | Solicita la activación o desactivación del Afterburner |
+| MC01 | Bool 12 | MC02 | Bool 12 | DESCENT_ENABLE | Boolean | Orden de control | Habilita el perfil adaptativo de descenso |
 | MC01 | Num 1 | MC02 | Num 1 | SEQUENCE_STATE | Number | Estado | Identificador de la fase de vuelo |
 | MC01 | Num 2 | MC02 | Num 2 | SEQUENCE_TIMER | Number | Estado | Temporizador de la secuencia |
 | MC01 | Num 3 | MC02 | Num 3 | SPOILER | Number | Orden de control | Valor de control del spoiler |
 | MC01 | Num 4 | MC02 | Num 4 | ALTITUDE_STABLE_TIMER | Number | Estado | Temporizador de estabilidad de altitud |
 | MC01 | Num 5 | MC02 | Num 5 | ROLL_STABLE_TIMER | Number | Estado | Temporizador de estabilidad de roll |
-| MC01 | Bool 11 | MC02 | Bool 11 | AFTERBURNER | Boolean | Orden de control | Solicita la activación o desactivación del Afterburner |
+
 
 ## 4.2. MC02 → MC03 — Flight Control
 
@@ -216,6 +219,7 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
 |---|---|---|---|---|---|---|---|
 | MC02 | Bool 8 | MC04 | Bool 8 | ALTITUDE_HOLD | Boolean | Orden de control | Habilita el control automático de altitud |
+| MC02 | Bool 12 | MC04 | Bool 9 | DESCENT_ENABLE → DESCENT_MODE | Boolean | Orden de control | Habilita el modo de control de descenso de MC04 |
 
 ## 4.4. MC02 → MC05 — Navigation
 
@@ -247,6 +251,7 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
 |---|---|---|---|---|---|---|---|
 | MC04 | Num 5 | MC07 | Num 6 | DESIRED_VERTICAL_SPEED | Number | Cálculo de control | Velocidad vertical deseada calculada por MC04 |
+| MC04 | Num 6 | MC07 | Num 4 | ALTITUDE_TARGET | Number | Cálculo de control | Altitud objetivo seleccionada por MC04 |
 
 ## 4.8. MC05 → MC07 — Telemetry
 
@@ -270,17 +275,18 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC02 | Bool 3 | MC07 | Bool 6 | ROLL_STABILIZER | Boolean | Estado | Estabilización de roll habilitada |
 | MC02 | Bool 8 | MC07 | Bool 5 | ALTITUDE_HOLD | Boolean | Estado | Mantenimiento de altitud habilitado |
 | MC02 | Bool 9 | MC07 | Bool 3 | AUTOPILOT | Boolean | Estado | Piloto automático habilitado |
+| MC02 | Bool 12 | MC07 | Bool 13 | DESCENT_ENABLE | Boolean | Estado | Indica que el perfil adaptativo de descenso está habilitado |
 
 ## 4.10. MC06 → MC07 — Telemetry
 
 | Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
 |---|---|---|---|---|---|---|---|
-| MC06 | Number 5 | MC07 | Number 17 | SPOILER | Number | Estado de actuador | Posición o valor aplicado al spoiler |
+| MC06 | Num 5 | MC07 | Num 17 | SPOILER | Number | Estado de actuador | Posición o valor aplicado al spoiler |
 | MC06 | Bool 1 | MC07 | Bool 4 | MAIN_BOOSTER | Boolean | Estado de actuador | Estado del propulsor principal |
-| MC06 | Bool 5 | MC07 | Bool 8 | NORTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor norte |
-| MC06 | Bool 6 | MC07 | Bool 9 | EAST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor este |
-| MC06 | Bool 7 | MC07 | Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | Estado del propulsor sur |
-| MC06 | Bool 8 | MC07 | Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | Estado del propulsor oeste |
+| MC06 | Bool 5 | MC07 | Bool 8 | BOOSTER_NORTH | Boolean | Estado de actuador | Estado del propulsor norte |
+| MC06 | Bool 6 | MC07 | Bool 9 | BOOSTER_EAST | Boolean | Estado de actuador | Estado del propulsor este |
+| MC06 | Bool 7 | MC07 | Bool 10 | BOOSTER_SOUTH | Boolean | Estado de actuador | Estado del propulsor sur |
+| MC06 | Bool 8 | MC07 | Bool 11 | BOOSTER_WEST | Boolean | Estado de actuador | Estado del propulsor oeste |
 | MC06 | Bool 9 | MC07 | Bool 7 | ACCELERATION_BOOSTER | Boolean | Estado de actuador | Estado de los propulsores de aceleración |
 | MC06 | Bool 10 | MC07 | Bool 12 | AFTERBURNER | Boolean | Estado de actuador | Estado de activación del Afterburner |
 
@@ -292,6 +298,25 @@ MC03 también necesita recibir su multiplicador y el sensor de inclinación hori
 | MC01-ULS | Num 8 | MC07 | Num 20 | RX_TX_FREQUENCY_TX | Number | Telemetría | Frecuencia de transmisión |
 | MC01-ULS | Num 9 | MC07 | Num 21 | RX_TX_FREQUENCY_RX | Number | Telemetría | Frecuencia de recepción |
 
+## 4.12. MC02 → MC08 — Adaptive Descent Profile
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| MC02 | Bool 12 | MC08 | Bool 1 | DESCENT_ENABLE | Boolean | Orden de control | Habilita el cálculo del perfil adaptativo de descenso |
+
+## 4.13. MC05 → MC08 — Navigation to Descent Profile
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| MC05 | Num 7 | MC08 | Num 2 | AP_DISTANCE | Number | Dato de navegación | Distancia actual hasta el objetivo |
+
+## 4.14. MC08 → MC04 — Descent Control
+
+| Origen | Salida | Destino | Entrada | Señal | Dato | Naturaleza | Descripción |
+|---|---|---|---|---|---|---|---|
+| MC08 | Num 1 | MC04 | Num 10 | DESCENT_TARGET | Number | Cálculo de control | Altitud objetivo calculada para el perfil de descenso |
+| MC08 | Num 2 | MC04 | Num 11 | DESCENT_SPEED_TARGET | Number | Cálculo de control | Velocidad vertical deseada calculada para el descenso |
+
 ---
 
 
@@ -301,38 +326,46 @@ Esta tabla identifica las señales que deben suministrarse desde sensores físic
 
 Los canales indicados corresponden a las entradas documentadas de cada controlador. Cuando un mismo sensor o parámetro se utiliza en varios módulos, debe distribuirse su señal a todos los destinos que la necesitan.
 
-| Señal | Naturaleza | Dato | MC01 | MC03 | MC04 | MC05 | MC06 | MC07 |
-|---|---|---|---|---|---|---|---|---|
-| PITCH_RANGE | Parámetro de configuración | Number | Num 1 | — | — | — | — | — |
-| TILT_ROLL_HORIZ | Sensor físico | Number | Num 2 | Num 2 | — | — | Num 3 | Num 9 |
-| TILT_PITCH | Sensor físico | Number | Num 3 | — | — | — | — | Num 10 |
-| TARGET_RPS | Parámetro de configuración | Number | Num 4 | — | — | — | — | Num 8 |
-| REAL_RPS | Sensor físico | Number | Num 5 | — | — | — | — | Num 7 |
-| ALTITUDE | Sensor físico | Number | Num 6 | — | Num 1 | — | — | Num 3 |
-| ALT_TARGET | Parámetro de configuración | Number | Num 7 | — | Num 2 | — | — | Num 4 |
-| ROLL_STABLE_TIME | Parámetro de configuración | Number | Num 8 | — | — | — | — | — |
-| VERTICAL_SPEED | Sensor físico | Number | Num 12 | — | Num 6 | — | — | Num 5 |
-| AP_TARGET_X | Entrada de navegación | Number | Num 13 | — | — | Num 1 | — | — |
-| AP_TARGET_Y | Entrada de navegación | Number | Num 14 | — | — | Num 2 | — | — |
-| AP_SENSOR_X | Sensor de posición | Number | Num 15 | — | — | Num 3 | — | — |
-| AP_SENSOR_Y | Sensor de posición | Number | Num 16 | — | — | Num 4 | — | — |
-| AP_COMPASS | Sensor físico | Number | — | — | — | Num 5 | — | — |
-| AP_STEER_POWER | Parámetro de configuración | Number | — | — | — | Num 6 | — | — |
-| AP_CUTOFF_DIST | Parámetro de configuración | Number | Num 19 | — | — | Num 7 | — | — |
-| AP_DEADZONE | Parámetro de configuración | Number | — | — | — | Num 8 | — | — |
-| AP_STEER_SMOOTH | Parámetro de configuración | Number | — | — | — | Num 9 | — | — |
-| MAX_TAKEOFF_VSPEED | Parámetro de configuración | Number | Num 22 | — | — | — | — | — |
-| ROLL_CONTROL_MULTIPLIER | Parámetro de configuración | Number | — | Num 1 | — | — | — | — |
-| TILT_ROLL_VERT | Sensor físico | Number | — | — | — | — | Num 4 | — |
-| ALT_PID_P | Parámetro de configuración | Number | — | — | Num 3 | — | — | — |
-| ALT_PID_I | Parámetro de configuración | Number | — | — | Num 4 | — | — | — |
-| ALT_PID_D | Parámetro de configuración | Number | — | — | Num 5 | — | — | — |
-| MAX_CLIMB_SPEED | Parámetro de configuración | Number | — | — | Num 7 | — | — | — |
-| MAX_DESCENT_SPEED | Parámetro de configuración | Number | — | — | Num 8 | — | — | — |
-| ALTITUDE_GAIN | Parámetro de configuración | Number | — | — | Num 9 | — | — | — |
-| ALT_HOLD_DELAY | Parámetro de configuración | Number | Num 11 | — | — | — | — | — |
-| ALTITUDE_STABLE_TIME | Parámetro de configuración | Number | Num 10 | — | — | — | — | — |
-| ABSOLUTE_SPEED | Sensor físico | Number | — | — | — | — | — | Num 18 |
+| Señal | Naturaleza | Dato | MC01 | MC03 | MC04 | MC05 | MC06 | MC07 | MC08 |
+|---|---|---|---|---|---|---|---|---|---|
+| PITCH_RANGE | Parámetro de configuración | Number | Num 1 | — | — | — | — | — | — |
+| TARGET_RPS | Parámetro de configuración | Number | Num 4 | — | — | — | — | — | — |
+| ALTITUDE_SETPOINT | Parámetro de configuración | Number | Num 7 | — | Num 2 | — | — | — | — |
+| ROLL_STABLE_TIME | Parámetro de configuración | Number | Num 8 | — | — | — | — | — | — |
+| AP_STEERING | Parámetro de configuración | Number | — | — | — | Num 6 | — | — | — |
+| AP_CUTOFF | Parámetro de configuración | Number | Num 19 | — | — | Num 7 | — | — | — |
+| AP_DEADZONE | Parámetro de configuración | Number | — | — | — | Num 8 | — | — | — |
+| AP_SMOOTHING | Parámetro de configuración | Number | — | — | — | Num 9 | — | — | — |
+| MAX_TAKEOFF_VSPEED | Parámetro de configuración | Number | Num 22 | — | — | — | — | — | — |
+| ROLL_CONTROL_MULTIPLIER | Parámetro de configuración | Number | — | Num 1 | — | — | — | — | — |
+| ALT_PID_P | Parámetro de configuración | Number | — | — | Num 3 | — | — | — | — |
+| ALT_PID_I | Parámetro de configuración | Number | — | — | Num 4 | — | — | — | — |
+| ALT_PID_D | Parámetro de configuración | Number | — | — | Num 5 | — | — | — | — |
+| MAX_CLIMB_SPEED | Parámetro de configuración | Number | — | — | Num 7 | — | — | — | — |
+| MAX_DESCENT_SPEED | Parámetro de configuración | Number | — | — | Num 8 | — | — | — | Num 4 |
+| ALTITUDE_GAIN | Parámetro de configuración | Number | — | — | Num 9 | — | — | — | — |
+| ALT_HOLD_DELAY | Parámetro de configuración | Number | Num 11 | — | — | — | — | — | — |
+| ALTITUDE_STABLE_TIME | Parámetro de configuración | Number | Num 10 | — | — | — | — | — | — |
+| DESTINATION_ALTITUDE | Parámetro de configuración | Number | — | — | — | — | — | — | Num 5 |
+| DESCENT_DISTANCE_TRIGGER | Parámetro de configuración | Number | Num 9 | — | — | — | — | — | — |
+| PROFILE_EXPONENT | Parámetro de configuración | Number | — | — | — | — | — | — | Num 6 |
+| ARRIVAL_RADIUS | Parámetro de configuración | Number | — | — | — | — | — | — | Num 7 |
+| CLOSING_SPEED_FILTER | Parámetro de configuración | Number | — | — | — | — | — | — | Num 9 |
+| DESCENT_SPEED_FILTER | Parámetro de configuración | Number | — | — | — | — | — | — | Num 10 |
+| TILT_ROLL_HORIZ | Sensor físico | Number | Num 2 | Num 2 | — | — | Num 3 | Num 9 | — |
+| TILT_PITCH | Sensor físico | Number | Num 3 | — | — | — | — | — | — |
+| REAL_RPS | Sensor físico | Number | Num 5 | — | — | — | — | — | — |
+| ALTITUDE | Sensor físico | Number | Num 6 | — | Num 1 | — | — | Num 3 | Num 1 |
+| VERTICAL_SPEED | Sensor físico | Number | Num 12 | — | Num 6 | — | — | Num 5 | — |
+| HORIZONTAL_SPEED | Sensor físico | Number | — | — | — | — | — | — | Num 3 |
+| ABSOLUTE_SPEED | Sensor físico | Number | — | — | — | — | — | Num 18 | — |
+| AP_COMPASS | Sensor físico | Number | — | — | — | Num 5 | — | — | — |
+| TILT_ROLL_VERT | Sensor físico | Number | — | — | — | — | Num 4 | — | — |
+| AP_SENSOR_X | Sensor de posición | Number | Num 15 | — | — | Num 3 | — | — | — |
+| AP_SENSOR_Y | Sensor de posición | Number | Num 16 | — | — | Num 4 | — | — | — |
+| AP_TARGET_X | Entrada de navegación | Number | Num 13 | — | — | Num 1 | — | — | — |
+| AP_TARGET_Y | Entrada de navegación | Number | Num 14 | — | — | Num 2 | — | — | — |
+
 
 **Nota:** los guiones indican que la señal no aparece como entrada de ese módulo en la distribución documentada. No significan que el sensor no pueda utilizarse en otras funciones futuras.
 
@@ -362,6 +395,9 @@ No corresponden a sensores físicos ni a parámetros de configuración del siste
 | BOTTOM_BOOSTERS | Orden de control | MC02 | MC06 | Bool 3 |
 | ACCELERATION_BOOSTERS | Orden de control | MC02 | MC06 | Bool 4 |
 | AFTERBURNER | Orden de control | MC02 | MC06 | Bool 5 |
+| DESCENT_ENABLE → DESCENT_MODE | Orden de control | MC02 Bool 12 | MC04 | Bool 9 |
+| DESCENT_ENABLE | Orden de control | MC02 Bool 12 | MC08 | Bool 1 |
+| DESCENT_ENABLE | Estado | MC02 Bool 12 | MC07 | Bool 13 |
 
 ---
 
@@ -382,8 +418,9 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Num 4 | TARGET_RPS | Number | Parámetro de configuración | Configuración |
 | Num 5 | REAL_RPS | Number | Sensor físico | Sensor RPS |
 | Num 6 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 7 | ALT_TARGET | Number | Parámetro de configuración | Configuración |
+| Num 7 | ALTITUDE_TARGET | Number | Parámetro de configuración | Configuración |
 | Num 8 | ROLL_STABLE_TIME | Number | Parámetro de configuración | Configuración |
+| Num 9 | DESCENT_DISTANCE_TARGET | Number | Parámetro de configuración | Distancia objetivo para habilitar el descenso |
 | Num 10 | ALTITUDE_STABLE_TIME | Number | Parámetro de configuración | Configuración |
 | Num 11 | ALT_HOLD_DELAY | Number | Parámetro de configuración | Configuración |
 | Num 12 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
@@ -391,8 +428,9 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Num 14 | AP_TARGET_Y | Number | Entrada de navegación | Configuración de objetivo |
 | Num 15 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición |
 | Num 16 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición |
-| Num 19 | AP_CUTOFF_DIST | Number | Parámetro de configuración | Configuración |
+| Num 19 | AP_CUTOFF | Number | Parámetro de configuración | Configuración |
 | Num 22 | MAX_TAKEOFF_VSPEED | Number | Parámetro de configuración | Configuración |
+
 
 
 ## 6.2. Salidas Boolean
@@ -410,6 +448,7 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Bool 9 | AUTOPILOT | MC02 Bool 9 | Orden de control | Activación del piloto automático |
 | Bool 10 | START_STATUS | MC02 Bool 10 | Estado | Estado de inicio |
 | Bool 11 | AFTERBURNER | MC02 Bool 11 | Orden de control | Solicitud de activación o desactivación del Afterburner |
+| Bool 12 | DESCENT_ENABLE | MC02 Bool 12 | Orden de control | Habilita el perfil adaptativo de descenso |
 
 ## 6.3. Salidas Number
 
@@ -420,6 +459,30 @@ MC01 administra las fases de vuelo y determina cuándo deben activarse las disti
 | Num 3 | SPOILER | MC02 Num 3 | Orden de control | Valor del spoiler |
 | Num 4 | ALTITUDE_STABLE_TIMER | MC02 Num 4 | Estado | Temporizador de estabilidad de altitud |
 | Num 5 | ROLL_STABLE_TIMER | MC02 Num 5 | Estado | Temporizador de estabilidad de roll |
+
+## 6.4. Secuencia de vuelo
+
+MC01 administra la secuencia principal de vuelo mediante once fases:
+
+| Estado | Fase | Función |
+|---:|---|---|
+| 1 | ENGINE_CHECK | Comprobación inicial del sistema de propulsión |
+| 2 | ROLL_STABILIZER | Activación de la estabilización de roll |
+| 3 | MAIN_BOOSTER | Activación del propulsor principal |
+| 4 | DIRECTIONAL_BOOSTER | Activación del sistema de propulsión direccional |
+| 5 | BOTTOM_BOOSTER_SYSTEM | Activación del sistema de propulsores inferiores |
+| 6 | ACCELERATION_BOOSTERS | Activación de los propulsores de aceleración |
+| 7 | ROLL_STABILITY_CHECK | Comprobación de estabilidad de roll |
+| 8 | ALTITUDE_HOLD | Activación del mantenimiento de altitud |
+| 9 | AUTOPILOT | Activación del piloto automático y espera de la distancia de habilitación del descenso |
+| 10 | DESCENT_ENABLE | Habilitación del perfil adaptativo de descenso |
+| 11 | AUTOPILOT_COMPLETE | Finalización de la secuencia de piloto automático |
+
+La señal `DESCENT_DISTANCE_TARGET` determina la distancia a partir de la cual se habilita la fase de descenso.
+
+La señal `DESCENT_ENABLE` permite que MC02 distribuya la orden de activación del perfil adaptativo a MC04, MC07 y MC08.
+
+La finalización de la secuencia deshabilita el piloto automático.
 
 ---
 
@@ -446,6 +509,7 @@ No realiza los cálculos de estabilización, navegación o control de altitud.
 | Bool 9 | AUTOPILOT | Boolean | MC01 Bool 9 |
 | Bool 10 | START_STATUS | Boolean | MC01 Bool 10 |
 | Bool 11 | AFTERBURNER | Boolean | MC01 Bool 11 |
+| Bool 12 | DESCENT_ENABLE | Boolean | MC01 Bool 12 |
 | Num 1 | SEQUENCE_STATE | Number | MC01 Num 1 |
 | Num 2 | SEQUENCE_TIMER | Number | MC01 Num 2 |
 | Num 3 | SPOILER | Number | MC01 Num 3 |
@@ -469,6 +533,7 @@ MC02 utiliza una distribución directa: conserva el tipo, número y valor de cad
 | Bool 9 | AUTOPILOT | MC05 Bool 9 / MC07 Bool 3 |
 | Bool 10 | START_STATUS | Disponible para supervisión |
 | Bool 11 | AFTERBURNER | MC06 Bool 5 |
+| Bool 12 | DESCENT_ENABLE | MC04 Bool 9 / MC07 Bool 13 / MC08 Bool 1 |
 | Num 1 | SEQUENCE_STATE | MC07 Num 1 |
 | Num 2 | SEQUENCE_TIMER | MC07 Num 2 |
 | Num 3 | SPOILER | MC06 Num 1 / MC07 Num 17 |
@@ -522,7 +587,7 @@ MC04 calcula la velocidad vertical deseada y utiliza el control PID para generar
 | Canal | Señal | Dato | Naturaleza | Origen |
 |---|---|---|---|---|
 | Num 1 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 2 | ALT_TARGET | Number | Parámetro de configuración | Configuración de altitud objetivo |
+| Num 2 | ALTITUDE_SETPOINT | Number | Parámetro de configuración | Configuración de altitud objetivo |
 | Num 3 | ALT_PID_P | Number | Parámetro de configuración | Configuración PID |
 | Num 4 | ALT_PID_I | Number | Parámetro de configuración | Configuración PID |
 | Num 5 | ALT_PID_D | Number | Parámetro de configuración | Configuración PID |
@@ -530,7 +595,10 @@ MC04 calcula la velocidad vertical deseada y utiliza el control PID para generar
 | Num 7 | MAX_CLIMB_SPEED | Number | Parámetro de configuración | Configuración |
 | Num 8 | MAX_DESCENT_SPEED | Number | Parámetro de configuración | Configuración |
 | Num 9 | ALTITUDE_GAIN | Number | Parámetro de configuración | Configuración |
+| Num 10 | DESCENT_TARGET | Number | Cálculo de control | MC08 Num 1 |
+| Num 11 | DESCENT_SPEED_TARGET | Number | Cálculo de control | MC08 Num 2 |
 | Bool 8 | ALTITUDE_HOLD | Boolean | Orden de control | MC02 Bool 8 |
+| Bool 9 | DESCENT_MODE | Boolean | Orden de control | MC02 Bool 12 |
 
 
 ## 9.2. Salidas
@@ -540,6 +608,7 @@ MC04 calcula la velocidad vertical deseada y utiliza el control PID para generar
 | Num 3 | ELEVATOR_RIGHT | Number | Salida de actuador | Elevador derecho |
 | Num 4 | ELEVATOR_LEFT | Number | Salida de actuador | Elevador izquierdo |
 | Num 5 | DESIRED_VERTICAL_SPEED | Number | Cálculo de control | MC07 Num 6 |
+| Num 6 | ALTITUDE_TARGET | Number | Cálculo de control | MC07 Num 4 |
 
 **Importante:** `DESIRED_VERTICAL_SPEED` se transmite por Number 5. MC07 debe recibirla por Number 6.
 
@@ -547,18 +616,33 @@ Los dos elevadores reciben el mismo valor calculado por MC04. No deben interpret
 
 ## 9.3. Funcionamiento
 
-MC04 realiza las siguientes operaciones:
+MC04 dispone de dos modos de control:
 
-1. Lee la altitud actual.
-2. Compara la altitud actual con la altitud objetivo.
-3. Calcula la velocidad vertical deseada.
-4. Limita la velocidad vertical deseada a los límites definidos por el controlador.
-5. Ejecuta el cálculo PID.
-6. Aplica las protecciones del integrador.
-7. Limita y suaviza la salida de control.
-8. Publica la velocidad vertical deseada en Number 5.
+**Mantenimiento normal de altitud:**
 
-Cuando el mantenimiento de altitud está deshabilitado, el controlador realiza los reinicios de estado previstos por su implementación.
+1. Lee la altitud actual y la altitud objetivo.
+2. Calcula la velocidad vertical deseada mediante ALTITUDE_GAIN.
+3. Limita la velocidad vertical según los límites de ascenso y descenso.
+4. Ejecuta el PID de velocidad vertical.
+5. Aplica las protecciones del integrador.
+6. Limita y suaviza la salida de control.
+
+**Modo de descenso:**
+
+1. Recibe DESCENT_TARGET desde MC08.
+2. Recibe DESCENT_SPEED_TARGET desde MC08.
+3. Utiliza DESCENT_TARGET como referencia de altitud.
+4. Utiliza DESCENT_SPEED_TARGET como referencia de velocidad vertical.
+5. Ejecuta un PID independiente para el descenso.
+6. Aplica una respuesta de suavizado específica para este modo.
+
+Ambos modos utilizan las mismas salidas de elevadores.
+
+El controlador mantiene memorias PID independientes para el mantenimiento normal de altitud y el descenso.
+
+La salida DESIRED_VERTICAL_SPEED publica la referencia vertical utilizada por el controlador.
+
+La salida ALTITUDE_TARGET publica la altitud objetivo seleccionada.
 
 ---
 
@@ -577,10 +661,10 @@ MC05 calcula la posición relativa respecto al objetivo y genera los datos de na
 | Num 3 | AP_SENSOR_X | Number | Sensor físico | Sensor de posición X |
 | Num 4 | AP_SENSOR_Y | Number | Sensor físico | Sensor de posición Y |
 | Num 5 | AP_COMPASS | Number | Sensor físico | Brújula |
-| Num 6 | AP_STEER_POWER | Number | Parámetro de configuración | Configuración |
-| Num 7 | AP_CUTOFF_DIST | Number | Parámetro de configuración | Configuración |
+| Num 6 | AP_STEERING | Number | Parámetro de configuración | Configuración |
+| Num 7 | AP_CUTOFF | Number | Parámetro de configuración | Configuración |
 | Num 8 | AP_DEADZONE | Number | Parámetro de configuración | Configuración |
-| Num 9 | AP_STEER_SMOOTH | Number | Parámetro de configuración | Configuración |
+| Num 9 | AP_SMOOTHING | Number | Parámetro de configuración | Configuración |
 | Bool 9 | AUTOPILOT | Boolean | Orden de control | MC02 Bool 9 |
 
 
@@ -658,10 +742,10 @@ También utiliza sus propios sensores de inclinación para seleccionar los propu
 | Canal | Señal | Dato | Naturaleza | Función |
 |---|---|---|---|---|
 | Bool 1 | MAIN_BOOSTER | Boolean | Salida de actuador | Activación del propulsor principal |
-| Bool 5 | NORTH_BOOSTER | Boolean | Salida de actuador | Activación del propulsor norte |
-| Bool 6 | EAST_BOOSTER | Boolean | Salida de actuador | Activación del propulsor este |
-| Bool 7 | SOUTH_BOOSTER | Boolean | Salida de actuador | Activación del propulsor sur |
-| Bool 8 | WEST_BOOSTER | Boolean | Salida de actuador | Activación del propulsor oeste |
+| Bool 5 | BOOSTER_NORTH | Boolean | Salida de actuador | Activación del propulsor norte |
+| Bool 6 | BOOSTER_EAST | Boolean | Salida de actuador | Activación del propulsor este |
+| Bool 7 | BOOSTER_SOUTH | Boolean | Salida de actuador | Activación del propulsor sur |
+| Bool 8 | BOOSTER_WEST | Boolean | Salida de actuador | Activación del propulsor oeste |
 | Bool 9 | ACCELERATION_BOOSTER | Boolean | Salida de actuador | Activación del propulsor de aceleración |
 | Bool 10 | AFTERBURNER | Boolean | Salida de actuador | Activación del Afterburner |
 
@@ -696,10 +780,10 @@ La lógica contempla:
 
 Las órdenes de los propulsores inferiores se combinan con las órdenes de los propulsores direccionales en las mismas cuatro salidas Boolean:
 
-- NORTH_BOOSTER
-- EAST_BOOSTER
-- SOUTH_BOOSTER
-- WEST_BOOSTER
+- BOOSTER_NORTH
+- BOOSTER_EAST
+- BOOSTER_SOUTH
+- BOOSTER_WEST
 
 Por tanto, las cuatro salidas representan el resultado combinado de ambas lógicas, no dos grupos de salidas independientes.
 
@@ -735,7 +819,7 @@ No gobierna directamente los actuadores de vuelo.
 | Num 1 | SEQUENCE_STATE | Number | Estado | MC02 Num 1 |
 | Num 2 | SEQUENCE_TIMER | Number | Estado | MC02 Num 2 |
 | Num 3 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
-| Num 4 | ALT_TARGET | Number | Parámetro de configuración | Configuración |
+| Num 4 | ALTITUDE_TARGET | Number | Cálculo de control | MC04 Num 6 |
 | Num 5 | VERTICAL_SPEED | Number | Sensor físico | Sensor de velocidad vertical |
 | Num 6 | DESIRED_VERTICAL_SPEED | Number | Cálculo de control | MC04 Num 5 |
 | Num 7 | REAL_RPS | Number | Sensor físico | Sensor RPS |
@@ -773,11 +857,12 @@ MC07 utiliza estos valores para incorporarlos a la transmisión HTTP.
 | Bool 5 | ALTITUDE_HOLD | Boolean | Estado | MC02 Bool 8 |
 | Bool 6 | ROLL_STABILIZER | Boolean | Estado | MC02 Bool 3 |
 | Bool 7 | ACCELERATION_BOOSTERS | Boolean | Estado de actuador | MC06 Bool 9 |
-| Bool 8 | NORTH_BOOSTER | Boolean | Estado de actuador | MC06 Bool 5 |
-| Bool 9 | EAST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 6 |
-| Bool 10 | SOUTH_BOOSTER | Boolean | Estado de actuador | MC06 Bool 7 |
-| Bool 11 | WEST_BOOSTER | Boolean | Estado de actuador | MC06 Bool 8 |
+| Bool 8 | BOOSTER_NORTH | Boolean | Estado de actuador | MC06 Bool 5 |
+| Bool 9 | BOOSTER_EAST | Boolean | Estado de actuador | MC06 Bool 6 |
+| Bool 10 | BOOSTER_SOUTH | Boolean | Estado de actuador | MC06 Bool 7 |
+| Bool 11 | BOOSTER_WEST | Boolean | Estado de actuador | MC06 Bool 8 |
 | Bool 12 | AFTERBURNER | Boolean | Estado de actuador | MC06 Bool 10 |
+| Bool 13 | DESCENT_ENABLE | Boolean | Estado | MC02 Bool 12 |
 
 ## 12.4. Información transmitida
 
@@ -801,6 +886,8 @@ MC07 recopila información sobre:
 - Valor del spoiler.
 - Estado de activación del Afterburner.
 - Velocidad absoluta en km/h.
+- Estado del perfil adaptativo de descenso.
+- Altitud objetivo seleccionada durante el descenso.
 
 ## 12.5. Comunicación HTTP
 
@@ -816,7 +903,70 @@ MC07 proporciona una salida de comunicación HTTP, pero no dispone de salidas de
 
 ---
 
-# 13. Tabla maestra de salidas de actuadores
+# 13. MC08 — ADAPTIVE DESCENT PROFILE
+
+**Responsabilidad:** cálculo adaptativo del perfil de descenso.
+
+MC08 calcula la altitud objetivo y la velocidad vertical deseada durante el descenso del vehículo.
+
+Utiliza la distancia al objetivo proporcionada por MC05, la altitud actual y diferentes parámetros de configuración para generar un perfil geométrico de descenso.
+
+Sus resultados se transmiten directamente a MC04, que utiliza estas referencias para controlar los elevadores.
+
+## 13.1. Entradas Number
+
+| Canal | Señal | Dato | Naturaleza | Origen |
+|---|---|---|---|---|
+| Num 1 | ALTITUDE | Number | Sensor físico | Sensor de altitud |
+| Num 2 | AP_DISTANCE | Number | Dato de navegación | MC05 Num 7 |
+| Num 3 | HORIZONTAL_SPEED | Number | Sensor físico | Sensor de velocidad horizontal |
+| Num 4 | MAX_DESCENT_SPEED | Number | Parámetro de configuración | Configuración |
+| Num 5 | DESTINATION_ALTITUDE | Number | Parámetro de configuración | Configuración |
+| Num 6 | PROFILE_EXPONENT | Number | Parámetro de configuración | Configuración |
+| Num 7 | ARRIVAL_RADIUS | Number | Parámetro de configuración | Configuración |
+| Num 9 | CLOSING_SPEED_FILTER | Number | Parámetro de configuración | Configuración |
+| Num 10 | DESCENT_SPEED_FILTER | Number | Parámetro de configuración | Configuración |
+
+**Nota:** MC08 Num 8 no está asignado en la interfaz documentada actualmente.
+
+## 13.2. Entradas Boolean
+
+| Canal | Señal | Dato | Naturaleza | Origen |
+|---|---|---|---|---|
+| Bool 1 | DESCENT_ENABLE | Boolean | Orden de control | MC02 Bool 12 |
+
+## 13.3. Salidas Number
+
+| Canal | Señal | Dato | Naturaleza | Destino |
+|---|---|---|---|---|
+| Num 1 | DESCENT_TARGET | Number | Cálculo de control | MC04 Num 10 |
+| Num 2 | DESCENT_SPEED_TARGET | Number | Cálculo de control | MC04 Num 11 |
+
+## 13.4. Funcionamiento
+
+MC08 utiliza la distancia al objetivo para calcular un perfil geométrico de descenso.
+
+El controlador realiza las siguientes operaciones:
+
+1. Comprueba si el descenso está habilitado.
+2. Obtiene la altitud actual y la distancia al objetivo.
+3. Calcula la distancia inicial del perfil.
+4. Determina el progreso del descenso según la distancia restante.
+5. Calcula la altitud objetivo mediante el perfil geométrico.
+6. Evalúa la velocidad horizontal y la velocidad de aproximación.
+7. Calcula la velocidad vertical deseada.
+8. Aplica los filtros de velocidad configurados.
+9. Genera las referencias de altitud y velocidad vertical.
+
+La salida `DESCENT_TARGET` proporciona la referencia de altitud que debe utilizar MC04.
+
+La salida `DESCENT_SPEED_TARGET` proporciona la referencia de velocidad vertical para el controlador PID independiente de descenso de MC04.
+
+MC08 no controla directamente los elevadores. Su función es generar las referencias que utilizará MC04 para realizar el control de descenso.
+
+---
+
+# 14. Tabla maestra de salidas de actuadores
 
 Esta tabla identifica las salidas de control que deben llegar a los actuadores del vehículo.
 
@@ -832,19 +982,19 @@ Los canales lógicos están identificados por los scripts. La correspondencia co
 | MC06 | Num 5 | SPOILER | Number | Sistema de spoiler |
 | MC06 | Bool 1 | MAIN_BOOSTER | Boolean | Propulsor principal |
 | MC06 | Bool 9 | ACCELERATION_BOOSTER | Boolean | Propulsor de aceleración |
-| MC06 | Bool 5 | NORTH_BOOSTER | Boolean | Propulsor norte |
-| MC06 | Bool 6 | EAST_BOOSTER | Boolean | Propulsor este |
-| MC06 | Bool 7 | SOUTH_BOOSTER | Boolean | Propulsor sur |
-| MC06 | Bool 8 | WEST_BOOSTER | Boolean | Propulsor oeste |
+| MC06 | Bool 5 | BOOSTER_NORTH | Boolean | Propulsor norte |
+| MC06 | Bool 6 | BOOSTER_EAST | Boolean | Propulsor este |
+| MC06 | Bool 7 | BOOSTER_SOUTH | Boolean | Propulsor sur |
+| MC06 | Bool 8 | BOOSTER_WEST | Boolean | Propulsor oeste |
 | MC06 | Bool 10 | AFTERBURNER | Boolean | Afterburner |
 
 **Nota:** las salidas `DESIRED_VERTICAL_SPEED` de MC04 y las salidas de navegación de MC05 son señales internas de comunicación entre controladores, no salidas físicas de actuadores.
 
 ---
 
-# 14. Diagramas de arquitectura
+# 15. Diagramas de arquitectura
 
-## 14.1. Distribución general
+## 15.1. Distribución general
 
 ```text
                  SENSORES Y CONFIGURACIÓN
@@ -857,7 +1007,6 @@ Los canales lógicos están identificados por los scripts. La correspondencia co
        | SEQ. |         |ROLL  |         | ALT. |
        +------+         +------+         +------+
           |
-          | Órdenes y estados
           v
        +------+
        | MC02 |
@@ -871,25 +1020,38 @@ Los canales lógicos están identificados por los scripts. La correspondencia co
        | MC03 |         | MC04 |         | MC05 |
        |ROLL  |         | ALT. |         | NAV. |
        +------+         +------+         +------+
-                                           |
-                                           | AP_TARGET_HEADING
-                                           | Num 12
-                                           v
-                                        +------+
-                                        | MC06 |
-                                        |PROP. |
-                                        +------+
+                                             |
+                          AP_DISTANCE        |
+                              |              |
+                              v              |
+                         +------+            |
+                         | MC08 |            |
+                         |DESC. |            |
+                         +------+            |
+                              |              |
+                  DESCENT_TARGET             |
+                  DESCENT_SPEED_TARGET       |
+                              |              |
+                              v              |
+                           MC04 <------------+
+                              |
+                              v
+                         ELEVADORES
+
+       MC05 ---------> MC06 ---------> PROPULSORES
+       MC02 ---------> MC08
+       MC02 ---------> MC04
 
        MC02 -----------+
-       MC04 -----------+----> MC07 ----> HTTP
-       MC05 -----------+
+       MC04 -----------+
+       MC05 -----------+----> MC07 ----> HTTP
        MC06 -----------+
        SENSORES -------+
 ```
 
 El diagrama representa relaciones funcionales. No significa que todas las señales deban pasar por MC02.
 
-## 14.2. Flujo principal de órdenes
+## 15.2. Flujo principal de órdenes
 
 ```text
 MC01 FLIGHT SEQUENCE
@@ -904,9 +1066,11 @@ MC02 MASTER CONTROL
           +----> MC05 NAVIGATION
           |
           +----> MC06 PROPULSION
+          |
+          +----> MC08 ADAPTIVE DESCENT PROFILE
 ```
 
-## 14.3. Flujo de navegación y propulsión
+## 15.3. Flujo de navegación y propulsión
 
 ```text
 SENSORES DE POSICIÓN
@@ -934,37 +1098,37 @@ COORDENADAS OBJETIVO
                 PROPULSORES DIRECCIONALES
 ```
 
-## 14.4. Flujo de control de altitud
+## 15.4. Flujo de control de altitud
 
 ```text
-SENSOR DE ALTITUD ------------------+
-                                    |
-ALTITUDE_TARGET --------------------+
-                                    |
-SENSOR VERTICAL_SPEED --------------+
-                                    |
-ALT_PID_P / ALT_PID_I / ALT_PID_D --+
-                          |
-                          v
-                   MC04 ALTITUDE
-                          |
-              +-----------+-----------+
-              |                       |
-              v                       v
-        ELEVADORES             DESIRED_VERTICAL_SPEED
-                                      |
-                                      | MC04 Num 5
-                                      v
-                                  MC07 Num 6
+MC01 FLIGHT SEQUENCE
+          |
+          | DESCENT_ENABLE
+          v
+MC02 MASTER CONTROL
+          |
+          +----------------------+
+          |                      |
+          v                      v
+     MC08 DESCENT           MC04 ALTITUDE
+          ^                      ^
+          |                      |
+          | AP_DISTANCE          |
+          |                      |
+     MC05 NAVIGATION             |
+          |                      |
+          +---- MC08 ------------+
+                DESCENT_TARGET
+                DESCENT_SPEED_TARGET
 ```
 
 ---
 
-# 15. Procedimiento de validación del montaje
+# 16. Procedimiento de validación del montaje
 
 La validación debe realizarse módulo por módulo antes de probar el sistema completo.
 
-## 15.1. Comprobación de conexiones Composite
+## 16.1. Comprobación de conexiones Composite
 
 - [ ] Todos los microcontroladores están instalados.
 - [ ] Cada Composite está conectado al módulo correspondiente.
@@ -974,7 +1138,7 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 - [ ] No existen asignaciones duplicadas involuntarias.
 - [ ] Todas las señales necesarias llegan a sus destinos.
 
-## 15.2. Comprobación de sensores
+## 16.2. Comprobación de sensores
 
 - [ ] Sensor de altitud.
 - [ ] Sensor de velocidad vertical.
@@ -987,7 +1151,7 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 - [ ] Sensor de brújula.
 - [ ] Valores de configuración.
 
-## 15.3. Comprobación de módulos
+## 16.3. Comprobación de módulos
 
 | Módulo | Prueba |
 |---|---|
@@ -998,8 +1162,9 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 | MC05 | Posición, distancia, rumbo y salida de navegación |
 | MC06 | Propulsor principal, Afterburner, aceleración, direccionales, inferiores y spoiler |
 | MC07 | Recepción de datos y transmisión HTTP |
+| MC08 | Cálculo del perfil de descenso, altitud objetivo y velocidad vertical deseada |
 
-## 15.4. Pruebas de integración
+## 16.4. Pruebas de integración
 
 - [ ] MC01 transmite correctamente las órdenes a MC02.
 - [ ] MC02 retransmite correctamente las órdenes a los módulos correspondientes.
@@ -1020,10 +1185,20 @@ La validación debe realizarse módulo por módulo antes de probar el sistema co
 - [ ] MC07 recibe correctamente AFTERBURNER por Bool 12.
 - [ ] MC07 transmite el estado AFTERBURNER en el parámetro HTTP `afterburner`.
 - [ ] El parámetro HTTP `afterburner` devuelve 1 cuando está activado y 0 cuando está desactivado.
+- [ ] MC01 transmite DESCENT_ENABLE a MC02 por Bool 12.
+- [ ] MC02 distribuye DESCENT_ENABLE a MC04, MC07 y MC08.
+- [ ] MC04 recibe DESCENT_MODE por Bool 9.
+- [ ] MC08 recibe AP_DISTANCE desde MC05 por Num 2.
+- [ ] MC08 genera correctamente DESCENT_TARGET por Num 1.
+- [ ] MC08 genera correctamente DESCENT_SPEED_TARGET por Num 2.
+- [ ] MC04 recibe ambas referencias de descenso.
+- [ ] MC04 publica ALTITUDE_TARGET por Num 6.
+- [ ] MC07 recibe ALTITUDE_TARGET por Num 4.
+- [ ] MC07 recibe DESCENT_ENABLE por Bool 13.
 
 ---
 
-# 16. Consideraciones de integración pendientes
+# 17. Consideraciones de integración pendientes
 
 Los siguientes puntos deben comprobarse durante el montaje y las pruebas físicas.
 
@@ -1037,12 +1212,18 @@ Los siguientes puntos deben comprobarse durante el montaje y las pruebas física
 | Distribución Composite física | Por comprobar en vehículo | Verificar conexiones y ramificaciones |
 | Telemetría HTTP | Pendiente de prueba integrada | Verificar recepción en el puerto 8080 |
 | Afterburner | Canales definidos | Verificar MC01 Bool 11 → MC02 Bool 11 → MC06 Bool 5 → MC06 Bool 10 → MC07 Bool 12 y comprobar transmisión HTTP |
+| MC01 DESCENT_ENABLE | Canal definido: Bool 12 | Conectar a MC02 Bool 12 |
+| MC02 DESCENT_ENABLE | Canal definido: Bool 12 | Distribuir a MC04 Bool 9, MC07 Bool 13 y MC08 Bool 1 |
+| MC05 AP_DISTANCE | Canal definido: Num 7 | Conectar a MC08 Num 2 |
+| MC08 DESCENT_TARGET | Canal definido: Num 1 | Conectar a MC04 Num 10 |
+| MC08 DESCENT_SPEED_TARGET | Canal definido: Num 2 | Conectar a MC04 Num 11 |
+| MC04 ALTITUDE_TARGET | Canal definido: Num 6 | Conectar a MC07 Num 4 |
 
 Las conexiones lógicas indicadas en este documento deben respetarse aunque la distribución física del cableado sea diferente.
 
 ---
 
-# 17. Mantenimiento y ampliación
+# 18. Mantenimiento y ampliación
 
 La arquitectura permite ampliar las funciones del sistema sin modificar innecesariamente los demás controladores.
 
@@ -1061,7 +1242,7 @@ Las nuevas señales deben incorporarse primero a la tabla maestra de conexiones 
 
 ---
 
-# 18. Política de versiones
+# 19. Política de versiones
 
 El proyecto utiliza dos niveles de versionado.
 
@@ -1091,9 +1272,25 @@ Cuando se modifica una conexión, debe actualizarse la documentación del origen
 
 Una modificación de canal no se considera completa hasta que ambos extremos estén documentados y comprobados.
 
+
 ---
 
-# 19. Filosofía del proyecto
+## 19.1. Registro de versiones de módulos
+
+| Microcontrolador | Módulo | Versión | Estado |
+|---|---|---|---|
+| MC01 | FLIGHT SEQUENCE | 1.3.1 | Documentado |
+| MC02 | MASTER CONTROL | 1.2.0 | Documentado |
+| MC03 | FLIGHT CONTROL | 1.0.1 | Documentado |
+| MC04 | ALTITUDE CONTROL | 1.5.1 | Documentado |
+| MC05 | NAVIGATION | 1.0.2 | Documentado |
+| MC06 | PROPULSION | 1.1.0 | Documentado |
+| MC07 | TELEMETRY | 1.4.1 | Documentado |
+| MC08 | ADAPTIVE DESCENT PROFILE | 1.7.2 | Documentado |
+
+---
+
+# 20. Filosofía del proyecto
 
 El OAI MIZUSHIMA YR-02 se basa en tres principios:
 
@@ -1107,7 +1304,7 @@ El objetivo es mantener un sistema de control de vuelo organizado, verificable y
 
 ---
 
-# 20. Estándar de programación de microcontroladores
+# 21. Estándar de programación de microcontroladores
 
 ## MC Architecture Standard v1.0
 
@@ -1115,7 +1312,7 @@ Todos los microcontroladores (MC) del proyecto **OAI MIZUSHIMA YR-02** deberán 
 
 Este estándar establece el orden y la organización que debe mantener el código de cada microcontrolador, garantizando la uniformidad de la arquitectura y facilitando su lectura, mantenimiento, ampliación e integración dentro del sistema.
 
-### 20.1. HEADER & DOCUMENTATION
+### 21.1. HEADER & DOCUMENTATION
 
 Identificación del microcontrolador mediante un encabezado que incluya:
 
@@ -1125,31 +1322,31 @@ Identificación del microcontrolador mediante un encabezado que incluya:
 - Versión global del sistema.
 - Descripción de su responsabilidad y propósito.
 
-### 20.2. INPUT CONFIGURATION
+### 21.2. INPUT CONFIGURATION
 
 Definición y asignación de todas las entradas utilizadas por el microcontrolador.
 
 Cada entrada deberá estar identificada con su correspondiente canal, nombre y tipo de señal, manteniendo la correspondencia con la tabla maestra de conexiones.
 
-### 20.3. OUTPUT CONFIGURATION
+### 21.3. OUTPUT CONFIGURATION
 
 Definición y asignación de todas las salidas utilizadas por el microcontrolador.
 
 Cada salida deberá estar identificada con su correspondiente canal, nombre y tipo de dato, respetando la arquitectura de conexiones establecida.
 
-### 20.4. SYSTEM CONFIGURATION
+### 21.4. SYSTEM CONFIGURATION
 
 Declaración y configuración de constantes, parámetros y valores necesarios para el funcionamiento del sistema.
 
 Esta sección debe centralizar los valores de configuración para evitar su dispersión por las diferentes funciones del código.
 
-### 20.5. SYSTEM STATE
+### 21.5. SYSTEM STATE
 
 Declaración de las variables que representan el estado interno del microcontrolador.
 
 Incluye las variables de control, estados operativos, indicadores internos y cualquier otro dato necesario para conservar y gestionar el funcionamiento del módulo.
 
-### 20.6. GENERAL UTILITIES
+### 21.6. GENERAL UTILITIES
 
 Implementación de funciones auxiliares reutilizables y operaciones generales.
 
@@ -1161,25 +1358,25 @@ Por ejemplo:
 - Funciones de validación.
 - Operaciones auxiliares comunes.
 
-### 20.7. SYSTEM FUNCTIONS
+### 21.7. SYSTEM FUNCTIONS
 
 Implementación de las funciones principales que ejecutan la lógica y las responsabilidades específicas del microcontrolador.
 
 Cada función deberá tener una responsabilidad claramente definida, evitando duplicidades y manteniendo una estructura modular.
 
-### 20.8. MAIN TICK
+### 21.8. MAIN TICK
 
 Implementación de la función principal `onTick()`, encargada de coordinar la ejecución del microcontrolador en cada ciclo.
 
 Esta función debe organizar la secuencia de ejecución de las funciones del sistema y mantener el flujo de procesamiento establecido para el módulo.
 
-### 20.9. OUTPUT PROCESSING
+### 21.9. OUTPUT PROCESSING
 
 Procesamiento y actualización de todas las salidas del microcontrolador.
 
 Esta sección debe encargarse de transferir los resultados de la lógica interna a los canales de salida correspondientes, respetando los tipos de dato y las asignaciones establecidas.
 
-### 20.10. END OF MC
+### 21.10. END OF MC
 
 Cierre del código y finalización de la estructura del microcontrolador.
 
