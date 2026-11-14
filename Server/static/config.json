@@ -4,6 +4,7 @@
         "eventLog": true,
         "flightRecorder": true,
         "missionBar": true,
-        "systemDiagnostics": true
+        "systemDiagnostics": true,
+        "systemInformation": true
     }
 }

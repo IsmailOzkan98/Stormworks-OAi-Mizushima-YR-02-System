@@ -30,6 +30,9 @@ function setVisibility(element, enabled) {
 
     element.hidden = enabled === false;
 
+    element.style.display =
+        enabled === false ? "none" : "";
+
 }
 
 
@@ -124,7 +127,7 @@ function updateUnitDesignation(config) {
    05. SYSTEM INFORMATION
    ============================================================ */
 
-function updateSystemInformation(config) {
+function updateSystemInformation(config, moduleEnabled = true) {
 
     const data = config.systemInformation ?? {};
 
@@ -149,7 +152,7 @@ function updateSystemInformation(config) {
 
     // Section visibility.
 
-    const enabled = data.enabled !== false;
+    const enabled = moduleEnabled === true && data.enabled !== false;
 
     setVisibility(heading, enabled);
     setVisibility(container, enabled);
@@ -235,7 +238,11 @@ function updateFooter(config) {
    07. INITIALIZATION
    ============================================================ */
 
-export async function initProjectData() {
+export async function initProjectData(options = {}) {
+
+    const {
+        systemInformationEnabled = true
+    } = options;
 
     try {
 
@@ -252,7 +259,12 @@ export async function initProjectData() {
         updatePage(config);
         updateBrand(config);
         updateUnitDesignation(config);
-        updateSystemInformation(config);
+
+        updateSystemInformation(
+            config,
+            systemInformationEnabled
+        );
+
         updateFooter(config.footer);
 
         console.info(

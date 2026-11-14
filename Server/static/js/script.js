@@ -1623,6 +1623,36 @@ async function initializeFlightRecorder(enabled) {
 
 }
 
+/* ------------------------------------------------------------
+   INITIALIZE PROJECT DATA
+   ------------------------------------------------------------ */
+
+async function initializeProjectData(enabled) {
+
+    try {
+
+        const { initProjectData } = await import(
+            "./modules/projectData/projectData.js"
+        );
+
+        await initProjectData({
+            systemInformationEnabled: enabled
+        });
+
+    } catch (error) {
+
+        console.error(
+            "[PROJECT DATA] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+/* ------------------------------------------------------------
+   initialize System Diagnostics
+   ------------------------------------------------------------ */
 
 async function initializeSystemDiagnostics(enabled) {
     if (!enabled) return;
@@ -1666,6 +1696,10 @@ async function initializeModules() {
         modules.eventLog === true
     );
 
+    await initializeProjectData(
+        modules.systemInformation === true
+    );
+
     await initializeMissionBar(
         modules.missionBar === true
     );
@@ -1677,6 +1711,8 @@ async function initializeModules() {
     await initializeSystemDiagnostics(
         modules.systemDiagnostics === true
     );
+
+    
 
 }
 
@@ -1722,25 +1758,3 @@ window.addEventListener(
 /* ============================================================
    END OF FLIGHT TELEMETRY MONITOR
    ============================================================ */
-
-
-   /* ------------------------------------------------------------
-   20.1 PROJECT DATA MODULE
-   ------------------------------------------------------------ */
-
-import("./modules/projectData/projectData.js")
-    .then(({ initProjectData }) => {
-
-        initProjectData();
-
-    })
-    .catch(error => {
-
-        console.error(
-            "[PROJECT DATA] Module initialization failed:",
-            error
-        );
-
-    });
-
-
