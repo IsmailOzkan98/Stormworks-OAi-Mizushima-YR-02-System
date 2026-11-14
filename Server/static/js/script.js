@@ -1897,3 +1897,24 @@ refreshRecorderStatus();
 /* ============================================================
    18. END OF FLIGHT TELEMETRY MONITOR
    ============================================================ */
+
+
+
+/* ============================================================
+   19. New Architecture
+   ============================================================ */
+
+/* ============================================================
+   PROJECT DATA MODULE
+   ============================================================ */
+
+import("./modules/projectData/projectData.js")
+    .then(({ initProjectData }) => {
+        initProjectData();
+    })
+    .catch(error => {
+        console.error(
+            "[PROJECT DATA] Module initialization failed:",
+            error
+        );
+    });

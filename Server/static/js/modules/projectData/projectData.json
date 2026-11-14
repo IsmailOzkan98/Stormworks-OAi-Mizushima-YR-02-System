@@ -1,0 +1,51 @@
+
+{
+    "page": {
+        "enabled": true,
+        "title": "MIZUSHIMA | Flight Monitor"
+    },
+
+    "brand": {
+        "enabled": true,
+        "eyebrow": "OAI AEROSPACE SYSTEMS · FLIGHT TELEMETRY",
+        "name": "MIZUSHIMA",
+        "identifier": "YR-02",
+        "subtitle": "FLIGHT MONITOR · CONTROL SYSTEM"
+    },
+
+    "unitDesignation": {
+        "enabled": true,
+        "label": "UNIT DESIGNATION",
+        "name": "YR-02 / EXPERIMENTAL",
+        "description": "STORMWORKS FLIGHT SIMULATION"
+    },
+
+    "systemInformation": {
+        "enabled": true,
+        "sectionNumber": "03",
+        "title": "SYSTEM INFORMATION",
+
+        "items": [
+            {
+                "enabled": true,
+                "label": "CONTROL SYSTEM",
+                "value": "v2.1.0"
+            },
+            {
+                "enabled": true,
+                "label": "PLATFORM",
+                "value": "STORMWORKS"
+            },
+            {
+                "enabled": true,
+                "label": "DATA MODE",
+                "value": "READ ONLY"
+            },
+            {
+                "enabled": true,
+                "label": "REFRESH RATE",
+                "value": "250 MS"
+            }
+        ]
+    }
+}
