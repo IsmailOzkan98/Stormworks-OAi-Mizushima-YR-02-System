@@ -198,7 +198,41 @@ function updateSystemInformation(config) {
 
 
 /* ============================================================
-   06. INITIALIZATION
+   06. FOOTER
+   ============================================================ */
+
+function updateFooter(config) {
+    const footer = document.querySelector(".footer");
+
+    if (!footer || !config) return;
+
+    // Control general de visibilidad
+    if (config.enabled === false) {
+        footer.style.display = "none";
+        return;
+    }
+
+    footer.style.display = "";
+
+    // Limpiar contenido predeterminado
+    footer.replaceChildren();
+
+    // Generar elementos desde JSON
+    if (!Array.isArray(config.items)) return;
+
+    config.items.forEach(item => {
+        if (!item || item.enabled === false) return;
+
+        const span = document.createElement("span");
+        span.textContent = item.value ?? "";
+
+        footer.appendChild(span);
+    });
+}
+
+
+/* ============================================================
+   07. INITIALIZATION
    ============================================================ */
 
 export async function initProjectData() {
@@ -219,6 +253,7 @@ export async function initProjectData() {
         updateBrand(config);
         updateUnitDesignation(config);
         updateSystemInformation(config);
+        updateFooter(config.footer);
 
         console.info(
             "[PROJECT DATA] Configuration loaded."

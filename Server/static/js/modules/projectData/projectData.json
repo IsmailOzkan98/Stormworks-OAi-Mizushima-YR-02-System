@@ -47,5 +47,27 @@
                 "value": "250 MS"
             }
         ]
+    },
+
+    "footer": {
+        "enabled": true,
+        "items": [
+            {
+                "enabled": true,
+                "label": "ORGANIZATION",
+                "value": "OAI AEROSPACE SYSTEMS"
+            },
+            {
+                "enabled": true,
+                "label": "PROJECT IDENTIFICATION",
+                "value": "MIZUSHIMA YR-02 · FLIGHT MONITOR"
+            },
+            {
+                "enabled": true,
+                "label": "DATA ACCESS",
+                "value": "READ ONLY TELEMETRY"
+            }
+        ]
     }
+    
 }
