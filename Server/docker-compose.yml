@@ -8,4 +8,6 @@ services:
       - ./app.py:/app/app.py
       - ./templates:/app/templates
       - ./static:/app/static
+      - ./logs:/app/logs
+      - ./recorder_config.json:/app/recorder_config.json
     restart: unless-stopped

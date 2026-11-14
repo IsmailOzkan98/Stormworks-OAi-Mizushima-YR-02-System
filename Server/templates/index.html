@@ -76,6 +76,29 @@
                 <strong id="flightStatus" class="state-pill idle">IDLE</strong>
             </div>
 
+            <div class="recorder-controls">
+
+            <span class="micro-label">FLIGHT RECORDER</span>
+
+            <div class="recorder-buttons">
+
+                <button id="startRecording" class="recorder-btn start">
+                    <span class="recorder-dot"></span>
+                    START
+                </button>
+
+                <button id="stopRecording" class="recorder-btn stop" disabled>
+                    STOP
+                </button>
+
+            </div>
+
+            <span id="recorderStatus" class="recorder-status">
+                RECORDER STANDBY
+            </span>
+
+        </div>
+
         </div>
 
 
@@ -131,46 +154,57 @@
                     <span>STATUS</span>
                 </div>
 
-                <div class="diagnostic-row">
-                    <span>MAIN PROPULSION</span>
-                    <span class="diagnostic-status">
-                        <i class="indicator" id="main"></i>
-                        <b id="mainStatus">OFFLINE</b>
-                    </span>
-                </div>
+                <div class="diagnostic-grid">
 
-                <div class="diagnostic-row">
-                    <span>ALTITUDE HOLD</span>
-                    <span class="diagnostic-status">
-                        <i class="indicator" id="altHold"></i>
-                        <b id="altHoldStatus">OFFLINE</b>
-                    </span>
-                </div>
+                    <div class="diagnostic-row">
+                        <span>MAIN PROPULSION</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="main"></i>
+                            <b id="mainStatus">OFFLINE</b>
+                        </span>
+                    </div>
 
-                <div class="diagnostic-row">
-                    <span>ROLL STABILIZER</span>
-                    <span class="diagnostic-status">
-                        <i class="indicator" id="rollStab"></i>
-                        <b id="rollStabStatus">OFFLINE</b>
-                    </span>
-                </div>
+                    <div class="diagnostic-row">
+                        <span>ALTITUDE HOLD</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="altHold"></i>
+                            <b id="altHoldStatus">OFFLINE</b>
+                        </span>
+                    </div>
 
-                <div class="diagnostic-row">
-                    <span>THROTTLE CONTROL</span>
-                    <span class="diagnostic-status">
-                        <i class="indicator" id="accel"></i>
-                        <b id="accelStatus">OFFLINE</b>
-                    </span>
-                </div>
+                    <div class="diagnostic-row">
+                        <span>ROLL STABILIZER</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="rollStab"></i>
+                            <b id="rollStabStatus">OFFLINE</b>
+                        </span>
+                    </div>
 
-                <div class="diagnostic-row">
-                    <span>AFTERBURNER</span>
-                    <span class="diagnostic-status">
-                        <i class="indicator" id="afterburner"></i>
-                        <b id="afterburnerStatus">OFFLINE</b>
-                    </span>
+                    <div class="diagnostic-row">
+                        <span>THROTTLE CONTROL</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="accel"></i>
+                            <b id="accelStatus">OFFLINE</b>
+                        </span>
+                    </div>
+
+                    <div class="diagnostic-row">
+                        <span>AFTERBURNER</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="afterburner"></i>
+                            <b id="afterburnerStatus">OFFLINE</b>
+                        </span>
+                    </div>
+
+                    <div class="diagnostic-row">
+                        <span>DESCENT ENABLE</span>
+                        <span class="diagnostic-status">
+                            <i class="indicator" id="descent"></i>
+                            <b id="descentStatus">OFFLINE</b>
+                        </span>
+                    </div>
+
                 </div>
-                
 
                 <div class="diagnostic-separator">DIRECTIONAL BOOSTERS</div>
 

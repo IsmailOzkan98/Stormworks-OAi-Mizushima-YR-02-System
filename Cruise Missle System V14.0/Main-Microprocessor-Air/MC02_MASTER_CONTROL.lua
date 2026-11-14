@@ -1,7 +1,7 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 02: MASTER CONTROL
--- VERSION: 1.1.0
+-- VERSION: 1.2.0
 -- SYSTEM VERSION: 14.0
 -- MIGRATED FROM v13.1.0
 --
@@ -36,7 +36,9 @@ local INPUT = {
     
     START_STATUS = 10,
 
-    AFTERBURNER = 11
+    AFTERBURNER = 11,
+
+    DESCENT_ENABLE = 12
 }
 
 local INPUT_NUM = {
@@ -72,7 +74,9 @@ local OUTPUT = {
 
     START_STATUS = 10,
 
-    AFTERBURNER = 11
+    AFTERBURNER = 11,
+
+    DESCENT_ENABLE = 12
 }
 
 local OUTPUT_NUM = {
