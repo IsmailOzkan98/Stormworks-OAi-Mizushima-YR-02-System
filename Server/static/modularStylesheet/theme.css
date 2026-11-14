@@ -1,14 +1,16 @@
-
 /* =========================================
-   RETRO INDUSTRIAL / TECHNICAL PAPER THEME
+   RETRO TECHNICAL PAPER
+   Faithful adaptation of the original theme
 ========================================= */
 
 :root {
-    /* BASE */
+    /* PAPER */
     --bg: #d1cdb7;
     --panel: #dcd8c0;
     --panel2: #c9c5ad;
-    --border: #8f8b78;
+    --paper-light: #e8e4d0;
+    --paper-shadow: #bab5a1;
+    --border: #bab5a1;
 
     /* TEXT */
     --gold: #454138;
@@ -24,7 +26,7 @@
 
     /* TYPOGRAPHY */
     --mono: 'IBM Plex Mono', monospace;
-    --display: 'Barlow Condensed', sans-serif;
+    --display: Helvetica, Arial, sans-serif;
 
     /* GRAPHS */
     --graph-altitude: #454138;
@@ -36,9 +38,8 @@
     --alt-error-color: #a18a50;
     --vs-error-color: #a18a50;
 
-    /* PAPER */
-    --paper-shadow: #bab5a1;
-    --paper-light: #e8e4d0;
+    /* MOTION */
+    --transition: .2s ease;
 }
 
 /* =========================================
@@ -51,6 +52,7 @@ html {
 
 body {
     background-color: var(--bg);
+
     background-image:
         linear-gradient(to right, #ccc8b1 1px, transparent 1px),
         linear-gradient(to bottom, #ccc8b1 1px, transparent 1px);
@@ -58,14 +60,26 @@ body {
     background-size: 20px 20px;
 
     color: var(--ivory);
-    font-family: var(--mono);
+    font-family: var(--display);
+    font-weight: 300;
     letter-spacing: .03rem;
-    font-weight: 400;
 }
 
-/* Remove dark overlay */
 body::before {
     background: none;
+}
+
+::selection {
+    background: var(--gold);
+    color: var(--paper-light);
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    letter-spacing: inherit;
 }
 
 /* =========================================
@@ -75,34 +89,33 @@ body::before {
 header {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-left: 5px solid var(--gold);
+    border-left: 4px solid var(--gold);
 
-    box-shadow: 5px 5px 0 var(--paper-shadow);
+    box-shadow: 3px 3px 0 var(--paper-shadow);
 }
 
-.eyebrow {
+.eyebrow,
+.subtitle {
     color: var(--muted);
 }
 
 h1 {
     color: var(--gold-light);
-    font-weight: 400;
+    font-family: var(--display);
+    font-weight: 300;
     text-shadow: 3px 3px 0 var(--paper-shadow);
-    letter-spacing: 5px;
+    letter-spacing: .5rem;
+    text-transform: uppercase;
 }
 
 h1 span {
     color: var(--gold);
 }
 
-.subtitle {
-    color: var(--muted);
-}
-
 .connection {
     background: var(--paper-light);
     border: 1px solid var(--border);
-    box-shadow: 3px 3px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .connection strong {
@@ -120,16 +133,17 @@ h1 span {
 .mission-bar {
     background: var(--paper-light);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
+    box-shadow: 3px 3px 0 var(--paper-shadow);
 }
 
 .micro-label {
     color: var(--muted);
+    font-weight: 300;
 }
 
 .mission-stage strong {
     color: var(--gold);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .state-pill.running {
@@ -149,9 +163,10 @@ h1 span {
 ========================================= */
 
 .section-heading {
-    border-bottom: 2px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
     color: var(--gold);
-    font-weight: 500;
+    font-weight: 400;
+    letter-spacing: .1rem;
 }
 
 .section-heading > span {
@@ -165,14 +180,20 @@ h1 span {
 .card {
     background: var(--panel);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
-    transition: .2s ease;
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition);
 }
 
 .card:hover {
+    background: var(--paper-light);
     border-color: var(--gold);
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--paper-shadow);
+
+    box-shadow: 3px 3px 0 var(--paper-shadow);
 }
 
 .card::after {
@@ -181,11 +202,13 @@ h1 span {
 
 .card-label {
     color: var(--muted);
+    font-weight: 300;
 }
 
 .value {
     color: var(--gold);
-    font-weight: 500;
+    font-family: var(--mono);
+    font-weight: 400;
 }
 
 .unit {
@@ -211,11 +234,12 @@ h1 span {
 .diagnostics-panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .diagnostic-header {
     color: var(--gold);
+    font-weight: 400;
 }
 
 .diagnostic-row {
@@ -224,6 +248,7 @@ h1 span {
 
 .diagnostic-status b {
     color: var(--muted);
+    font-weight: 400;
 }
 
 .diagnostic-status b.active-text {
@@ -233,12 +258,14 @@ h1 span {
 .indicator {
     background: var(--paper-shadow);
     border: 1px solid var(--border);
+    box-shadow: none;
 }
 
 .indicator.active {
     background: var(--green);
     border-color: var(--green);
-    box-shadow: 0 0 5px var(--green);
+    box-shadow: 0 0 3px var(--green);
+    animation: indicator-pulse 2s infinite ease-in-out;
 }
 
 .diagnostic-separator {
@@ -253,12 +280,13 @@ h1 span {
 .booster {
     background: var(--paper-light);
     border: 1px solid var(--border);
+    transition: all var(--transition);
 }
 
 .booster.pulse {
-    background: #c9c5ad;
+    background: var(--panel2);
     border-color: var(--gold);
-    box-shadow: inset 0 0 0 2px var(--paper-shadow);
+    box-shadow: inset 0 0 0 1px var(--paper-shadow);
 }
 
 .booster.pulse span {
@@ -278,13 +306,14 @@ h1 span {
 .monitor-panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .monitor-title,
 .event-header {
     color: var(--gold);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
 }
 
 .monitor-item {
@@ -297,6 +326,7 @@ h1 span {
 
 .monitor-item strong {
     color: var(--gold);
+    font-weight: 400;
 }
 
 /* =========================================
@@ -306,7 +336,7 @@ h1 span {
 .event-panel {
     background: var(--paper-light);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .event-header span:last-child {
@@ -315,11 +345,11 @@ h1 span {
 
 .event-entry {
     border-bottom: 1px solid var(--paper-shadow);
-    transition: background-color .2s;
+    transition: background-color var(--transition);
 }
 
 .event-entry:hover {
-    background: rgba(69,65,56,.06);
+    background: rgba(69, 65, 56, .05);
 }
 
 .event-time {
@@ -366,7 +396,7 @@ h1 span {
 
 .event-entry.error {
     border-left-color: var(--red);
-    background: rgba(164,94,82,.06);
+    background: rgba(164, 94, 82, .06);
 }
 
 .event-entry.error span:last-child {
@@ -410,7 +440,7 @@ h1 span {
 .system-info > div {
     background: var(--panel);
     border: 1px solid var(--border);
-    box-shadow: 3px 3px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .system-info span {
@@ -419,6 +449,7 @@ h1 span {
 
 .system-info strong {
     color: var(--gold);
+    font-weight: 400;
 }
 
 /* =========================================
@@ -426,11 +457,22 @@ h1 span {
 ========================================= */
 
 .recorder-btn {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+
     border: 1px solid var(--border);
     background: var(--paper-light);
     color: var(--gold);
+
     font-family: var(--mono);
-    box-shadow: 2px 2px 0 var(--paper-shadow);
+
+    box-shadow: none;
+
+    transition:
+        color var(--transition),
+        background-color var(--transition),
+        border-color var(--transition);
 }
 
 .recorder-btn.start {
@@ -438,21 +480,73 @@ h1 span {
     border-color: var(--green);
 }
 
-.recorder-btn.start:not(:disabled):hover {
-    background: #c5d0ba;
-}
-
 .recorder-btn.stop {
     color: var(--red);
     border-color: var(--red);
 }
 
+.recorder-btn.start:not(:disabled):hover {
+    background: var(--green);
+    color: var(--paper-light);
+}
+
 .recorder-btn.stop:not(:disabled):hover {
-    background: #dfc5bd;
+    background: var(--red);
+    color: var(--paper-light);
+}
+
+.recorder-btn:not(:disabled):active {
+    background: var(--paper-light);
+    color: var(--gold);
 }
 
 .recorder-status {
     color: var(--muted);
+}
+
+/* =========================================
+   ORIGINAL TECHNICAL BUTTON EFFECT
+========================================= */
+
+button:not(:disabled),
+.button,
+.recorder-btn:not(:disabled) {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+button:not(:disabled)::after,
+.button::after,
+.recorder-btn:not(:disabled)::after {
+    content: "";
+
+    position: absolute;
+    inset: 0 auto 0 0;
+
+    width: 0;
+
+    background: var(--gold);
+
+    z-index: -1;
+
+    transition: width var(--transition) ease-out;
+}
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: var(--paper-light);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+button:not(:disabled):active,
+.button:active {
+    color: var(--gold);
 }
 
 /* =========================================
@@ -462,7 +556,7 @@ h1 span {
 .telemetry-chart-panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .telemetry-chart-panel::after {
@@ -472,6 +566,7 @@ h1 span {
 .telemetry-chart-header {
     color: var(--gold);
     border-bottom: 1px solid var(--border);
+    font-weight: 400;
 }
 
 .telemetry-chart-header span:last-child {
@@ -485,6 +580,8 @@ h1 span {
 
 .telemetry-readouts strong {
     color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 400;
 }
 
 .telemetry-readouts > div:nth-child(2) strong {
@@ -508,11 +605,37 @@ h1 span {
 }
 
 /* =========================================
+   INPUTS AND CONTROLS
+========================================= */
+
+input,
+select,
+textarea {
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--paper-light);
+    color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 1px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* =========================================
    SCROLLBAR
 ========================================= */
 
 .event-list::-webkit-scrollbar {
     width: 5px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: var(--panel);
 }
 
 .event-list::-webkit-scrollbar-thumb {
@@ -526,20 +649,22 @@ h1 span {
 footer {
     border-top: 1px solid var(--border);
     color: var(--muted);
-}
-
-/* =========================================
-   SELECTION
-========================================= */
-
-::selection {
-    background: var(--gold);
-    color: var(--paper-light);
+    font-weight: 300;
 }
 
 /* =========================================
    ANIMATIONS
 ========================================= */
+
+@keyframes indicator-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
+}
 
 @keyframes pulse {
     0%, 100% {
@@ -548,5 +673,19 @@ footer {
 
     50% {
         opacity: .45;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
     }
 }
