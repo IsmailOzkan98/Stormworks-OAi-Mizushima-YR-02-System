@@ -1,0 +1,608 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* =========================================
+   THEME - VARIABLES
+========================================= */
+
+:root {
+    --bg: #11110f;
+    --panel: #24221d;
+    --panel2: #2d2a23;
+    --border: #514c3e;
+
+    --gold: #b8a675;
+    --gold-light: #e0d2a8;
+    --ivory: #e5dfce;
+    --muted: #aaa38f;
+
+    --green: #a6c69a;
+    --cyan: #b2cccc;
+    --yellow: #d9bc79;
+    --red: #d17a70;
+
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Barlow Condensed', sans-serif;
+
+    /* TELEMETRY GRAPH COLORS */
+    --graph-altitude: #b8a675;
+    --graph-target: #b2cccc;
+    --graph-alt-error: #d17a70;
+    --graph-vs-error: #d17a70;
+
+    /* TELEMETRY ERROR READOUTS */
+    --alt-error-color: #d9bc79;
+    --vs-error-color: #d9bc79;
+}
+
+/* =========================================
+   GLOBAL APPEARANCE
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(ellipse at top, #302d23, transparent 65%),
+        #10100e;
+
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-size: 16px;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(rgba(184,166,117,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,166,117,.025) 1px, transparent 1px);
+
+    background-size: 35px 35px;
+}
+
+/* =========================================
+   HEADER THEME
+========================================= */
+
+header {
+    background: linear-gradient(100deg, #29271f, #171612);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+}
+
+.eyebrow {
+    color: var(--gold-light);
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+h1 {
+    font: 700 36px var(--display);
+    letter-spacing: 4px;
+}
+
+h1 span {
+    color: var(--gold);
+}
+
+.subtitle {
+    color: var(--muted);
+    letter-spacing: 1px;
+}
+
+.unit-designation span,
+.unit-designation small {
+    color: var(--muted);
+}
+
+.unit-designation strong {
+    color: var(--gold-light);
+}
+
+.connection {
+    background: #11110f;
+    border: 1px solid var(--border);
+}
+
+.connection strong {
+    font: 700 20px var(--display);
+    letter-spacing: 2px;
+}
+
+.connection small {
+    color: var(--muted);
+}
+
+.light {
+    background: var(--red);
+    border-radius: 50%;
+}
+
+.light.online {
+    background: var(--green);
+    box-shadow: 0 0 12px var(--green);
+    animation: pulse 2s infinite;
+}
+
+/* =========================================
+   MISSION BAR THEME
+========================================= */
+
+.mission-bar {
+    background: #25231d;
+    border: 1px solid var(--border);
+}
+
+.micro-label {
+    color: var(--muted);
+    letter-spacing: 1.5px;
+}
+
+.mission-stage strong {
+    font: 700 23px var(--display);
+    letter-spacing: 2px;
+    color: var(--gold-light);
+}
+
+.state-pill.running {
+    color: var(--green) !important;
+}
+
+.state-pill.completed {
+    color: var(--cyan) !important;
+}
+
+.state-pill.idle {
+    color: var(--yellow) !important;
+}
+
+/* =========================================
+   SECTION HEADINGS
+========================================= */
+
+.section-heading {
+    border-bottom: 1px solid var(--border);
+    font: 600 17px var(--display);
+    letter-spacing: 2px;
+    color: var(--gold-light);
+}
+
+.section-heading > span {
+    color: var(--gold);
+    font: 600 13px var(--mono);
+}
+
+/* =========================================
+   METRIC CARDS
+========================================= */
+
+.card {
+    background: linear-gradient(140deg, #2b2922, #1d1c18);
+    border: 1px solid var(--border);
+    transition: border-color .2s;
+}
+
+.card:hover {
+    border-color: var(--gold);
+}
+
+.card::after {
+    background: var(--gold);
+}
+
+.card-label {
+    color: var(--muted);
+    letter-spacing: .8px;
+}
+
+.value {
+    font: 600 clamp(25px, 1.9vw, 32px) var(--display);
+    font-variant-numeric: tabular-nums;
+}
+
+.unit {
+    color: var(--muted);
+}
+
+.highlight {
+    color: var(--gold-light);
+}
+
+.cyan {
+    color: var(--cyan);
+}
+
+.yellow {
+    color: var(--yellow);
+}
+
+#altError {
+    color: var(--alt-error-color);
+}
+
+#vsError {
+    color: var(--vs-error-color);
+}
+
+/* =========================================
+   DIAGNOSTICS
+========================================= */
+
+.diagnostics-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+}
+
+.diagnostic-header {
+    color: var(--gold);
+    letter-spacing: 1.5px;
+}
+
+.diagnostic-row {
+    border-top: 1px solid #39372f;
+}
+
+.diagnostic-status b {
+    color: var(--muted);
+}
+
+.diagnostic-status b.active-text {
+    color: var(--green);
+}
+
+.indicator {
+    background: #625e52;
+    border: 1px solid #938b78;
+    border-radius: 50%;
+}
+
+.indicator.active {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 9px var(--green);
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--border);
+    color: var(--gold);
+    letter-spacing: 1.5px;
+}
+
+/* =========================================
+   DIRECTIONAL BOOSTERS
+========================================= */
+
+.booster {
+    background: #171713;
+    border: 1px solid #39372f;
+    transition:
+        background-color .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.booster.pulse {
+    background: #393426;
+    border-color: var(--gold-light);
+
+    box-shadow:
+        inset 0 0 12px rgba(184,166,117,.15),
+        0 0 10px rgba(184,166,117,.35);
+}
+
+.booster.pulse span {
+    color: var(--gold-light);
+}
+
+.booster.pulse .indicator {
+    background: var(--gold-light);
+    border-color: var(--gold-light);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+/* =========================================
+   MONITOR
+========================================= */
+
+.monitor-panel {
+    background: #25231d;
+    border: 1px solid var(--border);
+}
+
+.monitor-title,
+.event-header {
+    color: var(--gold-light);
+    letter-spacing: 1.5px;
+    border-bottom: 1px solid var(--border);
+}
+
+.monitor-item {
+    border-bottom: 1px solid #39372f;
+}
+
+.monitor-item span {
+    color: var(--muted);
+}
+
+.monitor-item strong {
+    color: var(--gold-light);
+}
+
+/* =========================================
+   EVENT LOG
+========================================= */
+
+.event-panel {
+    background: #171713;
+    border: 1px solid var(--border);
+}
+
+.event-header span:last-child {
+    color: var(--green);
+}
+
+.event-entry {
+    border-bottom: 1px solid #333129;
+    border-left: 2px solid transparent;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.event-entry:hover {
+    background: rgba(184,166,117,.055);
+}
+
+.event-time {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.event-entry span:last-child {
+    color: var(--ivory);
+}
+
+/* FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid #62583d;
+    border-left-color: var(--gold);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--gold-light);
+}
+
+/* ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--green);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--green);
+}
+
+/* DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--ivory);
+}
+
+/* ERRORS */
+
+.event-entry.error {
+    border-left-color: var(--red);
+    background: rgba(209,122,112,.035);
+}
+
+.event-entry.error span:last-child {
+    color: var(--red);
+}
+
+/* NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--cyan);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--cyan);
+}
+
+/* WARNINGS */
+
+.event-entry.warning {
+    border-left-color: var(--yellow);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--yellow);
+}
+
+/* NORMAL EVENTS */
+
+.event-entry.normal {
+    border-left-color: var(--border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--muted);
+}
+
+/* =========================================
+   SYSTEM INFO
+========================================= */
+
+.system-info > div {
+    background: #24221c;
+    border: 1px solid var(--border);
+}
+
+.system-info span {
+    color: var(--muted);
+}
+
+.system-info strong {
+    color: var(--gold-light);
+}
+
+/* =========================================
+   FLIGHT DATA RECORDER
+========================================= */
+
+.recorder-btn {
+    border: 1px solid var(--border);
+    background: #171713;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.recorder-btn:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+}
+
+.recorder-btn.start {
+    color: var(--green);
+    border-color: var(--green);
+}
+
+.recorder-btn.start:not(:disabled):hover {
+    background: #293729;
+}
+
+.recorder-btn.stop {
+    color: var(--red);
+    border-color: var(--red);
+}
+
+.recorder-btn.stop:not(:disabled):hover {
+    background: #392421;
+}
+
+.recorder-dot {
+    background: var(--green);
+    border-radius: 50%;
+}
+
+.recorder-btn.start:disabled .recorder-dot {
+    background: var(--muted);
+}
+
+.recorder-status {
+    color: var(--muted);
+    letter-spacing: .7px;
+}
+
+.recorder-status.recording {
+    color: var(--red);
+    animation: pulse 1.2s infinite;
+}
+
+/* =========================================
+   TELEMETRY GRAPHS
+========================================= */
+
+.telemetry-chart-panel {
+    background: linear-gradient(140deg, #2b2922, #1d1c18);
+    border: 1px solid var(--border);
+}
+
+.telemetry-chart-panel::after {
+    background: var(--gold);
+}
+
+.telemetry-chart-header {
+    color: var(--gold-light);
+    border-bottom: 1px solid var(--border);
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--muted);
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--gold-light);
+    font: 600 21px var(--display);
+    font-variant-numeric: tabular-nums;
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--cyan);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--yellow);
+}
+
+.legend-alt {
+    color: var(--gold-light);
+}
+
+.legend-target {
+    color: var(--cyan);
+}
+
+.legend-error {
+    color: var(--graph-alt-error);
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.event-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: var(--gold);
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .45;
+    }
+}
