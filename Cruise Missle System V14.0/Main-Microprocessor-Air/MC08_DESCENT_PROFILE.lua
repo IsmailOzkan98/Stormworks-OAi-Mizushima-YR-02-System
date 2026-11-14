@@ -1,14 +1,27 @@
 
 -- OAI MIZUSHIMA YR-02
 -- MC 08: ADAPTIVE DESCENT PROFILE
--- VERSION: 1.6.0
+-- VERSION: 1.7.0
 -- SYSTEM VERSION: 14.0
 --
 -- RESPONSIBILITY:
---   Adaptive descent profile
+--   Dynamic geometric descent profile
 --   Moving platform tracking
---   Dynamic altitude correction
---   Vertical speed monitoring
+--   Adaptive vertical speed reference
+--   Distance-based altitude targeting
+--
+-- CHANGES v1.7.0:
+--   Direct altitude reference from AP_DISTANCE
+--   Mathematical vertical speed calculation
+--   Horizontal speed validation
+--   Dynamic destination altitude
+--   Removed accumulated altitude integration
+--   Removed arrival completion lock
+--   Removed final approach gain
+--   Removed artificial minimum descent speed
+--
+-- INPUTS AND OUTPUTS:
+--   Original channel assignments preserved
 
 
 --------------------------------------------------
@@ -30,7 +43,7 @@ local INPUT = {
     PROFILE_EXPONENT = 6,
     ARRIVAL_RADIUS = 7,
 
-    VERTICAL_SPEED = 8,
+    VERTICAL_SPEED = 8, -- obsoleto
 
     CLOSING_SPEED_FILTER = 9,
 
@@ -61,15 +74,7 @@ local OUTPUT = {
 
 local CONFIG = {
 
-    TICK_RATE = 60,
-
-    ARRIVAL_ALTITUDE_TOLERANCE = 2,
-
-    ARRIVAL_VERTICAL_SPEED_TOLERANCE = 0.5,
-
-    FINAL_APPROACH_GAIN = 0.15,
-
-    MIN_FINAL_DESCENT_SPEED = 0.3
+    TICK_RATE = 60
 
 }
 
@@ -84,11 +89,13 @@ local SYSTEM = {
 
     descentStarted = false,
 
-    descentCompleted = false,
-
     previousDistance = 0,
 
     distanceInitialized = false,
+
+    initialAltitude = 0,
+
+    initialDistance = 0,
 
     closingSpeed = 0,
 
@@ -125,11 +132,13 @@ local function resetSystem(data)
 
     SYSTEM.descentStarted = false
 
-    SYSTEM.descentCompleted = false
-
     SYSTEM.distanceInitialized = false
 
     SYSTEM.previousDistance = data.distance
+
+    SYSTEM.initialAltitude = data.altitude
+
+    SYSTEM.initialDistance = data.distance
 
     SYSTEM.closingSpeed = 0
 
@@ -144,7 +153,15 @@ end
 -- 07. DISTANCE TRACKING
 --------------------------------------------------
 
-local function updateClosingSpeed(distance)
+local function updateClosingSpeed(
+
+    distance,
+
+    horizontalSpeed,
+
+    filter
+
+)
 
     if not SYSTEM.distanceInitialized then
 
@@ -159,8 +176,9 @@ local function updateClosingSpeed(distance)
     end
 
 
-    -- Positive = approaching platform.
-    -- Negative = moving away from platform.
+    --------------------------------------------------
+    -- RAW CLOSING SPEED
+    --------------------------------------------------
 
     local rawClosingSpeed =
 
@@ -171,6 +189,10 @@ local function updateClosingSpeed(distance)
     SYSTEM.previousDistance = distance
 
 
+    --------------------------------------------------
+    -- NO APPROACH
+    --------------------------------------------------
+
     if rawClosingSpeed <= 0 then
 
         SYSTEM.closingSpeed = 0
@@ -180,13 +202,34 @@ local function updateClosingSpeed(distance)
     end
 
 
+    --------------------------------------------------
+    -- HORIZONTAL SPEED VALIDATION
+    --------------------------------------------------
+
+    if horizontalSpeed > 0 then
+
+        rawClosingSpeed = math.min(
+
+            rawClosingSpeed,
+
+            horizontalSpeed
+
+        )
+
+    end
+
+
+    --------------------------------------------------
+    -- FILTER
+    --------------------------------------------------
+
     SYSTEM.closingSpeed = lerp(
 
         SYSTEM.closingSpeed,
 
         rawClosingSpeed,
 
-        data.closingSpeedFilter
+        clamp(filter, 0, 1)
 
     )
 
@@ -197,45 +240,259 @@ end
 
 
 --------------------------------------------------
--- 08. DYNAMIC DESCENT DISTANCE
+-- 08. DYNAMIC GEOMETRIC PROFILE
 --------------------------------------------------
 
-local function calculateStartDistance(
+local function calculateAltitudeTarget(data)
 
-    altitudeDifference,
+    --------------------------------------------------
+    -- PROFILE PARAMETERS
+    --------------------------------------------------
 
-    closingSpeed,
+    local destinationAltitude =
 
-    maxDescentSpeed,
+        data.destinationAltitude
 
-    profileExponent
+
+    local altitudeDifference =
+
+        SYSTEM.initialAltitude -
+        destinationAltitude
+
+
+    local arrivalRadius = math.max(
+
+        0,
+
+        data.arrivalRadius
+
+    )
+
+
+    local profileExponent = math.max(
+
+        1,
+
+        data.profileExponent
+
+    )
+
+
+    --------------------------------------------------
+    -- DESCENT ONLY
+    --------------------------------------------------
+
+    if altitudeDifference <= 0 then
+
+        return SYSTEM.initialAltitude, 0
+
+    end
+
+
+    --------------------------------------------------
+    -- AVAILABLE PROFILE DISTANCE
+    --------------------------------------------------
+
+    local profileDistance = math.max(
+
+        0,
+
+        SYSTEM.initialDistance -
+        arrivalRadius
+
+    )
+
+
+    --------------------------------------------------
+    -- PROFILE ALREADY INSIDE ARRIVAL RADIUS
+    --------------------------------------------------
+
+    if profileDistance <= 0 then
+
+        return destinationAltitude, 0
+
+    end
+
+
+    --------------------------------------------------
+    -- NORMALIZED DISTANCE
+    --------------------------------------------------
+
+    local remainingDistance = clamp(
+
+        data.distance - arrivalRadius,
+
+        0,
+
+        profileDistance
+
+    )
+
+
+    local progress =
+
+        remainingDistance / profileDistance
+
+
+    --------------------------------------------------
+    -- GEOMETRIC ALTITUDE PROFILE
+    --------------------------------------------------
+
+    local profileValue =
+
+        1 - ((1 - progress) ^ profileExponent)
+
+
+    local altitudeTarget =
+
+        destinationAltitude +
+
+        altitudeDifference * profileValue
+
+
+    return altitudeTarget, progress
+
+end
+
+
+--------------------------------------------------
+-- 09. ADAPTIVE DESCENT SPEED
+--------------------------------------------------
+
+local function calculateDescentSpeed(
+
+    data,
+
+    progress
 
 )
 
-    if altitudeDifference <= 0
-        or closingSpeed <= 0
-        or maxDescentSpeed <= 0 then
+    --------------------------------------------------
+    -- SPEED LIMIT
+    --------------------------------------------------
+
+    local maxDescentSpeed = math.abs(
+
+        data.maxDescentSpeed
+
+    )
+
+
+    if maxDescentSpeed <= 0 then
 
         return 0
 
     end
 
 
-    return
+    --------------------------------------------------
+    -- PROFILE PARAMETERS
+    --------------------------------------------------
 
-        profileExponent *
+    local altitudeDifference = math.max(
+
+        0,
+
+        SYSTEM.initialAltitude -
+        data.destinationAltitude
+
+    )
+
+
+    local profileDistance = math.max(
+
+        0,
+
+        SYSTEM.initialDistance -
+        math.max(0, data.arrivalRadius)
+
+    )
+
+
+    local profileExponent = math.max(
+
+        1,
+
+        data.profileExponent
+
+    )
+
+
+    if altitudeDifference <= 0
+        or profileDistance <= 0 then
+
+        return 0
+
+    end
+
+
+    --------------------------------------------------
+    -- EFFECTIVE HORIZONTAL CLOSING SPEED
+    --------------------------------------------------
+
+    local closingSpeed = SYSTEM.closingSpeed
+
+
+    --------------------------------------------------
+    -- PROFILE DERIVATIVE
+    --------------------------------------------------
+
+    local profileSlope =
+
         altitudeDifference *
-        closingSpeed /
+        profileExponent /
+        profileDistance
+
+
+    if profileExponent > 1 then
+
+        profileSlope =
+
+            profileSlope *
+            ((1 - progress) ^ (profileExponent - 1))
+
+    end
+
+
+    --------------------------------------------------
+    -- REQUIRED VERTICAL SPEED
+    --------------------------------------------------
+
+    local requiredDescentSpeed =
+
+        profileSlope *
+        closingSpeed
+
+
+    --------------------------------------------------
+    -- MAXIMUM DESCENT LIMIT
+    --------------------------------------------------
+
+    requiredDescentSpeed = clamp(
+
+        requiredDescentSpeed,
+
+        0,
+
         maxDescentSpeed
+
+    )
+
+
+    return -requiredDescentSpeed
 
 end
 
 
 --------------------------------------------------
--- 09. ADAPTIVE DESCENT PROFILE
+-- 10. ADAPTIVE DESCENT SYSTEM
 --------------------------------------------------
 
 local function updateDescent(data, enabled)
+
+    --------------------------------------------------
+    -- ENABLE EDGE
+    --------------------------------------------------
 
     local risingEdge =
 
@@ -246,7 +503,7 @@ local function updateDescent(data, enabled)
 
 
     --------------------------------------------------
-    -- RESET WHEN DISABLED
+    -- DISABLED
     --------------------------------------------------
 
     if not enabled then
@@ -263,7 +520,7 @@ local function updateDescent(data, enabled)
 
 
     --------------------------------------------------
-    -- INITIALIZE DESCENT
+    -- INITIALIZATION
     --------------------------------------------------
 
     if risingEdge then
@@ -283,93 +540,60 @@ local function updateDescent(data, enabled)
 
 
     --------------------------------------------------
-    -- UPDATE DYNAMIC DISTANCE
+    -- UPDATE CLOSING SPEED
     --------------------------------------------------
 
-    local closingSpeed = updateClosingSpeed(
+    updateClosingSpeed(
 
-        data.distance
+        data.distance,
+
+        data.horizontalSpeed,
+
+        data.closingSpeedFilter
 
     )
 
 
     --------------------------------------------------
-    -- READ CURRENT CONDITIONS
+    -- CURRENT ALTITUDE RELATION
     --------------------------------------------------
 
-    local altitudeDifference = math.max(
-
-        0,
-
-        data.altitude -
-        data.destinationAltitude
-
-    )
-
-
-    local maxDescentSpeed = math.abs(
-
-        data.maxDescentSpeed
-
-    )
-
-
-    local profileExponent = math.max(
-
-        1,
-
-        data.profileExponent
-
-    )
-
-
-    local arrivalRadius = math.max(
-
-        0,
-
-        data.arrivalRadius
-
-    )
-
-
-    -- Negative vertical speed means descent.
-
-    local verticalSpeed = data.verticalSpeed
-
-
-    local altitudeError =
+    local altitudeDifference =
 
         data.altitude -
         data.destinationAltitude
 
 
     --------------------------------------------------
-    -- ARRIVAL DETECTION
+    -- CALCULATE GEOMETRIC TARGET
     --------------------------------------------------
 
-    if data.distance <= arrivalRadius
+    local altitudeTarget, progress =
 
-        and math.abs(altitudeError) <=
-            CONFIG.ARRIVAL_ALTITUDE_TOLERANCE
-
-        and math.abs(verticalSpeed) <=
-            CONFIG.ARRIVAL_VERTICAL_SPEED_TOLERANCE then
-
-        SYSTEM.descentCompleted = true
-
-    end
+        calculateAltitudeTarget(data)
 
 
     --------------------------------------------------
-    -- FINAL ALTITUDE HOLD
+    -- ARRIVAL RADIUS
     --------------------------------------------------
 
-    if SYSTEM.descentCompleted then
+    if data.distance <= data.arrivalRadius then
 
-        SYSTEM.descentTarget =
-            data.destinationAltitude
+        altitudeTarget = data.destinationAltitude
 
-        SYSTEM.descentSpeedTarget = 0
+        if altitudeDifference > 0 then
+
+            SYSTEM.descentSpeedTarget =
+
+                -math.abs(data.maxDescentSpeed)
+
+        else
+
+            SYSTEM.descentSpeedTarget = 0
+
+        end
+
+        SYSTEM.descentTarget = altitudeTarget
 
         return
 
@@ -381,189 +605,45 @@ local function updateDescent(data, enabled)
 
 
     --------------------------------------------------
-    -- DYNAMIC START DISTANCE
+    -- CALCULATE REQUIRED DESCENT SPEED
     --------------------------------------------------
 
-    local startDistance = calculateStartDistance(
+    local desiredDescentSpeed =
 
-        altitudeDifference,
+        calculateDescentSpeed(
 
-        closingSpeed,
+            data,
 
-        maxDescentSpeed,
-
-        profileExponent
-
-    )
-
-
-    --------------------------------------------------
-    -- DESCENT SPEED CALCULATION
-    --------------------------------------------------
-
-    local desiredDescentSpeed = 0
-
-
-    --------------------------------------------------
-    -- NORMAL APPROACH
-    --------------------------------------------------
-
-    if data.distance > arrivalRadius
-
-        and startDistance > 0
-
-        and data.distance < startDistance then
-
-
-        local progress = clamp(
-
-            1 - data.distance / startDistance,
-
-            0,
-
-            1
+            progress
 
         )
 
 
-        local profileRamp =
-
-            progress ^ (profileExponent - 1)
-
-
-        local effectiveDistance = math.max(
-
-            data.distance,
-
-            arrivalRadius
-
-        )
-
-
-        local requiredDescentSpeed =
-
-            altitudeDifference *
-            closingSpeed /
-            effectiveDistance
-
-
-        desiredDescentSpeed =
-
-            requiredDescentSpeed *
-            profileRamp
-
-    end
-
-
     --------------------------------------------------
-    -- FINAL APPROACH
+    -- SPEED STABILIZATION
     --------------------------------------------------
 
-    if data.distance <= arrivalRadius
+    SYSTEM.descentSpeedTarget = lerp(
 
-        and altitudeDifference >
-            CONFIG.ARRIVAL_ALTITUDE_TOLERANCE then
-
-
-        desiredDescentSpeed = math.max(
-
-            CONFIG.MIN_FINAL_DESCENT_SPEED,
-
-            altitudeDifference *
-            CONFIG.FINAL_APPROACH_GAIN
-
-        )
-
-    end
-
-
-    --------------------------------------------------
-    -- VERTICAL SPEED SAFETY
-    --------------------------------------------------
-
-    -- If already close to destination altitude,
-    -- stop requesting further descent.
-
-    if altitudeError <=
-        CONFIG.ARRIVAL_ALTITUDE_TOLERANCE then
-
-        desiredDescentSpeed = 0
-
-    end
-
-
-    --------------------------------------------------
-    -- SPEED LIMIT
-    --------------------------------------------------
-
-    desiredDescentSpeed = clamp(
+        SYSTEM.descentSpeedTarget,
 
         desiredDescentSpeed,
 
-        0,
-
-        maxDescentSpeed
+        clamp(data.descentSpeedFilter, 0, 1)
 
     )
 
 
     --------------------------------------------------
-    -- DESCENT SPEED STABILIZATION
+    -- UPDATE DIRECT ALTITUDE REFERENCE
     --------------------------------------------------
 
-    if closingSpeed <= 0
-
-        and data.distance > arrivalRadius then
-
-        SYSTEM.descentSpeedTarget = 0
-
-    else
-
-        SYSTEM.descentSpeedTarget = lerp(
-
-            SYSTEM.descentSpeedTarget,
-
-            -desiredDescentSpeed,
-
-            data.descentSpeedFilter
-
-        )
-
-    end
+    SYSTEM.descentTarget = altitudeTarget
 
 
     --------------------------------------------------
-    -- DYNAMIC ALTITUDE REFERENCE
+    -- RETURN
     --------------------------------------------------
-
-    local dt = 1 / CONFIG.TICK_RATE
-
-
-    SYSTEM.descentTarget =
-
-        SYSTEM.descentTarget +
-        SYSTEM.descentSpeedTarget * dt
-
-
-    --------------------------------------------------
-    -- ALTITUDE LIMITS
-    --------------------------------------------------
-
-    if SYSTEM.descentTarget <
-        data.destinationAltitude then
-
-        SYSTEM.descentTarget =
-            data.destinationAltitude
-
-    end
-
-
-    if SYSTEM.descentTarget > data.altitude then
-
-        SYSTEM.descentTarget = data.altitude
-
-    end
-
 
     return
 
@@ -575,7 +655,7 @@ end
 
 
 --------------------------------------------------
--- 10. MAIN TICK
+-- 11. MAIN TICK
 --------------------------------------------------
 
 function onTick()
@@ -608,7 +688,7 @@ function onTick()
 
         closingSpeedFilter =
             input.getNumber(INPUT.CLOSING_SPEED_FILTER),
-        
+
         descentSpeedFilter =
             input.getNumber(INPUT.DESCENT_SPEED_FILTER)
 
@@ -619,6 +699,10 @@ function onTick()
 
         input.getBool(INPUT.DESCENT_ENABLE)
 
+
+    --------------------------------------------------
+    -- UPDATE SYSTEM
+    --------------------------------------------------
 
     local descentTarget, descentSpeedTarget =
 
@@ -655,4 +739,4 @@ function onTick()
 end
 
 
--- END OF MC08 v1.6.0
+-- END OF MC08 v1.7.0
