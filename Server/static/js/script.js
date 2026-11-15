@@ -337,105 +337,6 @@ function pulseDirection(id, active) {
 }
 
 
-/* ============================================================
-   09. INTERFACE RENDERER
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   09.1 ENGINE
-   ------------------------------------------------------------ */
-
-function renderEngine(data) {
-
-    setValue("rpm", number(data, "rps"));
-
-    setValue("rpmTarget", number(data, "rps_target"));
-
-}
-
-
-/* ------------------------------------------------------------
-   09.2 AIRCRAFT ATTITUDE
-   ------------------------------------------------------------ */
-
-function renderAttitude(data) {
-
-    setValue("roll", number(data, "roll", 2));
-
-    setValue("pitch", number(data, "pitch", 2));
-
-    setValue("yaw", number(data, "yaw", 2));
-
-}
-
-
-/* ------------------------------------------------------------
-   09.3 AIRCRAFT SPEED
-   ------------------------------------------------------------ */
-
-function renderSpeed(data) {
-
-    setValue(
-        "absoluteSpeed",
-        number(data, "absolute_speed", 1)
-    );
-
-}
-
-
-/* ------------------------------------------------------------
-   09.4 NAVIGATION
-   ------------------------------------------------------------ */
-
-function renderNavigation(data) {
-
-    setValue("gpsX", number(data, "my_x", 2));
-
-    setValue("gpsY", number(data, "my_y", 2));
-
-    setValue("targetX", number(data, "target_x", 2));
-
-    setValue("targetY", number(data, "target_y", 2));
-
-    setValue("distance", number(data, "ap_distance", 1));
-
-}
-
-
-/* ------------------------------------------------------------
-   09.5 AUTOPILOT
-   ------------------------------------------------------------ */
-
-function renderAutopilot(data) {
-
-    const active = isActive(data, "ap");
-
-    const status = active
-        ? "ACTIVE"
-        : "OFFLINE";
-
-    setValue("autopilot", status);
-
-    setValue("monitorAutopilot", status);
-
-}
-
-
-/* ------------------------------------------------------------
-   09.6 CONTROL SYSTEMS
-   ------------------------------------------------------------ */
-
-function renderControls(data) {
-
-    setValue(
-        "spoiler",
-        number(data, "spoiler", 2)
-    );
-
-}
-
-
 /* ------------------------------------------------------------
    09.8 MODULE DATA
    ------------------------------------------------------------ */
@@ -502,20 +403,7 @@ function updateInterface(data) {
 
     pendingMissionData = data;
 
-
     renderModules(data);
-
-    renderEngine(data);
-
-    renderAttitude(data);
-
-    renderSpeed(data);
-
-    renderNavigation(data);
-
-    renderAutopilot(data);
-
-    renderControls(data);
 
     renderDiagnostics(data);
 
