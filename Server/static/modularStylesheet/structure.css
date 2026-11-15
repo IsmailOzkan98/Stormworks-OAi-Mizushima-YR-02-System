@@ -1,7 +1,14 @@
+/* ==================================================
+   01. GLOBAL STRUCTURE
+================================================== */
 
-/* =========================================
-   STRUCTURE - GLOBAL
-========================================= */
+:root {
+    /* Main dashboard spacing */
+    --spacing-module: 14px;
+    --spacing-section: 8px;
+    --spacing-card: 8px;
+    --spacing-column: 14px;
+}
 
 body {
     margin: 0;
@@ -17,9 +24,10 @@ body {
     margin: auto;
 }
 
-/* =========================================
-   HEADER
-========================================= */
+
+/* ==================================================
+   02. HEADER
+================================================== */
 
 header {
     display: flex;
@@ -35,10 +43,7 @@ h1 {
     margin: 2px 0;
 }
 
-.eyebrow {
-    font-size: 11px;
-}
-
+.eyebrow,
 .subtitle {
     font-size: 11px;
 }
@@ -88,17 +93,17 @@ h1 {
 }
 
 
-/* =========================================
-   MISSION LAYOUT
-========================================= */
-
+/* ==================================================
+   03. MISSION LAYOUT
+================================================== */
 
 .mission-layout {
     display: grid;
     grid-template-columns: minmax(0, 9fr) minmax(0, 1fr);
-    gap: 10px;
-    width: 100%;
     align-items: stretch;
+    gap: 10px;
+
+    width: 100%;
     padding-bottom: 0.5%;
 }
 
@@ -113,26 +118,22 @@ h1 {
     box-sizing: border-box;
     height: 100%;
     min-height: 68px;
+    margin-top: 10px;
+    padding: 9px 18px;
 }
 
 
-/* =========================================
-   MISSION BAR
-========================================= */
+/* ==================================================
+   04. MISSION BAR
+================================================== */
 
 .mission-bar {
-    box-sizing: border-box;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 20px;
 
     width: 100%;
-    min-height: 68px;
-
-    margin-top: 10px;
-    padding: 9px 18px;
 }
 
 .mission-stage {
@@ -142,8 +143,8 @@ h1 {
 }
 
 .micro-label {
-    font-size: 10px;
     margin-bottom: 5%;
+    font-size: 10px;
 }
 
 .mission-data {
@@ -167,14 +168,11 @@ h1 {
 }
 
 
-/* =========================================
-   RECORDER PANEL
-========================================= */
-
+/* ==================================================
+   05. FLIGHT DATA RECORDER
+================================================== */
 
 .recorder-panel {
-    box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -182,59 +180,127 @@ h1 {
     gap: 12px;
 
     width: 100%;
-    min-height: 68px;
-
-    margin-top: 10px;
-    padding: 9px 18px;
 }
 
-/* =========================================
-   MAIN GRID
-========================================= */
+.recorder-controls {
+    min-width: 155px;
+}
+
+.recorder-buttons {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.recorder-btn {
+    padding: 7px 11px;
+    font-size: 10px;
+}
+
+.recorder-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 5px;
+}
+
+.recorder-status {
+    display: block;
+    margin-top: 5px;
+    font-size: 9px;
+}
+
+
+/* ==================================================
+   06. MAIN DASHBOARD GRID
+================================================== */
+
+/* Main three-column layout */
 
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1.08fr 1fr .85fr;
-    gap: 14px;
+    align-items: start;
+    gap: var(--spacing-column);
 
     margin-top: 12px;
-    align-items: start;
 }
 
+/* Universal spacing between modules */
+
 .column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-module);
+
     min-width: 0;
 }
 
-/* =========================================
-   SECTION HEADINGS
-========================================= */
+
+/* ==================================================
+   07. DYNAMIC MODULES
+================================================== */
+
+/* Container for dynamically generated card sections */
+
+#cardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-module);
+
+    min-width: 0;
+}
+
+/* Each dynamically generated section */
+
+.dashboard-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-section);
+
+    min-width: 0;
+}
+
+/* Cards inside each section */
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-card);
+
+    min-width: 0;
+}
+
+
+/* ==================================================
+   08. SECTION HEADINGS
+================================================== */
+
+.system-info-module {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-section);
+
+    min-width: 0;
+}
 
 .section-heading {
     display: flex;
     align-items: center;
     gap: 10px;
 
-    margin: 9px 0 8px;
+    margin: 0;
     padding-bottom: 6px;
-}
-
-.section-heading:first-child {
-    margin-top: 0;
 }
 
 .section-heading > span {
     display: inline-block;
 }
 
-/* =========================================
-   METRIC CARDS
-========================================= */
 
-.metric-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-}
+/* ==================================================
+   09. METRIC CARDS
+================================================== */
 
 .card {
     position: relative;
@@ -248,14 +314,15 @@ h1 {
     position: absolute;
     bottom: 0;
     left: 0;
+
     width: 25px;
     height: 2px;
 }
 
 .card-label {
+    min-height: 14px;
     font-size: 11px;
     line-height: 1.3;
-    min-height: 14px;
 }
 
 .value {
@@ -265,13 +332,18 @@ h1 {
 }
 
 .unit {
-    font-size: 10px;
     margin-top: 4px;
+    font-size: 10px;
 }
 
-/* =========================================
-   DIAGNOSTICS
-========================================= */
+
+/* ==================================================
+   10. DIAGNOSTICS
+================================================== */
+
+.diagnostics-panel {
+    padding: 12px;
+}
 
 .diagnostic-grid {
     display: grid;
@@ -286,10 +358,6 @@ h1 {
 
 .diagnostic-grid .diagnostic-row > span:first-child {
     font-size: 10px;
-}
-
-.diagnostics-panel {
-    padding: 12px;
 }
 
 .diagnostic-header,
@@ -332,27 +400,30 @@ h1 {
     font-size: 10px;
 }
 
+
+/* ==================================================
+   11. DIRECTIONAL BOOSTERS
+================================================== */
+
 .booster-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 7px;
 }
 
-/* =========================================
-   DIRECTIONAL BOOSTERS
-========================================= */
-
 .booster {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     padding: 9px;
     font-size: 11px;
 }
 
-/* =========================================
-   MONITOR
-========================================= */
+
+/* ==================================================
+   12. MONITOR
+================================================== */
 
 .monitor-panel {
     padding: 12px 14px;
@@ -362,6 +433,7 @@ h1 {
 .event-header {
     display: flex;
     justify-content: space-between;
+
     padding-bottom: 9px;
     font-size: 11px;
 }
@@ -385,13 +457,13 @@ h1 {
     font-size: 11px;
 }
 
-/* =========================================
-   EVENT LOG
-========================================= */
+
+/* ==================================================
+   13. EVENT LOG
+================================================== */
 
 .event-panel {
     box-sizing: border-box;
-
     height: clamp(180px, 25vh, 280px);
 
     padding: 12px;
@@ -427,14 +499,17 @@ h1 {
     white-space: nowrap;
 }
 
-/* =========================================
-   SYSTEM INFO
-========================================= */
+
+/* ==================================================
+   14. SYSTEM INFO
+================================================== */
 
 .system-info {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 7px;
+
+    min-width: 0;
 }
 
 .system-info > div {
@@ -442,6 +517,8 @@ h1 {
     flex-direction: column;
     gap: 5px;
     padding: 9px;
+
+    min-width: 0;
 }
 
 .system-info span {
@@ -452,41 +529,10 @@ h1 {
     font-size: 11px;
 }
 
-/* =========================================
-   FLIGHT DATA RECORDER
-========================================= */
 
-.recorder-controls {
-    min-width: 155px;
-}
-
-.recorder-buttons {
-    display: flex;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.recorder-btn {
-    padding: 7px 11px;
-    font-size: 10px;
-}
-
-.recorder-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 5px;
-}
-
-.recorder-status {
-    display: block;
-    margin-top: 5px;
-    font-size: 9px;
-}
-
-/* =========================================
-   TELEMETRY GRAPHS
-========================================= */
+/* ==================================================
+   15. TELEMETRY GRAPHS
+================================================== */
 
 .telemetry-stack {
     display: flex;
@@ -506,6 +552,7 @@ h1 {
     position: absolute;
     bottom: 0;
     left: 0;
+
     width: 25px;
     height: 2px;
 }
@@ -530,6 +577,7 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 7px;
+
     padding: 8px 0 5px;
 }
 
@@ -556,8 +604,9 @@ h1 {
 
 .telemetry-legend {
     display: flex;
-    gap: 12px;
     flex-wrap: wrap;
+    gap: 12px;
+
     padding: 3px 0 5px;
     font-size: 9px;
 }
@@ -568,9 +617,10 @@ h1 {
     height: 105px;
 }
 
-/* =========================================
-   FOOTER
-========================================= */
+
+/* ==================================================
+   16. FOOTER
+================================================== */
 
 footer {
     display: flex;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,127 +13,131 @@
 </head>
 
 <body>
-<div class="container">
+    <div class="container">
 
-    <header>
-        <div class="brand">
-            <div class="eyebrow">PROJECT CATEGORY</div>
-            <h1>PROJECT NAME <span>PROJECT-IDPROJECT-ID</span></h1>
-            <div class="subtitle">PROJECT DESCRIPTION</div>
-        </div>
-
-        <div class="header-right">
-            <div class="unit-designation">
-                <span>UNIT DESIGNATION</span>
-                <strong>UNIT NAME / CLASS</strong>
-                <small>UNIT DESCRIPTION</small>
+        <header>
+            <div class="brand">
+                <div class="eyebrow">PROJECT CATEGORY</div>
+                <h1>PROJECT NAME <span>PROJECT-IDPROJECT-ID</span></h1>
+                <div class="subtitle">PROJECT DESCRIPTION</div>
             </div>
 
-            <div class="connection">
-                <div class="light" id="onlineLight"></div>
-                <div>
-                    <strong id="onlineText">OFFLINE</strong>
-                    <small id="connectionDetail">Waiting for telemetry...</small>
+            <div class="header-right">
+                <div class="unit-designation">
+                    <span>UNIT DESIGNATION</span>
+                    <strong>UNIT NAME / CLASS</strong>
+                    <small>UNIT DESCRIPTION</small>
+                </div>
+
+                <div class="connection">
+                    <div class="light" id="onlineLight"></div>
+                    <div>
+                        <strong id="onlineText">OFFLINE</strong>
+                        <small id="connectionDetail">Waiting for telemetry...</small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <section class="mission-layout">
+        <section class="mission-layout">
 
-        <!-- MISSION BAR MODULE -->
-        <div id="missionBarContainer"></div>
+            <!-- MISSION BAR MODULE -->
+            <div id="missionBarContainer"></div>
 
-        <!-- FLIGHT RECORDER MODULE -->
-        <div id="flightRecorderContainer"></div>
-
-    </section>
-    
-
-    <!-- DASHBOARD -->
-
-    <main class="dashboard-grid">
-
-        <!-- COLUMN 1 -->
-
-        <section class="column">
-
-            
-            <!-- EVENT LOG MODULE -->
-            <div id="eventLogContainer"></div>
-
-
-            <!-- SYSTEM DIAGNOSTICS -->
-            <div id="systemDiagnosticsContainer"></div>
-
-            
-            <!-- SYSTEM INFORMATION -->
-
-            <div class="section-heading">
-                <span>03</span> SYSTEM INFORMATION
-            </div>
-
-            <div class="system-info">
-
-                <div>
-                    <span>CONTROL SYSTEM</span>
-                    <strong>v0.0.0</strong>
-                </div>
-
-                <div>
-                    <span>PLATFORM</span>
-                    <strong>UNDEFINED</strong>
-                </div>
-
-                <div>
-                    <span>DATA MODE</span>
-                    <strong>NOT SPECIFIED</strong>
-                </div>
-
-                <div>
-                    <span>OTHER INFO</span>
-                    <strong>DATA</strong>
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- COLUMN 2 -->
-
-        <section class="column">
-
-            <!-- 04 FLIGHT TELEMETRY -->
-            <div id="telemetryGraphsContainer"></div>
-
-            <!-- 05 MISSION MONITOR -->
-            <div id="missionMonitorContainer"></div>
-
-        </section>
-
-        <!-- COLUMN 3 -->
-
-        <section class="column">
-
-            <!-- Cards -->
-
-            <div id="cardsContainer"></div>
+            <!-- FLIGHT RECORDER MODULE -->
+            <div id="flightRecorderContainer"></div>
 
         </section>
 
 
-        
+        <!-- DASHBOARD -->
 
-    </main>
+        <main class="dashboard-grid">
 
-    <!-- FOOTER -->
+            <!-- COLUMN 1 -->
 
-    <footer class="footer">
-        <span>ORGANIZATION</span>
-        <span>PROJECT IDENTIFICATION</span>
-        <span>DATA ACCESS</span>
-    </footer>
+            <section class="column">
+
+
+                <!-- EVENT LOG MODULE -->
+                <div id="eventLogContainer"></div>
+
+
+                <!-- SYSTEM DIAGNOSTICS -->
+                <div id="systemDiagnosticsContainer"></div>
+
+
+                <!-- SYSTEM INFORMATION -->
+
+                <div class="system-info-module">
+                    
+                    <div class="section-heading">
+                        <span>03</span> SYSTEM INFORMATION
+                    </div>
+
+                    <div class="system-info">
+
+                        <div>
+                            <span>CONTROL SYSTEM</span>
+                            <strong>v0.0.0</strong>
+                        </div>
+
+                        <div>
+                            <span>PLATFORM</span>
+                            <strong>UNDEFINED</strong>
+                        </div>
+
+                        <div>
+                            <span>DATA MODE</span>
+                            <strong>NOT SPECIFIED</strong>
+                        </div>
+
+                        <div>
+                            <span>OTHER INFO</span>
+                            <strong>DATA</strong>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- COLUMN 2 -->
+
+            <section class="column">
+
+                <!-- 04 FLIGHT TELEMETRY -->
+                <div id="telemetryGraphsContainer"></div>
+
+                <!-- 05 MISSION MONITOR -->
+                <div id="missionMonitorContainer"></div>
+
+            </section>
+
+            <!-- COLUMN 3 -->
+
+            <section class="column">
+
+                <!-- Cards -->
+
+                <div id="cardsContainer"></div>
+
+            </section>
+
+
+
+
+        </main>
+
+        <!-- FOOTER -->
+
+        <footer class="footer">
+            <span>ORGANIZATION</span>
+            <span>PROJECT IDENTIFICATION</span>
+            <span>DATA ACCESS</span>
+        </footer>
 
 
 </body>
+
 </html>
