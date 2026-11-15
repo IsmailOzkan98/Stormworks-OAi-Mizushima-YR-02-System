@@ -1,1 +1,6 @@
-Server/logs/
+# Python
+__pycache__/
+*.py[cod]
+
+# Flight Monitor recordings
+Server/telemetry-monitor/app/logs/flight_*.json
