@@ -1,0 +1,772 @@
+/* =========================================
+   RETRO TECHNICAL PAPER
+   Faithful adaptation of the original theme
+========================================= */
+
+:root {
+    /* PAPER */
+    --bg: #d1cdb7;
+    --panel: #dcd8c0;
+    --panel2: #c9c5ad;
+    --paper-light: #dcd8c0;
+    --paper-shadow: #bab5a1;
+    --border: #bab5a1;
+
+    /* TEXT */
+    --gold: #454138;
+    --gold-light: #353329;
+    --ivory: #454138;
+    --muted: #777362;
+
+    /* ORIGINAL THEME COLORS */
+    --text-primary: #454138;
+    --text-secondary: #dcd8c0;
+    --text-shadow: #bab5a1;
+
+    --main-bg-color: #d1cdb7;
+    --bg-grid-color: #ccc8b1;
+    --bg-grid-2-color: rgba(204, 200, 177, 0);
+
+    /* STATUS */
+    --green: #65765b;
+    --cyan: #657c80;
+    --yellow: #a18a50;
+    --red: #a45e52;
+
+    /* TYPOGRAPHY */
+    --mono: 'IBM Plex Mono', monospace;
+    --display: Helvetica, Arial, sans-serif;
+
+    /* GRAPHS */
+    --graph-altitude: #454138;
+    --graph-target: #657c80;
+    --graph-alt-error: #a45e52;
+    --graph-vs-error: #a45e52;
+
+    /* ERROR READOUTS */
+    --alt-error-color: #a18a50;
+    --vs-error-color: #a18a50;
+
+    /* MOTION */
+    --transition: .2s ease;
+}
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+html {
+    background: var(--bg);
+}
+
+body {
+    background-color: var(--main-bg-color);
+
+    background-image:
+        linear-gradient(
+            to right,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        ),
+        linear-gradient(
+            to bottom,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        );
+
+    background-size: 20px 20px;
+
+    color: var(--text-primary);
+    font-family: var(--display);
+    font-weight: 300;
+    letter-spacing: .03rem;
+}
+
+body::before {
+    background: none;
+}
+
+::selection {
+    background-color: var(--text-primary);
+    color: var(--text-secondary);
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    letter-spacing: inherit;
+}
+
+
+/* =========================================
+   SECTION HEADER — REUSABLE
+========================================= */
+
+.section-header {
+    background: var(--text-primary);
+    color: var(--text-secondary);
+    border-left: 4px solid var(--text-shadow);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+
+.module-header > span {
+    color: var(--text-shadow);
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+header {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.eyebrow,
+.subtitle {
+    color: var(--muted);
+}
+
+h1 {
+    color: var(--gold-light);
+    font-family: var(--display);
+    font-weight: 300;
+    text-shadow: 3px 3px 0 var(--paper-shadow);
+    letter-spacing: .5rem;
+    text-transform: uppercase;
+}
+
+h1 span {
+    color: var(--gold);
+}
+
+.connection {
+    background: var(--paper-light);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.connection strong {
+    color: var(--gold);
+}
+
+.connection small {
+    color: var(--muted);
+}
+
+/* =========================================
+   MISSION BAR
+========================================= */
+
+.mission-bar {
+    background: var(--text-secondary);
+    border: 1px solid var(--text-shadow);
+    box-shadow: 3px 3px 0 var(--text-shadow);
+}
+
+.micro-label {
+    color: var(--muted);
+    font-weight: 300;
+}
+
+.mission-stage strong {
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
+.state-pill.running {
+    color: var(--green) !important;
+}
+
+.state-pill.completed {
+    color: var(--cyan) !important;
+}
+
+.state-pill.idle {
+    color: var(--yellow) !important;
+}
+
+/* MISSION INFORMATION */
+
+.mission-stage {
+    background: var(--panel2);
+    border-left: 3px solid var(--gold);
+}
+
+.mission-stage .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.mission-stage strong {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* DATA CELLS */
+
+.mission-data > div {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 1px 1px 0 var(--paper-shadow);
+}
+
+.mission-data .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.mission-data strong {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.mission-data .state-pill {
+    color: var(--green);
+    font-size: 11px;
+}
+
+/* =========================================
+   RECORDER PANEL
+========================================= */
+
+.recorder-panel {
+    background: var(--paper-light);
+    border: 1px solid var(--border);
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+/* =========================================
+   METRIC CARDS
+========================================= */
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition);
+}
+
+.card:hover {
+    background: var(--paper-light);
+    border-color: var(--gold);
+
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.card::after {
+    background: var(--gold);
+}
+
+.card-label {
+    color: var(--muted);
+    font-weight: 300;
+}
+
+.value {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+.unit {
+    color: var(--muted);
+}
+
+.highlight {
+    color: var(--gold);
+}
+
+.cyan {
+    color: var(--cyan);
+}
+
+.yellow {
+    color: var(--yellow);
+}
+
+/* =========================================
+   DIAGNOSTICS
+========================================= */
+
+.diagnostics-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.diagnostic-header {
+    color: var(--gold);
+    font-weight: 400;
+}
+
+.diagnostic-row {
+    border-top: 1px solid var(--border);
+}
+
+.diagnostic-status b {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.diagnostic-status b.active-text {
+    color: var(--green);
+}
+
+.indicator {
+    background: var(--paper-shadow);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+.indicator.active {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 3px var(--green);
+    animation: indicator-pulse 2s infinite ease-in-out;
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--border);
+    color: var(--gold);
+}
+
+/* =========================================
+   DIRECTIONAL BOOSTERS
+========================================= */
+
+.booster {
+    background: var(--paper-light);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.booster.pulse {
+    background: var(--panel2);
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--paper-shadow);
+}
+
+.booster.pulse span {
+    color: var(--gold);
+}
+
+.booster.pulse .indicator {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: none;
+}
+
+/* =========================================
+   MONITOR
+========================================= */
+
+.monitor-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.monitor-title,
+.event-header {
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+}
+
+.monitor-item {
+    border-bottom: 1px solid var(--border);
+}
+
+.monitor-item span {
+    color: var(--muted);
+}
+
+.monitor-item strong {
+    color: var(--gold);
+    font-weight: 400;
+}
+
+/* =========================================
+   EVENT LOG
+========================================= */
+
+.event-panel {
+    background: var(--paper-light);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.event-header span:last-child {
+    color: var(--green);
+}
+
+.event-entry {
+    border-bottom: 1px solid var(--paper-shadow);
+    transition: background-color var(--transition);
+}
+
+.event-entry:hover {
+    background: rgba(69, 65, 56, .05);
+}
+
+.event-time {
+    color: var(--muted);
+}
+
+.event-entry span:last-child {
+    color: var(--gold);
+}
+
+/* FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid var(--border);
+    border-left-color: var(--gold);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--gold);
+}
+
+/* ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--green);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--green);
+}
+
+/* DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--muted);
+}
+
+/* ERRORS */
+
+.event-entry.error {
+    border-left-color: var(--red);
+    background: rgba(164, 94, 82, .06);
+}
+
+.event-entry.error span:last-child {
+    color: var(--red);
+}
+
+/* NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--cyan);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--cyan);
+}
+
+/* WARNINGS */
+
+.event-entry.warning {
+    border-left-color: var(--yellow);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--yellow);
+}
+
+/* NORMAL EVENTS */
+
+.event-entry.normal {
+    border-left-color: var(--border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--muted);
+}
+
+/* =========================================
+   SYSTEM INFO
+========================================= */
+
+.system-info > div {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.system-info span {
+    color: var(--muted);
+}
+
+.system-info strong {
+    color: var(--gold);
+    font-weight: 400;
+}
+
+/* =========================================
+   FLIGHT DATA RECORDER BUTTON
+========================================= */
+
+.recorder-dot {
+    background: var(--green);
+}
+
+.recorder-btn.stop .recorder-dot {
+    background: var(--red);
+}
+
+/* =========================================
+   TELEMETRY GRAPHS
+========================================= */
+
+.telemetry-chart-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.telemetry-chart-panel::after {
+    background: var(--gold);
+}
+
+.telemetry-chart-header {
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--muted);
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--cyan);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--yellow);
+}
+
+.legend-alt {
+    color: var(--gold);
+}
+
+.legend-target {
+    color: var(--cyan);
+}
+
+.legend-error {
+    color: var(--red);
+}
+
+/* =========================================
+   INPUTS AND CONTROLS
+========================================= */
+
+input,
+select,
+textarea {
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--paper-light);
+    color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 1px solid var(--gold);
+    outline-offset: 2px;
+}
+
+
+
+/* =========================================
+   GLOBAL BUTTON SYSTEM
+========================================= */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0;
+
+    background: var(--text-shadow);
+    color: var(--text-primary);
+
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .03rem;
+
+    cursor: pointer;
+
+    box-shadow: none;
+
+    transition:
+        color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+/* Horizontal sweep */
+
+button::after,
+.button::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+
+    background: var(--text-primary);
+    z-index: -1;
+
+    transition: width .2s ease-out;
+}
+
+/* Hover */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: var(--text-secondary);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+/* Active */
+
+button:not(:disabled):active,
+.button:active {
+    color: var(--text-secondary);
+    box-shadow: none;
+}
+
+/* Disabled */
+
+button:disabled,
+.button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.event-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: var(--panel);
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: var(--gold);
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 300;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes indicator-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .45;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

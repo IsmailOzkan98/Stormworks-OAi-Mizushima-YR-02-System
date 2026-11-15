@@ -1,0 +1,194 @@
+
+/* ============================================================
+   OAI MIZUSHIMA YR-02
+   SYSTEM EVENT DETECTOR
+
+   RESPONSIBILITY:
+   Detect flight system state changes and report them
+   to the Event Log.
+   ============================================================ */
+
+const SYSTEMS = [
+
+    ["main", "MAIN PROPULSION"],
+    ["alt_hold", "ALTITUDE HOLD"],
+    ["roll_stab", "ROLL STABILIZER"],
+    ["afterburner", "AFTERBURNER"],
+    ["descent", "DESCENT ENABLE"],
+
+    ["north", "NORTH BOOSTER"],
+    ["east", "EAST BOOSTER"],
+    ["south", "SOUTH BOOSTER"],
+    ["west", "WEST BOOSTER"]
+
+];
+
+// Previous states
+let previousSnapshot = {};
+
+let previousStage = null;
+
+let previousStatus = null;
+
+
+/* ------------------------------------------------------------
+   BOOLEAN STATE VALIDATION
+   ------------------------------------------------------------ */
+
+function getSystemState(value) {
+
+    if (
+        value === 1 ||
+        value === "1" ||
+        value === true ||
+        value === "true"
+    ) {
+        return true;
+    }
+
+    if (
+        value === 0 ||
+        value === "0" ||
+        value === false ||
+        value === "false"
+    ) {
+        return false;
+    }
+
+    return null;
+
+}
+
+
+/* ------------------------------------------------------------
+   INITIALIZE DETECTOR
+   ------------------------------------------------------------ */
+
+export function initSystemEventDetector(logEvent) {
+
+    if (typeof logEvent !== "function") {
+
+        console.error(
+            "[SYSTEM EVENT DETECTOR] Invalid Event Log callback."
+        );
+
+        return null;
+
+    }
+
+
+    /* --------------------------------------------------------
+       PROCESS TELEMETRY
+       -------------------------------------------------------- */
+
+    function processTelemetry(data) {
+
+        if (!data || typeof data !== "object") return;
+
+
+        // SYSTEM ACTIVATION / DEACTIVATION
+
+        SYSTEMS.forEach(([key, label]) => {
+
+            const current = getSystemState(data[key]);
+
+            // Ignore missing or non-boolean values
+            if (current === null) return;
+
+            const previous = previousSnapshot[key];
+
+            // Only report actual transitions
+            if (
+                previous !== undefined &&
+                previous !== current
+            ) {
+
+                logEvent(
+                    `${label}: ${current ? "ACTIVATED" : "DEACTIVATED"}.`,
+                    current ? "activation" : "deactivation"
+                );
+
+            }
+
+            previousSnapshot[key] = current;
+
+        });
+
+
+        // FLIGHT STAGE CHANGES
+
+        if (
+            typeof data.stage === "string" &&
+            data.stage.length > 0
+        ) {
+
+            const stage = data.stage;
+
+            if (
+                previousStage !== null &&
+                previousStage !== stage
+            ) {
+
+                logEvent(
+                    `Flight stage changed: ${stage}.`,
+                    "phase-event"
+                );
+
+            }
+
+            previousStage = stage;
+
+        }
+
+
+        // FLIGHT STATUS CHANGES
+
+        if (
+            typeof data.status === "string" &&
+            data.status.length > 0
+        ) {
+
+            const status = data.status.toUpperCase();
+
+            if (
+                previousStatus !== null &&
+                previousStatus !== status
+            ) {
+
+                logEvent(
+                    `Flight status changed: ${status}.`,
+                    "phase-event"
+                );
+
+            }
+
+            previousStatus = status;
+
+        }
+
+    }
+
+
+    return {
+
+        processTelemetry,
+
+        getState() {
+
+            return {
+
+                previousSnapshot: {
+                    ...previousSnapshot
+                },
+
+                previousStage,
+
+                previousStatus
+
+            };
+
+        }
+
+    };
+
+}
