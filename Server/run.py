@@ -1,6 +1,6 @@
 
 from app import create_app
-from config import HOST, PORT
+from app.config import HOST, PORT
 
 app = create_app()
 

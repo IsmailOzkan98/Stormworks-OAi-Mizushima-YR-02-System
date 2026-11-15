@@ -5,10 +5,5 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./app/core:/app/core
-      - ./app/recorder:/app/recorder
-      - ./app/routes:/app/routes
-      - ./app/templates:/app/templates
-      - ./app/static:/app/static
-      - ./app/logs:/app/logs
+      - ./app:/app/app
     restart: unless-stopped
