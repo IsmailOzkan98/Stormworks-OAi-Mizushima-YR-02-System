@@ -18,74 +18,88 @@
 
         "items": [
             {
-                "id": "eventLogContainer",
+                "id": "eventLog",
+                "module": "eventLog",
                 "column": 1,
-                "order": 1,
-                "width": 1
+                "order": 2
             },
             {
-                "id": "systemDiagnosticsContainer",
+                "id": "systemDiagnostics",
+                "module": "systemDiagnostics",
                 "column": 1,
-                "order": 2,
-                "width": 1
+                "order": 3
             },
             {
-                "id": "systemInformationContainer",
-                "column": 1,
-                "order": 3,
-                "width": 1
-            },
-            {
-                "id": "telemetryGraphsContainer",
-                "column": 2,
-                "order": 1,
-                "width": 1
-            },
-            {
-                "id": "missionMonitorContainer",
-                "column": 2,
-                "order": 2,
-                "width": 1
-            },
-            {
-                "id": "cardsContainer",
+                "id": "cardsEngineControl",
+                "module": "cardsModule",
+                "section": "engineControl",
                 "column": 3,
-                "order": 1,
-                "width": 1
+                "order": 2
+            },
+            {
+                "id": "telemetryGraphs",
+                "module": "telemetryGraphs",
+                "column": 2,
+                "order": 1
+            },
+            {
+                "id": "missionMonitor",
+                "module": "missionMonitor",
+                "column": 2,
+                "order": 2
+            },
+            {
+                "id": "cardsNavigation",
+                "module": "cardsModule",
+                "section": "navigation",
+                "column": 3,
+                "order": 1
+            },
+            {
+                "id": "systemInformation",
+                "module": "systemInformation",
+                "column": 1,
+                "order": 1
             }
         ]
     },
 
     "registry": {
+
         "missionBar": {
             "name": "MISSION BAR",
             "path": "../modules/missionBar/missionBar.js",
-            "container": "missionBarContainer",
             "initializer": "initMissionBar",
-            "updater": "updateMissionBarData"
-        },
-
-        "missionMonitor": {
-            "name": "MISSION MONITOR",
-            "path": "../modules/missionMonitor/missionMonitor.js",
-            "container": "missionMonitorContainer",
-            "initializer": "initMissionMonitor",
-            "updater": "updateMissionMonitorData",
-            "special": "missionMonitor"
+            "updater": "updateMissionBarData",
+            "container": "missionBarContainer"
         },
 
         "flightRecorder": {
             "name": "FLIGHT RECORDER",
             "path": "../modules/flightRecorder/flightRecorder.js",
-            "container": "flightRecorderContainer",
             "initializer": "initFlightRecorder",
-            "special": "flightRecorder"
+            "special": "flightRecorder",
+            "container": "flightRecorderContainer"
+        },
+
+        "eventLog": {
+            "name": "EVENT LOG",
+            "path": "../modules/eventLog/eventLog.js",
+            "initializer": "initEventLog",
+            "special": "eventLog"
+        },
+
+        "missionMonitor": {
+            "name": "MISSION MONITOR",
+            "path": "../modules/missionMonitor/missionMonitor.js",
+            "initializer": "initMissionMonitor",
+            "updater": "updateMissionMonitorData",
+            "special": "missionMonitor"
         },
 
         "systemDiagnostics": {
             "name": "SYSTEM DIAGNOSTICS",
             "path": "../modules/systemDiagnostics/systemDiagnostics.js",
-            "container": "systemDiagnosticsContainer",
             "initializer": "initSystemDiagnostics",
             "updater": "updateSystemDiagnostics"
         },
@@ -93,18 +107,24 @@
         "telemetryGraphs": {
             "name": "TELEMETRY GRAPHS",
             "path": "../modules/telemetryGraphs/telemetryGraphs.js",
-            "container": "telemetryGraphsContainer",
             "initializer": "initTelemetryGraphs",
             "updater": "updateTelemetryGraphsData"
         },
 
         "cardsModule": {
             "name": "CARDS",
-            "key": "cards",
             "path": "../modules/cards/cards.js",
-            "container": "cardsContainer",
             "initializer": "initCards",
-            "updater": "updateCards"
+            "updater": "updateCards",
+            "multiple": true,
+            "key": "cards"
+        },
+
+        "systemInformation": {
+            "name": "SYSTEM INFORMATION",
+            "path": "../modules/projectData/projectData.js",
+            "initializer": "initSystemInformation",
+            "special": "systemInformation"
         }
     }
 }

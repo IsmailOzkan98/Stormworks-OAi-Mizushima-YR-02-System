@@ -3,7 +3,6 @@
     {
       "id": "navigation",
       "title": {
-        "number": "06",
         "name": "NAVIGATION"
       },
       "cards": [
@@ -60,7 +59,6 @@
     {
       "id": "engineControl",
       "title": {
-        "number": "07",
         "name": "ENGINE & CONTROL"
       },
       "cards": [
