@@ -6,6 +6,7 @@
         "missionBar": true,
         "systemDiagnostics": true,
         "systemInformation": true,
-        "missionMonitor": true
+        "missionMonitor": true,
+        "telemetryGraphs": true
     }
 }

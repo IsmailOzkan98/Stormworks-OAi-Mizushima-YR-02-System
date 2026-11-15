@@ -25,6 +25,7 @@ let missionBarModule = null;
 let pendingMissionData = null;
 let systemDiagnosticsModule = null;
 let missionMonitorModule = null;
+let telemetryGraphsModule = null;
 
 // Event Log estará disponible cuando se inicialice.
 // Mientras tanto, los eventos se mostrarán en consola.
@@ -57,55 +58,7 @@ let requestInProgress = false;
    03. GRAPH CONFIGURATION
    ============================================================ */
 
-// GRAPH HISTORY
 
-const GRAPH_HISTORY_SECONDS = 60;
-const MAX_GRAPH_POINTS = 1200;
-
-
-// PERMANENT GRAPH SCALE HISTORY
-
-// These values are maintained throughout the session.
-// The scale can expand but never contracts.
-
-const graphExtremes = {
-
-    altitude: {
-        min: Infinity,
-        max: -Infinity
-    },
-
-    altitudeTarget: {
-        min: Infinity,
-        max: -Infinity
-    },
-
-    altitudeError: {
-        min: Infinity,
-        max: -Infinity
-    },
-
-    verticalSpeed: {
-        min: Infinity,
-        max: -Infinity
-    },
-
-    verticalSpeedTarget: {
-        min: Infinity,
-        max: -Infinity
-    },
-
-    verticalSpeedError: {
-        min: Infinity,
-        max: -Infinity
-    }
-
-};
-
-
-// TELEMETRY HISTORY
-
-const telemetryHistory = [];
 
 
 /* ============================================================
@@ -199,681 +152,6 @@ function isActive(data, key) {
 
 }
 
-
-/* ============================================================
-   07. GRAPH DATA MANAGEMENT
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   07.1 UPDATE PERMANENT GRAPH EXTREMES
-   ------------------------------------------------------------ */
-
-// Update historical minimum and maximum values.
-//
-// IMPORTANT:
-// This function is called only after a new telemetry
-// sample has been accepted.
-//
-// Historical extremes are never removed.
-
-function updateGraphExtremes(data) {
-
-    const keys = {
-
-        altitude: "alt",
-        altitudeTarget: "alt_target",
-        altitudeError: "alt_error",
-
-        verticalSpeed: "vs",
-        verticalSpeedTarget: "vs_target",
-        verticalSpeedError: "vs_error"
-
-    };
-
-    Object.keys(graphExtremes).forEach(key => {
-
-        const value = getNumericValue(
-            data,
-            keys[key]
-        );
-
-        if (value === null) return;
-
-        if (value > graphExtremes[key].max) {
-
-            graphExtremes[key].max = value;
-
-        }
-
-        if (value < graphExtremes[key].min) {
-
-            graphExtremes[key].min = value;
-
-        }
-
-    });
-
-}
-
-
-/* ------------------------------------------------------------
-   07.2 RECORD TELEMETRY
-   ------------------------------------------------------------ */
-
-// Store accepted telemetry samples.
-//
-// History is limited to:
-// - Last 60 seconds
-// - Maximum 1200 samples
-//
-// Duplicate and older timestamps are rejected.
-
-function recordTelemetry(data) {
-
-    const timestamp = Number(data.timestamp);
-
-    // VALIDATE TIMESTAMP
-
-    if (
-        !Number.isFinite(timestamp) ||
-        timestamp <= 0
-    ) {
-        return;
-    }
-
-
-    // PREVENT DUPLICATE OR OLDER SAMPLES
-
-    const lastPoint =
-        telemetryHistory[telemetryHistory.length - 1];
-
-    if (
-        lastPoint &&
-        timestamp <= lastPoint.timestamp
-    ) {
-        return;
-    }
-
-
-    // ACCEPT TELEMETRY SAMPLE
-
-    const sample = {
-
-        timestamp,
-
-        altitude: getNumericValue(data, "alt"),
-        altitudeTarget: getNumericValue(data, "alt_target"),
-        altitudeError: getNumericValue(data, "alt_error"),
-
-        verticalSpeed: getNumericValue(data, "vs"),
-        verticalSpeedTarget: getNumericValue(data, "vs_target"),
-        verticalSpeedError: getNumericValue(data, "vs_error")
-
-    };
-
-
-    // UPDATE PERMANENT SCALE
-
-    updateGraphExtremes(data);
-
-
-    // ADD SAMPLE TO HISTORY
-
-    telemetryHistory.push(sample);
-
-
-    // REMOVE SAMPLES OLDER THAN 60 SECONDS
-
-    const cutoff =
-        timestamp - GRAPH_HISTORY_SECONDS;
-
-    while (
-        telemetryHistory.length > 0 &&
-        telemetryHistory[0].timestamp < cutoff
-    ) {
-
-        telemetryHistory.shift();
-
-    }
-
-
-    // ENFORCE MAXIMUM HISTORY SIZE
-
-    while (
-        telemetryHistory.length > MAX_GRAPH_POINTS
-    ) {
-
-        telemetryHistory.shift();
-
-    }
-
-}
-
-
-/* ============================================================
-   08. GRAPH SCALE ENGINE
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   08.1 CREATE PERMANENT RANGE
-   ------------------------------------------------------------ */
-
-// Create a scale using historical minimum and maximum.
-//
-// The scale expands when new extremes appear.
-// The scale never contracts during the session.
-
-function createFixedRange(min, max) {
-
-    if (
-        !Number.isFinite(min) ||
-        !Number.isFinite(max)
-    ) {
-
-        return {
-            min: -1,
-            max: 1
-        };
-
-    }
-
-
-    // PREVENT ZERO RANGE
-
-    if (min === max) {
-
-        min -= 1;
-        max += 1;
-
-    }
-
-
-    // ADD 12% VISUAL PADDING
-
-    const padding = (max - min) * 0.12;
-
-    return {
-
-        min: min - padding,
-        max: max + padding
-
-    };
-
-}
-
-
-/* ------------------------------------------------------------
-   08.2 CALCULATE GRAPH SCALES
-   ------------------------------------------------------------ */
-
-function getGraphRanges(leftKeys, rightKey) {
-
-    let leftMin = Infinity;
-    let leftMax = -Infinity;
-
-
-    // LEFT AXIS
-    // Actual altitude / vertical speed
-    // Target altitude / vertical speed
-
-    leftKeys.forEach(key => {
-
-        leftMin = Math.min(
-            leftMin,
-            graphExtremes[key].min
-        );
-
-        leftMax = Math.max(
-            leftMax,
-            graphExtremes[key].max
-        );
-
-    });
-
-
-    // RIGHT AXIS
-    // Error
-
-    const rightMin =
-        graphExtremes[rightKey].min;
-
-    const rightMax =
-        graphExtremes[rightKey].max;
-
-
-    return {
-
-        leftRange: createFixedRange(
-            leftMin,
-            leftMax
-        ),
-
-        rightRange: createFixedRange(
-            rightMin,
-            rightMax
-        )
-
-    };
-
-}
-
-
-/* ============================================================
-   09. GRAPH RENDERING ENGINE
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   09.1 DRAW TELEMETRY CHART
-   ------------------------------------------------------------ */
-
-function drawTelemetryChart(
-    canvasId,
-    leftKeys,
-    rightKey
-) {
-
-    const canvas =
-        document.getElementById(canvasId);
-
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) return;
-
-
-    // GRAPH COLORS
-
-    const styles =
-        getComputedStyle(document.documentElement);
-
-    const colors = {
-
-        altitude: styles
-            .getPropertyValue("--graph-altitude")
-            .trim(),
-
-        target: styles
-            .getPropertyValue("--graph-target")
-            .trim(),
-
-        altError: styles
-            .getPropertyValue("--graph-alt-error")
-            .trim(),
-
-        vsError: styles
-            .getPropertyValue("--graph-vs-error")
-            .trim()
-
-    };
-
-
-    // CANVAS DIMENSIONS
-
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    if (!width || !height) return;
-
-    const dpr = window.devicePixelRatio || 1;
-
-
-    // HIGH DPI RENDERING
-
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
-
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
-
-
-    // GRAPH BOUNDARIES
-
-    const left = 39;
-    const right = width - 39;
-
-    const top = 10;
-    const bottom = height - 20;
-
-    const plotWidth = right - left;
-    const plotHeight = bottom - top;
-
-    if (plotWidth <= 0 || plotHeight <= 0) return;
-
-
-    // LATEST TELEMETRY SAMPLE
-
-    const latest = telemetryHistory[
-        telemetryHistory.length - 1
-    ];
-
-    if (!latest) return;
-
-
-    // TIME WINDOW
-
-    const startTime =
-        latest.timestamp - GRAPH_HISTORY_SECONDS;
-
-
-    // VERIFY THAT THE GRAPH HAS DATA
-
-    const hasLeftData = telemetryHistory.some(point =>
-        leftKeys.some(key => point[key] !== null)
-    );
-
-    if (!hasLeftData) return;
-
-
-    /* --------------------------------------------------------
-       09.1.1 PERMANENT GRAPH SCALE
-       -------------------------------------------------------- */
-
-    const ranges = getGraphRanges(
-        leftKeys,
-        rightKey
-    );
-
-    const leftRange = ranges.leftRange;
-    const rightRange = ranges.rightRange;
-
-
-    /* --------------------------------------------------------
-       09.1.2 COORDINATE CONVERSION
-       -------------------------------------------------------- */
-
-    function getX(timestamp) {
-
-        return left +
-            (
-                (timestamp - startTime) /
-                GRAPH_HISTORY_SECONDS
-            ) * plotWidth;
-
-    }
-
-
-    function getY(value, range) {
-
-        return bottom -
-            (
-                (value - range.min) /
-                (range.max - range.min)
-            ) * plotHeight;
-
-    }
-
-
-    /* --------------------------------------------------------
-       09.1.3 GRID
-       -------------------------------------------------------- */
-
-    ctx.lineWidth = 1;
-
-    ctx.strokeStyle =
-        "rgba(184,166,117,0.16)";
-
-    ctx.setLineDash([3, 4]);
-
-
-    // HORIZONTAL GRID
-
-    for (let i = 0; i <= 4; i++) {
-
-        const y =
-            top + (plotHeight / 4) * i;
-
-        ctx.beginPath();
-
-        ctx.moveTo(left, y);
-        ctx.lineTo(right, y);
-
-        ctx.stroke();
-
-    }
-
-
-    // VERTICAL GRID
-
-    for (let i = 0; i <= 4; i++) {
-
-        const x =
-            left + (plotWidth / 4) * i;
-
-        ctx.beginPath();
-
-        ctx.moveTo(x, top);
-        ctx.lineTo(x, bottom);
-
-        ctx.stroke();
-
-    }
-
-    ctx.setLineDash([]);
-
-
-    /* --------------------------------------------------------
-       09.1.4 AXIS LABELS
-       -------------------------------------------------------- */
-
-    ctx.fillStyle = "#aaa38f";
-
-    ctx.font = "9px IBM Plex Mono";
-
-
-    // LEFT AXIS
-
-    ctx.textAlign = "right";
-
-    ctx.fillText(
-        leftRange.max.toFixed(1),
-        left - 5,
-        top + 3
-    );
-
-    ctx.fillText(
-        leftRange.min.toFixed(1),
-        left - 5,
-        bottom
-    );
-
-
-    // RIGHT AXIS
-
-    ctx.textAlign = "left";
-
-    ctx.fillText(
-        rightRange.max.toFixed(1),
-        right + 5,
-        top + 3
-    );
-
-    ctx.fillText(
-        rightRange.min.toFixed(1),
-        right + 5,
-        bottom
-    );
-
-
-    // TIME LABELS
-
-    ctx.textAlign = "center";
-
-    ctx.fillText(
-        "-60s",
-        left,
-        height - 4
-    );
-
-    ctx.fillText(
-        "-30s",
-        left + plotWidth / 2,
-        height - 4
-    );
-
-    ctx.fillText(
-        "NOW",
-        right,
-        height - 4
-    );
-
-
-    /* --------------------------------------------------------
-       09.1.5 DRAW TELEMETRY CURVES
-       -------------------------------------------------------- */
-
-    function drawCurve(
-        key,
-        color,
-        range,
-        dashed = false
-    ) {
-
-        ctx.beginPath();
-
-        ctx.strokeStyle = color;
-
-        ctx.lineWidth = 2;
-
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round";
-
-        ctx.setLineDash(
-            dashed ? [5, 3] : []
-        );
-
-        let started = false;
-
-
-        telemetryHistory.forEach(point => {
-
-            const value = point[key];
-
-
-            // IGNORE INVALID VALUES AND OLD SAMPLES
-
-            if (
-                value === null ||
-                point.timestamp < startTime
-            ) {
-
-                started = false;
-                return;
-
-            }
-
-
-            const x = getX(point.timestamp);
-            const y = getY(value, range);
-
-
-            if (!started) {
-
-                ctx.moveTo(x, y);
-                started = true;
-
-            } else {
-
-                ctx.lineTo(x, y);
-
-            }
-
-        });
-
-
-        ctx.stroke();
-
-        ctx.setLineDash([]);
-
-    }
-
-
-    /* --------------------------------------------------------
-       09.1.6 ACTUAL VALUE
-       -------------------------------------------------------- */
-
-    drawCurve(
-        leftKeys[0],
-        colors.altitude,
-        leftRange
-    );
-
-
-    /* --------------------------------------------------------
-       09.1.7 TARGET VALUE
-       -------------------------------------------------------- */
-
-    drawCurve(
-        leftKeys[1],
-        colors.target,
-        leftRange,
-        true
-    );
-
-
-    /* --------------------------------------------------------
-       09.1.8 ERROR VALUE
-       -------------------------------------------------------- */
-
-    drawCurve(
-        rightKey,
-
-        canvasId === "altitudeChart"
-            ? colors.altError
-            : colors.vsError,
-
-        rightRange
-    );
-
-}
-
-
-/* ------------------------------------------------------------
-   09.2 UPDATE BOTH GRAPHS
-   ------------------------------------------------------------ */
-
-function drawTelemetryGraphs() {
-
-    drawTelemetryChart(
-        "altitudeChart",
-
-        [
-            "altitude",
-            "altitudeTarget"
-        ],
-
-        "altitudeError"
-    );
-
-
-    drawTelemetryChart(
-        "verticalSpeedChart",
-
-        [
-            "verticalSpeed",
-            "verticalSpeedTarget"
-        ],
-
-        "verticalSpeedError"
-    );
-
-}
 
 
 /* ============================================================
@@ -1144,52 +422,6 @@ function updateInterface(data) {
 
 
     /* --------------------------------------------------------
-       15.2 FLIGHT TELEMETRY
-       -------------------------------------------------------- */
-
-    setValue(
-        "altitude",
-        number(data, "alt")
-    );
-
-    setValue(
-        "altTarget",
-        number(data, "alt_target")
-    );
-
-    setValue(
-        "altError",
-        number(data, "alt_error")
-    );
-
-
-    setValue(
-        "verticalSpeed",
-        number(data, "vs")
-    );
-
-    setValue(
-        "vsTarget",
-        number(data, "vs_target")
-    );
-
-    setValue(
-        "vsError",
-        number(data, "vs_error")
-    );
-
-
-    // RECORD TELEMETRY
-
-    recordTelemetry(data);
-
-
-    // DRAW LIVE GRAPHS
-
-    drawTelemetryGraphs();
-
-
-    /* --------------------------------------------------------
        15.3 ENGINE
        -------------------------------------------------------- */
 
@@ -1203,6 +435,10 @@ function updateInterface(data) {
         number(data, "rps_target")
     );
 
+
+    if (telemetryGraphsModule) {
+        telemetryGraphsModule.updateTelemetryGraphsData(data);
+    }
 
     /* --------------------------------------------------------
        15.4 AIRCRAFT ATTITUDE
@@ -1461,7 +697,8 @@ async function loadModuleConfiguration() {
                 flightRecorder: false,
                 missionBar: false,
                 missionMonitor: false,
-                systemDiagnostics: false
+                systemDiagnostics: false,
+                telemetryGraphs: false,
             }
         };
 
@@ -1568,6 +805,63 @@ async function initializeMissionBar(enabled) {
 
         console.error(
             "[MISSION BAR] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+/* ------------------------------------------------------------
+   INITIALIZE TELEMETRY GRAPHS
+   ------------------------------------------------------------ */
+
+async function initializeTelemetryGraphs(enabled) {
+
+    if (!enabled) {
+
+        console.info("[TELEMETRY GRAPHS] Disabled by configuration.");
+        return;
+
+    }
+
+    try {
+
+        const module = await import(
+            "./modules/telemetryGraphs/telemetryGraphs.js"
+        );
+
+        const container = document.getElementById(
+            "telemetryGraphsContainer"
+        );
+
+        const initialized = await module.initTelemetryGraphs(
+            container
+        );
+
+        if (initialized) {
+
+            telemetryGraphsModule = module;
+
+            if (pendingMissionData) {
+
+                module.updateTelemetryGraphsData(
+                    pendingMissionData
+                );
+
+            }
+
+            logEvent(
+                "Telemetry Graphs initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[TELEMETRY GRAPHS] Initialization failed:",
             error
         );
 
@@ -1783,7 +1077,9 @@ async function initializeModules() {
         modules.systemDiagnostics === true
     );
 
-    
+    await initializeTelemetryGraphs(
+        modules.telemetryGraphs === true
+    );
 
 }
 
@@ -1822,9 +1118,12 @@ setInterval(
 
 window.addEventListener(
     "resize",
-    drawTelemetryGraphs
+    () => {
+        if (telemetryGraphsModule) {
+            telemetryGraphsModule.drawTelemetryGraphsOnResize();
+        }
+    }
 );
-
 
 /* ============================================================
    END OF FLIGHT TELEMETRY MONITOR
