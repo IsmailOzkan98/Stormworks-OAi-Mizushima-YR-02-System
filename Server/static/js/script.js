@@ -29,6 +29,7 @@ let systemDiagnosticsModule = null;
 let telemetryGraphsModule = null;
 let connectionManagerModule = null;
 let pendingMissionData = null;
+let systemEventDetectorModule = null;
 
 
 /* ============================================================
@@ -209,6 +210,14 @@ async function initializeConnectionManager() {
                 state.latestTelemetryTimestamp =
                     Number(data.timestamp);
 
+                // DETECT SYSTEM EVENTS
+                if (systemEventDetectorModule) {
+
+                    systemEventDetectorModule.processTelemetry(data);
+
+                }
+
+                // UPDATE INTERFACE
                 updateInterface(data);
 
             },
@@ -427,17 +436,6 @@ function renderControls(data) {
 
 
 /* ------------------------------------------------------------
-   09.7 DIAGNOSTICS
-   ------------------------------------------------------------ */
-
-function renderDiagnostics(data) {
-
-    updateDiagnostics(data);
-
-}
-
-
-/* ------------------------------------------------------------
    09.8 MODULE DATA
    ------------------------------------------------------------ */
 
@@ -643,6 +641,52 @@ async function initializeEventLog(enabled) {
 
         console.error(
             "[EVENT LOG] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   11.2.1 INITIALIZE SYSTEM EVENT DETECTOR
+   ------------------------------------------------------------ */
+
+async function initializeSystemEventDetector(enabled) {
+
+    if (!enabled) {
+
+        console.info(
+            "[SYSTEM EVENT DETECTOR] Disabled."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const { initSystemEventDetector } = await import(
+            "./modules/systemEventDetector/systemEventDetector.js"
+        );
+
+        systemEventDetectorModule =
+            initSystemEventDetector(state.logEvent);
+
+        if (systemEventDetectorModule) {
+
+            state.logEvent(
+                "System Event Detector initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[SYSTEM EVENT DETECTOR] Initialization failed:",
             error
         );
 
@@ -1006,6 +1050,12 @@ async function initializeModules() {
     // EVENT LOG MUST INITIALIZE FIRST
 
     await initializeEventLog(
+        modules.eventLog === true
+    );
+
+    // SYSTEM EVENT DETECTOR
+
+    await initializeSystemEventDetector(
         modules.eventLog === true
     );
 
