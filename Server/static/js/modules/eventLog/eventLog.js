@@ -42,8 +42,8 @@ export function initEventLog(container) {
        -------------------------------------------------------- */
 
     container.innerHTML = `
-        <div class="section-heading">
-            <span>01</span> EVENT RECORDER
+        <div class="event-log-title section-header module-header">
+            EVENT RECORDER
         </div>
 
         <div class="event-panel">

@@ -19,8 +19,7 @@ export async function initSystemDiagnostics(targetContainer) {
         const config = await response.json();
 
         targetContainer.innerHTML = `
-            <div class="section-heading">
-                <span>${config.title.number}</span>
+            <div class="section-heading module-header section-header">
                 ${config.title.name}
             </div>
 

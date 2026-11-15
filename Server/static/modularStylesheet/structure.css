@@ -305,16 +305,20 @@ h1 {
     min-width: 0;
 }
 
-.section-heading {
+/* Reusable module title structure */
+
+.module-header {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 10px;
 
+    width: 100%;
     margin: 0;
-    padding-bottom: 6px;
+    padding: 7px 12px;
 }
 
-.section-heading > span {
+.module-header > span {
     display: inline-block;
 }
 
@@ -554,6 +558,13 @@ h1 {
 /* ==================================================
    15. TELEMETRY GRAPHS
 ================================================== */
+
+.telemetry-title {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 7px 12px;
+}
 
 .telemetry-stack {
     display: flex;

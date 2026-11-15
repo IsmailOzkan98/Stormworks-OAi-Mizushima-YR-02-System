@@ -36,15 +36,9 @@ function createTelemetryGraphs() {
     container.hidden = false;
 
     const heading = document.createElement("div");
-    heading.className = "section-heading";
+    heading.className = "telemetry-title section-header";
 
-    const number = document.createElement("span");
-    number.textContent = config.sectionHeading.number;
-
-    heading.appendChild(number);
-    heading.append(
-        document.createTextNode(` ${config.sectionHeading.title}`)
-    );
+    heading.textContent = config.sectionHeading.title;
 
     container.appendChild(heading);
 

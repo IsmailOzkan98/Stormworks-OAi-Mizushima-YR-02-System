@@ -58,13 +58,9 @@ function createMissionMonitor() {
     const section = document.createElement("section");
 
     const heading = document.createElement("div");
-    heading.className = "section-heading";
-
-    const number = document.createElement("span");
-    number.textContent = config.sectionNumber ?? "05";
+    heading.className = "section-heading module-header section-header";
 
     heading.append(
-        number,
         document.createTextNode(
             ` ${config.title ?? "MISSION MONITOR"}`
         )
