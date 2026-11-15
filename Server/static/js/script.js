@@ -1,90 +1,73 @@
-
 /* ============================================================
    OAI MIZUSHIMA YR-02
    FLIGHT TELEMETRY MONITOR
-   VERSION: 2.0.0
+
+   VERSION: 2.1.0
 
    RESPONSIBILITY:
    Flight telemetry reception, visualization, diagnostics,
    connection monitoring and event logging.
 
-   GRAPH SYSTEM:
-   - 60-second rolling history
-   - Permanent session scale
-   - Independent error scale
-   - Live canvas rendering
+   ARCHITECTURE:
+   - Centralized application state
+   - Modular initialization
+   - Separated interface rendering
+   - Independent connection monitoring
+   - Rolling telemetry updates
+   - Dynamic module loading
 
    ============================================================ */
 
 
 /* ============================================================
-   MODULE MANAGEMENT
+   01. MODULE REFERENCES
    ============================================================ */
 
 let missionBarModule = null;
-let pendingMissionData = null;
-let systemDiagnosticsModule = null;
 let missionMonitorModule = null;
+let systemDiagnosticsModule = null;
 let telemetryGraphsModule = null;
+let connectionManagerModule = null;
+let pendingMissionData = null;
 
-// Event Log estará disponible cuando se inicialice.
-// Mientras tanto, los eventos se mostrarán en consola.
 
-let logEvent = (message, type = "normal") => {
+/* ============================================================
+   02. SYSTEM CONFIGURATION
+   ============================================================ */
 
-    console.log(`[${type.toUpperCase()}]`, message);
+const CONFIG = Object.freeze({
+
+    DIRECTION_PULSE_MS: 1500,
+
+    CONFIG_ENDPOINT: "/static/config.json"
+
+});
+
+
+/* ============================================================
+   03. APPLICATION STATE
+   ============================================================ */
+
+const state = {
+
+    previousConnection: null,
+
+    latestTelemetryTimestamp: 0,
+
+    directionTimers: {},
+
+    logEvent(message, type = "normal") {
+        console.log(`[${type.toUpperCase()}]`, message);
+    }
 
 };
 
-/* ============================================================
-   01. SYSTEM CONFIGURATION
-   ============================================================ */
-
-const OFFLINE_AFTER_MS = 2000;
-const REFRESH_RATE_MS = 250;
-const DIRECTION_PULSE_MS = 1500;
-
 
 /* ============================================================
-   02. TELEMETRY STATE
+   04. SYSTEM DEFINITIONS
    ============================================================ */
 
-let latestTelemetryTimestamp = 0;
-
-let requestInProgress = false;
-
-
-/* ============================================================
-   03. GRAPH CONFIGURATION
-   ============================================================ */
-
-
-
-
-/* ============================================================
-   04. GENERAL STATE
-   ============================================================ */
-
-let previousConnection = null;
-let previousSnapshot = {};
-let previousStage = null;
-let previousStatus = null;
-
-const directionTimers = {};
-
-const directions = [
-    "north",
-    "east",
-    "south",
-    "west"
-];
-
-
-/* ============================================================
-   05. SYSTEM DEFINITIONS
-   ============================================================ */
-
-const systems = [
+const SYSTEMS = [
 
     ["main", "main", "MAIN PROPULSION"],
     ["alt_hold", "altHold", "ALTITUDE HOLD"],
@@ -100,25 +83,38 @@ const systems = [
 
 ];
 
+const DIRECTIONS = [
+
+    "north",
+    "east",
+    "south",
+    "west"
+
+];
+
 
 /* ============================================================
-   06. NUMERICAL UTILITIES
+   05. TELEMETRY UTILITIES
    ============================================================ */
 
-// Convert telemetry value into a valid number.
-// Returns null when the value is unavailable.
+
+/* ------------------------------------------------------------
+   05.1 NUMERICAL VALIDATION
+   ------------------------------------------------------------ */
 
 function getNumericValue(data, key) {
 
+    const rawValue = data?.[key];
+
     if (
-        data[key] === null ||
-        data[key] === undefined ||
-        data[key] === ""
+        rawValue === null ||
+        rawValue === undefined ||
+        rawValue === ""
     ) {
         return null;
     }
 
-    const value = Number(data[key]);
+    const value = Number(rawValue);
 
     return Number.isFinite(value)
         ? value
@@ -127,424 +123,365 @@ function getNumericValue(data, key) {
 }
 
 
-// Format numerical values for interface display.
+/* ------------------------------------------------------------
+   05.2 NUMBER FORMATTING
+   ------------------------------------------------------------ */
 
 function number(data, key, decimals = 1) {
 
-    const value = Number(data[key]);
+    const value = getNumericValue(data, key);
 
-    return Number.isFinite(value)
+    return value !== null
         ? value.toFixed(decimals)
         : "--";
 
 }
 
 
-
-// Read system activation state.
+/* ------------------------------------------------------------
+   05.3 SYSTEM ACTIVATION
+   ------------------------------------------------------------ */
 
 function isActive(data, key) {
 
-    return data[key] === "1" ||
-        data[key] === 1 ||
-        data[key] === true ||
-        data[key] === "true";
+    const value = data?.[key];
+
+    return (
+        value === "1" ||
+        value === 1 ||
+        value === true ||
+        value === "true"
+    );
 
 }
 
 
-
 /* ============================================================
-   10. DOM INTERFACE UTILITIES
+   06. DOM HELPERS
    ============================================================ */
 
 
 /* ------------------------------------------------------------
-   10.1 UPDATE TEXT VALUES
+   06.1 UPDATE TEXT
    ------------------------------------------------------------ */
 
 function setValue(id, value) {
 
-    const element =
-        document.getElementById(id);
+    const element = document.getElementById(id);
 
-    if (element) {
+    if (!element) return;
 
-        element.textContent = value;
-
-    }
+    element.textContent = value;
 
 }
 
 
 /* ------------------------------------------------------------
-   10.2 UPDATE INDICATORS
+   06.2 UPDATE INDICATORS
    ------------------------------------------------------------ */
 
 function setIndicator(id, active) {
 
-    const element =
-        document.getElementById(id);
+    const element = document.getElementById(id);
 
-    if (element) {
+    if (!element) return;
 
-        element.classList.toggle(
-            "active",
-            active
-        );
-
-    }
+    element.classList.toggle("active", active);
 
 }
-
 
 
 /* ============================================================
-   12. CONNECTION MANAGEMENT
+   07. CONNECTION MANAGER
    ============================================================ */
+async function initializeConnectionManager() {
 
+    try {
 
-/* ------------------------------------------------------------
-   12.1 CONNECTION STATE
-   ------------------------------------------------------------ */
+        const { initConnectionManager } = await import(
+            "./modules/connectionManager/connectionManager.js"
+        );
 
-function setConnection(
-    online,
-    detail
-) {
+        connectionManagerModule = initConnectionManager({
 
-    const light =
-        document.getElementById("onlineLight");
+            onTelemetry(data) {
 
+                state.latestTelemetryTimestamp =
+                    Number(data.timestamp);
 
-    if (light) {
+                updateInterface(data);
 
-        light.classList.toggle(
-            "online",
-            online
+            },
+
+            onTelemetryConnectionChange(online) {
+
+                setConnection(
+                    online,
+                    online
+                        ? "Telemetría recibida"
+                        : "Telemetría detenida"
+                );
+
+            },
+
+            onPacketAge(age) {
+
+                if (missionMonitorModule) {
+
+                    missionMonitorModule
+                        .updateMissionMonitorPacketAge(age);
+
+                }
+
+            }
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "[CONNECTION MANAGER] Initialization failed:",
+            error
         );
 
     }
 
-
-    setValue(
-        "onlineText",
-        online ? "ONLINE" : "OFFLINE"
-    );
-
-    setValue(
-        "connectionDetail",
-        detail
-    );
-
-    if (missionMonitorModule) {
-
-    missionMonitorModule.updateMissionMonitorConnectionData(
-        online
-    );
-
 }
 
 
-    // CONNECTION CHANGE DETECTION
+/* ------------------------------------------------------------
+   07.1 UPDATE CONNECTION STATE
+   ------------------------------------------------------------ */
+
+function setConnection(online, detail) {
+
+    const light = document.getElementById("onlineLight");
+
+    if (light) {
+        light.classList.toggle("online", online);
+    }
+
+    setValue("onlineText", online ? "ONLINE" : "OFFLINE");
+    setValue("connectionDetail", detail);
+
+    if (missionMonitorModule) {
+        missionMonitorModule.updateMissionMonitorConnectionData(online);
+    }
 
     if (
-        previousConnection !== null &&
-        previousConnection !== online
+        state.previousConnection !== null &&
+        state.previousConnection !== online
     ) {
-
-        logEvent(
-
+        state.logEvent(
             online
                 ? "Telemetry connection restored."
                 : "Telemetry connection lost.",
-
-            online
-                ? "navigation-event"
-                : "error"
-
+            online ? "navigation-event" : "error"
         );
-
     }
 
-
-    previousConnection = online;
-
-}
-
-
-/* ------------------------------------------------------------
-   12.2 CONNECTION MONITORING
-   ------------------------------------------------------------ */
-
-function updateConnectionStatus() {
-
-
-    // NO TELEMETRY RECEIVED
-
-    if (!latestTelemetryTimestamp) {
-
-        setConnection(
-            false,
-            "Esperando telemetría..."
-        );
-
-        if (missionMonitorModule) {
-            missionMonitorModule.updateMissionMonitorPacketAge(null);
-        }
-
-        return;
-
-    }
-
-
-    // CALCULATE TELEMETRY AGE
-
-    const age =
-        Date.now() -
-        latestTelemetryTimestamp * 1000;
-
-
-    // CONNECTION VALIDATION
-
-    const online =
-        age >= 0 &&
-        age < OFFLINE_AFTER_MS;
-
-
-    setConnection(
-
-        online,
-
-        online
-            ? "Telemetría recibida"
-            : "Telemetría detenida"
-
-    );
-
-
-    if (missionMonitorModule) {
-
-        missionMonitorModule.updateMissionMonitorPacketAge(
-            Math.max(0, Math.round(age))
-        );
-
-    }
-
+    state.previousConnection = online;
 }
 
 
 /* ============================================================
-   13. DIRECTIONAL BOOSTER EFFECTS
+   08. DIRECTIONAL BOOSTER EFFECTS
    ============================================================ */
 
 
 /* ------------------------------------------------------------
-   13.1 BOOSTER PULSE
+   08.1 BOOSTER PULSE
    ------------------------------------------------------------ */
 
-function pulseDirection(
-    id,
-    active
-) {
+function pulseDirection(id, active) {
 
-    const indicator =
-        document.getElementById(id);
+    if (!active) return;
+
+    const indicator = document.getElementById(id);
 
     if (!indicator) return;
 
-
-    const booster =
-        indicator.closest(".booster");
+    const booster = indicator.closest(".booster");
 
     if (!booster) return;
 
 
-    if (active) {
-
-        booster.classList.add("pulse");
+    booster.classList.add("pulse");
 
 
-        // RESET PREVIOUS TIMER
+    // CLEAR PREVIOUS TIMER
 
-        clearTimeout(
-            directionTimers[id]
-        );
+    clearTimeout(state.directionTimers[id]);
 
 
-        // REMOVE PULSE AFTER DURATION
+    // REMOVE PULSE
 
-        directionTimers[id] = setTimeout(() => {
+    state.directionTimers[id] = setTimeout(() => {
 
-            booster.classList.remove("pulse");
+        booster.classList.remove("pulse");
 
-            delete directionTimers[id];
+        delete state.directionTimers[id];
 
-        }, DIRECTION_PULSE_MS);
-
-    }
+    }, CONFIG.DIRECTION_PULSE_MS);
 
 }
 
 
-
 /* ============================================================
-   15. MAIN INTERFACE UPDATE
+   09. INTERFACE RENDERER
    ============================================================ */
 
 
 /* ------------------------------------------------------------
-   15.1 FLIGHT SEQUENCE
+   09.1 ENGINE
    ------------------------------------------------------------ */
 
-function updateInterface(data) {
+function renderEngine(data) {
 
-    const stage =
-        data.stage || "UNKNOWN";
+    setValue("rpm", number(data, "rps"));
 
-    const status =
-        (data.status || "IDLE").toUpperCase();
+    setValue("rpmTarget", number(data, "rps_target"));
 
-
-    pendingMissionData = data;
-
-    if (missionBarModule) {
-        missionBarModule.updateMissionBarData(data);
-    }
-
-    if (missionMonitorModule) {
-        missionMonitorModule.updateMissionMonitorData(data);
-    }
-
-    if (systemDiagnosticsModule) {
-        systemDiagnosticsModule.updateSystemDiagnostics(data);
-    }
+}
 
 
-    /* --------------------------------------------------------
-       15.3 ENGINE
-       -------------------------------------------------------- */
+/* ------------------------------------------------------------
+   09.2 AIRCRAFT ATTITUDE
+   ------------------------------------------------------------ */
 
-    setValue(
-        "rpm",
-        number(data, "rps")
-    );
+function renderAttitude(data) {
 
-    setValue(
-        "rpmTarget",
-        number(data, "rps_target")
-    );
+    setValue("roll", number(data, "roll", 2));
 
+    setValue("pitch", number(data, "pitch", 2));
 
-    if (telemetryGraphsModule) {
-        telemetryGraphsModule.updateTelemetryGraphsData(data);
-    }
+    setValue("yaw", number(data, "yaw", 2));
 
-    /* --------------------------------------------------------
-       15.4 AIRCRAFT ATTITUDE
-       -------------------------------------------------------- */
-
-    setValue(
-        "roll",
-        number(data, "roll", 2)
-    );
-
-    setValue(
-        "pitch",
-        number(data, "pitch", 2)
-    );
-
-    setValue(
-        "yaw",
-        number(data, "yaw", 2)
-    );
+}
 
 
-    /* --------------------------------------------------------
-       15.5 AIRCRAFT SPEED
-       -------------------------------------------------------- */
+/* ------------------------------------------------------------
+   09.3 AIRCRAFT SPEED
+   ------------------------------------------------------------ */
+
+function renderSpeed(data) {
 
     setValue(
         "absoluteSpeed",
         number(data, "absolute_speed", 1)
     );
 
-
-    /* --------------------------------------------------------
-       15.6 NAVIGATION
-       -------------------------------------------------------- */
-
-    setValue(
-        "gpsX",
-        number(data, "my_x", 2)
-    );
-
-    setValue(
-        "gpsY",
-        number(data, "my_y", 2)
-    );
-
-    setValue(
-        "targetX",
-        number(data, "target_x", 2)
-    );
-
-    setValue(
-        "targetY",
-        number(data, "target_y", 2)
-    );
-
-    setValue(
-        "distance",
-        number(data, "ap_distance", 1)
-    );
+}
 
 
-    /* --------------------------------------------------------
-       15.7 AUTOPILOT
-       -------------------------------------------------------- */
+/* ------------------------------------------------------------
+   09.4 NAVIGATION
+   ------------------------------------------------------------ */
 
-    const autopilot =
-        isActive(data, "ap");
+function renderNavigation(data) {
+
+    setValue("gpsX", number(data, "my_x", 2));
+
+    setValue("gpsY", number(data, "my_y", 2));
+
+    setValue("targetX", number(data, "target_x", 2));
+
+    setValue("targetY", number(data, "target_y", 2));
+
+    setValue("distance", number(data, "ap_distance", 1));
+
+}
 
 
-    setValue(
-        "autopilot",
-        autopilot ? "ACTIVE" : "OFFLINE"
-    );
+/* ------------------------------------------------------------
+   09.5 AUTOPILOT
+   ------------------------------------------------------------ */
 
-    setValue(
-        "monitorAutopilot",
-        autopilot ? "ACTIVE" : "OFFLINE"
-    );
+function renderAutopilot(data) {
+
+    const active = isActive(data, "ap");
+
+    const status = active
+        ? "ACTIVE"
+        : "OFFLINE";
+
+    setValue("autopilot", status);
+
+    setValue("monitorAutopilot", status);
+
+}
 
 
-    /* --------------------------------------------------------
-       15.8 CONTROL SYSTEMS
-       -------------------------------------------------------- */
+/* ------------------------------------------------------------
+   09.6 CONTROL SYSTEMS
+   ------------------------------------------------------------ */
+
+function renderControls(data) {
 
     setValue(
         "spoiler",
         number(data, "spoiler", 2)
     );
 
+}
 
-    /* --------------------------------------------------------
-       15.9 DIAGNOSTICS
-       -------------------------------------------------------- */
+
+/* ------------------------------------------------------------
+   09.7 DIAGNOSTICS
+   ------------------------------------------------------------ */
+
+function renderDiagnostics(data) {
 
     updateDiagnostics(data);
 
+}
 
-    /* --------------------------------------------------------
-       15.10 LAST UPDATE
-       -------------------------------------------------------- */
+
+/* ------------------------------------------------------------
+   09.8 MODULE DATA
+   ------------------------------------------------------------ */
+
+function renderModules(data) {
+
+    if (missionBarModule) {
+
+        missionBarModule.updateMissionBarData(data);
+
+    }
+
+    if (missionMonitorModule) {
+
+        missionMonitorModule.updateMissionMonitorData(data);
+
+    }
+
+    if (systemDiagnosticsModule) {
+
+        systemDiagnosticsModule.updateSystemDiagnostics(data);
+
+    }
+
+    if (telemetryGraphsModule) {
+
+        telemetryGraphsModule.updateTelemetryGraphsData(data);
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   09.9 LAST UPDATE
+   ------------------------------------------------------------ */
+
+function renderLastUpdate() {
 
     setValue(
+
         "lastUpdate",
 
         new Date(
-            latestTelemetryTimestamp * 1000
+            state.latestTelemetryTimestamp * 1000
         ).toLocaleTimeString()
 
     );
@@ -552,118 +489,44 @@ function updateInterface(data) {
 }
 
 
-/* ============================================================
-   16. TELEMETRY COMMUNICATION
-   ============================================================ */
-
-
 /* ------------------------------------------------------------
-   16.1 REQUEST TELEMETRY
+   09.10 COMPLETE INTERFACE UPDATE
    ------------------------------------------------------------ */
 
-async function updateTelemetry() {
+function updateInterface(data) {
 
-    // PREVENT SIMULTANEOUS REQUESTS
-
-    if (requestInProgress) return;
-
-    requestInProgress = true;
+    pendingMissionData = data;
 
 
-    try {
+    renderModules(data);
 
-        // REQUEST SERVER TELEMETRY
+    renderEngine(data);
 
-        const response = await fetch(
-            "/api/telemetry",
-            {
-                cache: "no-store"
-            }
-        );
+    renderAttitude(data);
 
+    renderSpeed(data);
 
-        // HTTP VALIDATION
+    renderNavigation(data);
 
-        if (!response.ok) {
+    renderAutopilot(data);
 
-            throw new Error(
-                "HTTP " + response.status
-            );
+    renderControls(data);
 
-        }
+    renderDiagnostics(data);
 
-
-        // READ TELEMETRY
-
-        const data =
-            await response.json();
-
-        const timestamp =
-            Number(data.timestamp);
-
-
-        // TIMESTAMP VALIDATION
-
-        if (
-            Number.isFinite(timestamp) &&
-            timestamp > 0 &&
-            timestamp <= Date.now() / 1000
-        ) {
-
-
-            // ACCEPT ONLY NEW TELEMETRY
-
-            if (
-                timestamp > latestTelemetryTimestamp
-            ) {
-
-                latestTelemetryTimestamp =
-                    timestamp;
-
-
-                // UPDATE COMPLETE INTERFACE
-
-                updateInterface(data);
-
-            }
-
-        }
-
-
-        // UPDATE CONNECTION STATE
-
-        updateConnectionStatus();
-
-
-    } catch (error) {
-
-        // SERVER CONNECTION ERROR
-
-        setConnection(
-            false,
-            "Servidor no disponible"
-        );
-
-
-    } finally {
-
-        // RELEASE REQUEST LOCK
-
-        requestInProgress = false;
-
-    }
+    renderLastUpdate();
 
 }
 
 
 
 /* ============================================================
-   17. MODULE INITIALIZATION SYSTEM
+   11. MODULE INITIALIZATION
    ============================================================ */
 
 
 /* ------------------------------------------------------------
-   17.1 LOAD GLOBAL CONFIGURATION
+   11.1 LOAD CONFIGURATION
    ------------------------------------------------------------ */
 
 async function loadModuleConfiguration() {
@@ -671,17 +534,27 @@ async function loadModuleConfiguration() {
     try {
 
         const response = await fetch(
-            "/static/config.json",
-            { cache: "no-store" }
+
+            CONFIG.CONFIG_ENDPOINT,
+
+            {
+                cache: "no-store"
+            }
+
         );
 
+
         if (!response.ok) {
+
             throw new Error(
                 `Configuration HTTP ${response.status}`
             );
+
         }
 
+
         return await response.json();
+
 
     } catch (error) {
 
@@ -690,16 +563,29 @@ async function loadModuleConfiguration() {
             error
         );
 
-        // Safe fallback: all modules disabled.
+
+        // SAFE FALLBACK
+
         return {
+
             modules: {
+
                 eventLog: false,
+
                 flightRecorder: false,
+
                 missionBar: false,
+
                 missionMonitor: false,
+
                 systemDiagnostics: false,
+
                 telemetryGraphs: false,
+
+                systemInformation: false
+
             }
+
         };
 
     }
@@ -708,40 +594,50 @@ async function loadModuleConfiguration() {
 
 
 /* ------------------------------------------------------------
-   17.2 INITIALIZE EVENT LOG
+   11.2 INITIALIZE EVENT LOG
    ------------------------------------------------------------ */
 
 async function initializeEventLog(enabled) {
 
     if (!enabled) {
 
-        console.info("[EVENT LOG] Disabled by configuration.");
+        console.info(
+            "[EVENT LOG] Disabled by configuration."
+        );
+
         return;
 
     }
 
+
     try {
 
         const { initEventLog } = await import(
+
             "./modules/eventLog/eventLog.js"
+
         );
+
 
         const container = document.getElementById(
             "eventLogContainer"
         );
 
+
         const eventLogger = initEventLog(container);
+
 
         if (typeof eventLogger === "function") {
 
-            logEvent = eventLogger;
+            state.logEvent = eventLogger;
 
-            logEvent(
+            state.logEvent(
                 "Flight monitoring initialized.",
                 "system-event"
             );
 
         }
+
 
     } catch (error) {
 
@@ -756,35 +652,116 @@ async function initializeEventLog(enabled) {
 
 
 /* ------------------------------------------------------------
-   17.3 INITIALIZE MISSION BAR
+   11.3 GENERIC MODULE INITIALIZER
+   ------------------------------------------------------------ */
+
+async function initializeModule({
+
+    name,
+
+    enabled,
+
+    path,
+
+    containerId,
+
+    initFunction,
+
+    initOptions = undefined,
+
+    onReady
+
+}) {
+
+    if (!enabled) {
+
+        console.info(
+            `[${name}] Disabled by configuration.`
+        );
+
+        return null;
+
+    }
+
+
+    try {
+
+        const module = await import(path);
+
+
+        const container = document.getElementById(
+            containerId
+        );
+
+
+        const initialized = await module[initFunction](
+            container,
+            initOptions
+        );
+
+
+        if (!initialized) {
+
+            console.warn(
+                `[${name}] Initialization returned no instance.`
+            );
+
+            return null;
+
+        }
+
+
+        // EXECUTE MODULE-SPECIFIC SETUP
+
+        if (onReady) {
+
+            onReady(module, initialized);
+
+        }
+
+
+        state.logEvent(
+            `${name} initialized.`,
+            "system-event"
+        );
+
+
+        return module;
+
+
+    } catch (error) {
+
+        console.error(
+            `[${name}] Initialization failed:`,
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   11.4 MISSION BAR
    ------------------------------------------------------------ */
 
 async function initializeMissionBar(enabled) {
 
-    if (!enabled) {
+    missionBarModule = await initializeModule({
 
-        console.info("[MISSION BAR] Disabled by configuration.");
-        return;
+        name: "MISSION BAR",
 
-    }
+        enabled,
 
-    try {
+        path: "./modules/missionBar/missionBar.js",
 
-        const module = await import(
-            "./modules/missionBar/missionBar.js"
-        );
+        containerId: "missionBarContainer",
 
-        const container = document.getElementById(
-            "missionBarContainer"
-        );
+        initFunction: "initMissionBar",
 
-        const initialized = await module.initMissionBar(
-            container
-        );
-
-        if (initialized) {
-
-            missionBarModule = module;
+        onReady(module) {
 
             if (pendingMissionData) {
 
@@ -794,111 +771,32 @@ async function initializeMissionBar(enabled) {
 
             }
 
-            logEvent(
-                "Mission Bar initialized.",
-                "system-event"
-            );
-
         }
 
-    } catch (error) {
-
-        console.error(
-            "[MISSION BAR] Initialization failed:",
-            error
-        );
-
-    }
+    });
 
 }
 
-/* ------------------------------------------------------------
-   INITIALIZE TELEMETRY GRAPHS
-   ------------------------------------------------------------ */
-
-async function initializeTelemetryGraphs(enabled) {
-
-    if (!enabled) {
-
-        console.info("[TELEMETRY GRAPHS] Disabled by configuration.");
-        return;
-
-    }
-
-    try {
-
-        const module = await import(
-            "./modules/telemetryGraphs/telemetryGraphs.js"
-        );
-
-        const container = document.getElementById(
-            "telemetryGraphsContainer"
-        );
-
-        const initialized = await module.initTelemetryGraphs(
-            container
-        );
-
-        if (initialized) {
-
-            telemetryGraphsModule = module;
-
-            if (pendingMissionData) {
-
-                module.updateTelemetryGraphsData(
-                    pendingMissionData
-                );
-
-            }
-
-            logEvent(
-                "Telemetry Graphs initialized.",
-                "system-event"
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "[TELEMETRY GRAPHS] Initialization failed:",
-            error
-        );
-
-    }
-
-}
 
 /* ------------------------------------------------------------
-   INITIALIZE MISSION MONITOR
+   11.5 MISSION MONITOR
    ------------------------------------------------------------ */
 
 async function initializeMissionMonitor(enabled) {
 
-    if (!enabled) {
+    missionMonitorModule = await initializeModule({
 
-        console.info("[MISSION MONITOR] Disabled by configuration.");
-        return;
+        name: "MISSION MONITOR",
 
-    }
+        enabled,
 
-    try {
+        path: "./modules/missionMonitor/missionMonitor.js",
 
-        const module = await import(
-            "./modules/missionMonitor/missionMonitor.js"
-        );
+        containerId: "missionMonitorContainer",
 
-        const container = document.getElementById(
-            "missionMonitorContainer"
-        );
+        initFunction: "initMissionMonitor",
 
-        const initialized = await module.initMissionMonitor(
-            container
-        );
-
-        if (initialized) {
-
-            missionMonitorModule = module;
+        onReady(module) {
 
             if (pendingMissionData) {
 
@@ -909,74 +807,146 @@ async function initializeMissionMonitor(enabled) {
             }
 
             module.updateMissionMonitorConnectionData(
-                previousConnection === true
+                state.previousConnection === true
             );
 
-            logEvent(
-                "Mission Monitor initialized.",
-                "system-event"
-            );
+            if (state.latestTelemetryTimestamp) {
+
+                const age = Date.now() -
+                    state.latestTelemetryTimestamp * 1000;
+
+                module.updateMissionMonitorPacketAge(
+                    Math.max(0, Math.round(age))
+                );
+
+            }
 
         }
 
-    } catch (error) {
-
-        console.error(
-            "[MISSION MONITOR] Initialization failed:",
-            error
-        );
-
-    }
+    });
 
 }
 
 
 /* ------------------------------------------------------------
-   17.4 INITIALIZE FLIGHT RECORDER
+   11.6 TELEMETRY GRAPHS
+   ------------------------------------------------------------ */
+
+async function initializeTelemetryGraphs(enabled) {
+
+    telemetryGraphsModule = await initializeModule({
+
+        name: "TELEMETRY GRAPHS",
+
+        enabled,
+
+        path: "./modules/telemetryGraphs/telemetryGraphs.js",
+
+        containerId: "telemetryGraphsContainer",
+
+        initFunction: "initTelemetryGraphs",
+
+        onReady(module) {
+
+            if (pendingMissionData) {
+
+                module.updateTelemetryGraphsData(
+                    pendingMissionData
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ------------------------------------------------------------
+   11.7 FLIGHT RECORDER
    ------------------------------------------------------------ */
 
 async function initializeFlightRecorder(enabled) {
 
+    await initializeModule({
+
+        name: "FLIGHT RECORDER",
+
+        enabled,
+
+        path: "./modules/flightRecorder/flightRecorder.js",
+
+        containerId: "flightRecorderContainer",
+
+        initFunction: "initFlightRecorder",
+
+        initOptions: {
+            onEvent: state.logEvent
+        }
+
+    });
+
+}
+
+
+/* ------------------------------------------------------------
+   11.8 SYSTEM DIAGNOSTICS
+   ------------------------------------------------------------ */
+
+async function initializeSystemDiagnostics(enabled) {
+
     if (!enabled) {
 
         console.info(
-            "[FLIGHT RECORDER] Disabled by configuration."
+            "[SYSTEM DIAGNOSTICS] Disabled by configuration."
         );
 
         return;
 
     }
 
+
     try {
 
-        const module = await import(
-            "./modules/flightRecorder/flightRecorder.js"
+        const { initSystemDiagnostics } = await import(
+
+            "./modules/systemDiagnostics/systemDiagnostics.js"
+
         );
+
 
         const container = document.getElementById(
-            "flightRecorderContainer"
+            "systemDiagnosticsContainer"
         );
 
-        const initialized = await module.initFlightRecorder(
-            container,
-            {
-                onEvent: logEvent
+
+        systemDiagnosticsModule =
+            await initSystemDiagnostics(container);
+
+
+        if (systemDiagnosticsModule) {
+
+            if (pendingMissionData) {
+
+                systemDiagnosticsModule.updateSystemDiagnostics(
+                    pendingMissionData
+                );
+
             }
-        );
 
-        if (initialized) {
-
-            logEvent(
-                "Flight Recorder initialized.",
-                "system-event"
+            state.logEvent(
+                "System Diagnostics initialized.",
+                "success"
             );
 
         }
 
+
     } catch (error) {
 
         console.error(
-            "[FLIGHT RECORDER] Initialization failed:",
+            "[SYSTEM DIAGNOSTICS] Initialization failed:",
             error
         );
 
@@ -984,8 +954,9 @@ async function initializeFlightRecorder(enabled) {
 
 }
 
+
 /* ------------------------------------------------------------
-   INITIALIZE PROJECT DATA
+   11.9 PROJECT DATA
    ------------------------------------------------------------ */
 
 async function initializeProjectData(enabled) {
@@ -993,12 +964,18 @@ async function initializeProjectData(enabled) {
     try {
 
         const { initProjectData } = await import(
+
             "./modules/projectData/projectData.js"
+
         );
 
+
         await initProjectData({
+
             systemInformationEnabled: enabled
+
         });
+
 
     } catch (error) {
 
@@ -1011,35 +988,9 @@ async function initializeProjectData(enabled) {
 
 }
 
-/* ------------------------------------------------------------
-   initialize System Diagnostics
-   ------------------------------------------------------------ */
-
-async function initializeSystemDiagnostics(enabled) {
-    if (!enabled) return;
-
-    try {
-        const { initSystemDiagnostics } = await import(
-            "./modules/systemDiagnostics/systemDiagnostics.js"
-        );
-
-        const container = document.getElementById(
-            "systemDiagnosticsContainer"
-        );
-
-        systemDiagnosticsModule = await initSystemDiagnostics(container);
-
-        if (systemDiagnosticsModule) {
-            logEvent("System Diagnostics module initialized.", "success");
-        }
-
-    } catch (error) {
-        console.error("[SYSTEM DIAGNOSTICS] Initialization failed:", error);
-    }
-}
 
 /* ------------------------------------------------------------
-   17.5 INITIALIZE ALL MODULES
+   11.10 INITIALIZE ALL MODULES
    ------------------------------------------------------------ */
 
 async function initializeModules() {
@@ -1047,84 +998,116 @@ async function initializeModules() {
     const configuration =
         await loadModuleConfiguration();
 
+
     const modules =
         configuration.modules || {};
 
-    // Initialize Event Log first so other modules
-    // can send notifications to it.
+
+    // EVENT LOG MUST INITIALIZE FIRST
 
     await initializeEventLog(
         modules.eventLog === true
     );
 
+
+    // PROJECT DATA
+
     await initializeProjectData(
         modules.systemInformation === true
     );
 
-    await initializeMissionBar(
-        modules.missionBar === true
-    );
 
-    await initializeMissionMonitor(
-        modules.missionMonitor === true
-    );
+    // INITIALIZE INDEPENDENT MODULES
 
-    await initializeFlightRecorder(
-        modules.flightRecorder === true
-    );
+    await Promise.all([
 
-    await initializeSystemDiagnostics(
-        modules.systemDiagnostics === true
-    );
+        initializeMissionBar(
+            modules.missionBar === true
+        ),
 
-    await initializeTelemetryGraphs(
-        modules.telemetryGraphs === true
-    );
+        initializeMissionMonitor(
+            modules.missionMonitor === true
+        ),
+
+        initializeFlightRecorder(
+            modules.flightRecorder === true
+        ),
+
+        initializeSystemDiagnostics(
+            modules.systemDiagnostics === true
+        ),
+
+        initializeTelemetryGraphs(
+            modules.telemetryGraphs === true
+        )
+
+    ]);
 
 }
 
 
 /* ============================================================
-   18. APPLICATION INITIALIZATION
+   12. APPLICATION STARTUP
    ============================================================ */
 
-// INITIALIZE MODULES
 
-initializeModules();
+/* ------------------------------------------------------------
+   12.1 GRAPH RESIZE HANDLER
+   ------------------------------------------------------------ */
 
+function initializeResizeHandler() {
 
-// START TELEMETRY
+    window.addEventListener("resize", () => {
 
-updateTelemetry();
-
-
-// START REFRESH LOOP
-
-setInterval(
-    updateTelemetry,
-    REFRESH_RATE_MS
-);
-
-
-// START CONNECTION MONITOR
-
-setInterval(
-    updateConnectionStatus,
-    100
-);
-
-
-// GRAPH RESIZE HANDLER
-
-window.addEventListener(
-    "resize",
-    () => {
         if (telemetryGraphsModule) {
+
             telemetryGraphsModule.drawTelemetryGraphsOnResize();
+
         }
-    }
-);
+
+    });
+
+}
+
+
+/* ------------------------------------------------------------
+   12.3 APPLICATION INITIALIZATION
+   ------------------------------------------------------------ */
+
+
+async function initializeApplication() {
+
+    console.info(
+        "[SYSTEM] Initializing OAI MIZUSHIMA YR-02..."
+    );
+
+    // Initialize application modules
+    await initializeModules();
+
+    // Initialize independent connection services
+    await initializeConnectionManager();
+
+    // Initialize graph resize handling
+    initializeResizeHandler();
+
+    console.info(
+        "[SYSTEM] Flight Telemetry Monitor initialized."
+    );
+
+}
+
+initializeApplication().catch(error => {
+
+    console.error(
+        "[SYSTEM] Application initialization failed:",
+        error
+    );
+
+});
+
+
 
 /* ============================================================
-   END OF FLIGHT TELEMETRY MONITOR
+   END OF OAI MIZUSHIMA YR-02
+   FLIGHT TELEMETRY MONITOR
    ============================================================ */
