@@ -18,12 +18,12 @@
                 {
                     "id": "altHold",
                     "label": "ALTITUDE HOLD",
-                    "dataKey": "altHold"
+                    "dataKey": "alt_hold"
                 },
                 {
                     "id": "rollStab",
                     "label": "ROLL STABILIZER",
-                    "dataKey": "rollStab"
+                    "dataKey": "roll_stab"
                 },
                 {
                     "id": "accel",
