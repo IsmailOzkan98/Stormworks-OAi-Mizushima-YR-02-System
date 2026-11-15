@@ -154,24 +154,32 @@ h1 {
     grid-area: stage;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: center;
+    gap: 7px;
+
     min-width: 0;
+    padding: 10px 14px;
 }
 
 .mission-data {
     grid-area: data;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    align-items: stretch;
+    gap: 8px;
+
     min-width: 0;
 }
 
 .mission-data > div {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: center;
+    gap: 6px;
+
     min-width: 0;
+    padding: 9px 12px;
+    box-sizing: border-box;
 }
 
 .micro-label {

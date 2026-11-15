@@ -52,7 +52,7 @@ function createMissionBar() {
     const missionBar = document.createElement("section");
 
     const missionTitle = document.createElement("div");
-    missionTitle.className = "mission-bar-title  section-header";
+    missionTitle.className = "mission-bar-title section-header";
     missionTitle.textContent = config.title ?? "MISSION BAR";
 
     missionBar.className = "mission-bar mission-status-bar";
