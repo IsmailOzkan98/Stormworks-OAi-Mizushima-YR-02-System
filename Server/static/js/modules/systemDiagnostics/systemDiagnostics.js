@@ -78,7 +78,14 @@ export async function initSystemDiagnostics(targetContainer) {
 
             config.groups.forEach(group => {
                 group.items.forEach(item => {
-                    const active = Boolean(data[item.dataKey]);
+                    const value = data[item.dataKey];
+
+                    const active = (
+                        value === 1 ||
+                        value === "1" ||
+                        value === true ||
+                        value === "true"
+                    );
 
                     const indicator = targetContainer.querySelector(
                         `[data-diagnostic="${item.id}"]`
