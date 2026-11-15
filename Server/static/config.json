@@ -7,6 +7,7 @@
         "systemDiagnostics": true,
         "systemInformation": true,
         "missionMonitor": true,
-        "telemetryGraphs": true
+        "telemetryGraphs": true,
+        "cardsModule": true
     }
 }

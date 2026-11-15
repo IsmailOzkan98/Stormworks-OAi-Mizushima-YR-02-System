@@ -30,6 +30,7 @@ let telemetryGraphsModule = null;
 let connectionManagerModule = null;
 let pendingMissionData = null;
 let systemEventDetectorModule = null;
+let cardsModule = null;
 
 
 /* ============================================================
@@ -462,6 +463,12 @@ function renderModules(data) {
     if (telemetryGraphsModule) {
 
         telemetryGraphsModule.updateTelemetryGraphsData(data);
+
+    }
+
+    if (cardsModule) {
+
+        cardsModule.updateCards(data);
 
     }
 
@@ -1034,7 +1041,72 @@ async function initializeProjectData(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.10 INITIALIZE ALL MODULES
+   11.10 INITIALIZE CARDS
+   ------------------------------------------------------------ */
+
+async function initializeCards(enabled) {
+
+    if (!enabled) {
+
+        console.info(
+            "[CARDS] Disabled by configuration."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const { initCards } = await import(
+            "./modules/cards/cards.js"
+        );
+
+        const container = document.getElementById(
+            "cardsContainer"
+        );
+
+        if (!container) {
+
+            throw new Error(
+                "cardsContainer element not found."
+            );
+
+        }
+
+        cardsModule = await initCards(container);
+
+        if (cardsModule) {
+
+            if (pendingMissionData) {
+
+                cardsModule.updateCards(
+                    pendingMissionData
+                );
+
+            }
+
+            state.logEvent(
+                "Cards initialized.",
+                "system-event"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "[CARDS] Initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ------------------------------------------------------------
+   11.11 INITIALIZE ALL MODULES
    ------------------------------------------------------------ */
 
 async function initializeModules() {
@@ -1089,6 +1161,10 @@ async function initializeModules() {
 
         initializeTelemetryGraphs(
             modules.telemetryGraphs === true
+        ),
+
+        initializeCards(
+            modules.cardsModule === true
         )
 
     ]);
