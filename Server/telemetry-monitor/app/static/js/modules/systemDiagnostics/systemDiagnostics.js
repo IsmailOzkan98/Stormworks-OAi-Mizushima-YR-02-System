@@ -1,4 +1,4 @@
-
+const CONFIG_URL = "/api/systemDiagnostics-config";
 
 export async function initSystemDiagnostics(targetContainer) {
     if (!targetContainer) {
@@ -8,7 +8,7 @@ export async function initSystemDiagnostics(targetContainer) {
 
     try {
         const response = await fetch(
-            new URL("./systemDiagnostics.json", import.meta.url),
+            CONFIG_URL,
             { cache: "no-store" }
         );
 

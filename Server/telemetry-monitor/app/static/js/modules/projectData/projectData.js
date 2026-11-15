@@ -3,10 +3,7 @@
    PROJECT DATA MODULE
    ============================================================ */
 
-const CONFIG_URL = new URL(
-    "./projectData.json",
-    import.meta.url
-);
+const CONFIG_URL = "/api/projectData-config";
 
 
 /* ============================================================

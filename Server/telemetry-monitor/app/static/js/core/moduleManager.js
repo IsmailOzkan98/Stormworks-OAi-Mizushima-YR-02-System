@@ -13,7 +13,7 @@ import { state, modules } from "./state.js";
 
 const CONFIG = Object.freeze({
 
-    CONFIG_ENDPOINT: "/static/config.json"
+    CONFIG_ENDPOINT: "/api/frontend-config"
 
 });
 

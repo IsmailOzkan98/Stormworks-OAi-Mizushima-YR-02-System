@@ -1,4 +1,4 @@
-const CONFIG_URL = new URL("./cards.json", import.meta.url);
+const CONFIG_URL = "/api/cards-config";
 
 export async function initCards(container) {
     if (!container) {

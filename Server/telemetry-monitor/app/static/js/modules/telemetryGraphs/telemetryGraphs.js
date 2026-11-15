@@ -1,5 +1,5 @@
 
-const CONFIG_URL = new URL("./telemetryGraphs.json", import.meta.url);
+const CONFIG_URL = "/api/telemetryGraphs-config";
 
 let config = null;
 let container = null;
