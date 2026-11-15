@@ -11,6 +11,13 @@
             "class": "mission-stage"
         },
         {
+            "id": "sequence",
+            "label": "SEQUENCE",
+            "source": "state",
+            "default": "--",
+            "type": "text"
+        },
+        {
             "id": "rxTxState",
             "label": "RX-TX STATE",
             "source": "rx_tx_state",
@@ -32,13 +39,6 @@
             "default": "--",
             "type": "number",
             "decimals": 2
-        },
-        {
-            "id": "sequence",
-            "label": "SEQUENCE",
-            "source": "state",
-            "default": "--",
-            "type": "text"
         },
         {
             "id": "executionTicks",

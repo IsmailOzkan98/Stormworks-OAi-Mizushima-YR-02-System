@@ -28,16 +28,6 @@
         "items": [
             {
                 "enabled": true,
-                "label": "CONTROL SYSTEM",
-                "value": "v2.1.0"
-            },
-            {
-                "enabled": true,
-                "label": "PLATFORM",
-                "value": "STORMWORKS"
-            },
-            {
-                "enabled": true,
                 "label": "DATA MODE",
                 "value": "READ ONLY"
             },

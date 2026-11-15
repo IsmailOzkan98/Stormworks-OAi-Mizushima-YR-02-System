@@ -39,8 +39,6 @@ let cardsModule = null;
 
 const CONFIG = Object.freeze({
 
-    DIRECTION_PULSE_MS: 1500,
-
     CONFIG_ENDPOINT: "/static/config.json"
 
 });
@@ -56,111 +54,11 @@ const state = {
 
     latestTelemetryTimestamp: 0,
 
-    directionTimers: {},
-
     logEvent(message, type = "normal") {
         console.log(`[${type.toUpperCase()}]`, message);
     }
 
 };
-
-
-/* ============================================================
-   04. SYSTEM DEFINITIONS
-   ============================================================ */
-
-const SYSTEMS = [
-
-    ["main", "main", "MAIN PROPULSION"],
-    ["alt_hold", "altHold", "ALTITUDE HOLD"],
-    ["roll_stab", "rollStab", "ROLL STABILIZER"],
-    ["accel", "accel", "THROTTLE CONTROL"],
-    ["afterburner", "afterburner", "AFTERBURNER"],
-    ["descent", "descent", "DESCENT ENABLE"],
-
-    ["north", "north", "NORTH BOOSTER"],
-    ["east", "east", "EAST BOOSTER"],
-    ["south", "south", "SOUTH BOOSTER"],
-    ["west", "west", "WEST BOOSTER"]
-
-];
-
-const DIRECTIONS = [
-
-    "north",
-    "east",
-    "south",
-    "west"
-
-];
-
-
-/* ============================================================
-   05. TELEMETRY UTILITIES
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   05.1 NUMERICAL VALIDATION
-   ------------------------------------------------------------ */
-
-function getNumericValue(data, key) {
-
-    const rawValue = data?.[key];
-
-    if (
-        rawValue === null ||
-        rawValue === undefined ||
-        rawValue === ""
-    ) {
-        return null;
-    }
-
-    const value = Number(rawValue);
-
-    return Number.isFinite(value)
-        ? value
-        : null;
-
-}
-
-
-/* ------------------------------------------------------------
-   05.2 NUMBER FORMATTING
-   ------------------------------------------------------------ */
-
-function number(data, key, decimals = 1) {
-
-    const value = getNumericValue(data, key);
-
-    return value !== null
-        ? value.toFixed(decimals)
-        : "--";
-
-}
-
-
-/* ------------------------------------------------------------
-   05.3 SYSTEM ACTIVATION
-   ------------------------------------------------------------ */
-
-function isActive(data, key) {
-
-    const value = data?.[key];
-
-    return (
-        value === "1" ||
-        value === 1 ||
-        value === true ||
-        value === "true"
-    );
-
-}
-
-
-/* ============================================================
-   06. DOM HELPERS
-   ============================================================ */
 
 
 /* ------------------------------------------------------------
@@ -174,21 +72,6 @@ function setValue(id, value) {
     if (!element) return;
 
     element.textContent = value;
-
-}
-
-
-/* ------------------------------------------------------------
-   06.2 UPDATE INDICATORS
-   ------------------------------------------------------------ */
-
-function setIndicator(id, active) {
-
-    const element = document.getElementById(id);
-
-    if (!element) return;
-
-    element.classList.toggle("active", active);
 
 }
 
@@ -294,49 +177,6 @@ function setConnection(online, detail) {
 }
 
 
-/* ============================================================
-   08. DIRECTIONAL BOOSTER EFFECTS
-   ============================================================ */
-
-
-/* ------------------------------------------------------------
-   08.1 BOOSTER PULSE
-   ------------------------------------------------------------ */
-
-function pulseDirection(id, active) {
-
-    if (!active) return;
-
-    const indicator = document.getElementById(id);
-
-    if (!indicator) return;
-
-    const booster = indicator.closest(".booster");
-
-    if (!booster) return;
-
-
-    booster.classList.add("pulse");
-
-
-    // CLEAR PREVIOUS TIMER
-
-    clearTimeout(state.directionTimers[id]);
-
-
-    // REMOVE PULSE
-
-    state.directionTimers[id] = setTimeout(() => {
-
-        booster.classList.remove("pulse");
-
-        delete state.directionTimers[id];
-
-    }, CONFIG.DIRECTION_PULSE_MS);
-
-}
-
-
 /* ------------------------------------------------------------
    09.8 MODULE DATA
    ------------------------------------------------------------ */
@@ -377,25 +217,6 @@ function renderModules(data) {
 
 
 /* ------------------------------------------------------------
-   09.9 LAST UPDATE
-   ------------------------------------------------------------ */
-
-function renderLastUpdate() {
-
-    setValue(
-
-        "lastUpdate",
-
-        new Date(
-            state.latestTelemetryTimestamp * 1000
-        ).toLocaleTimeString()
-
-    );
-
-}
-
-
-/* ------------------------------------------------------------
    09.10 COMPLETE INTERFACE UPDATE
    ------------------------------------------------------------ */
 
@@ -403,33 +224,9 @@ function updateInterface(data) {
 
     pendingMissionData = data;
 
-
     renderModules(data);
 
-    renderEngine(data);
-
-    renderAttitude(data);
-
-    renderSpeed(data);
-
-    renderNavigation(data);
-
-    renderAutopilot(data);
-
-    renderControls(data);
-
-    renderDiagnostics(data);
-
-    renderLastUpdate();
-
 }
-
-
-
-/* ============================================================
-   11. MODULE INITIALIZATION
-   ============================================================ */
-
 
 /* ------------------------------------------------------------
    11.1 LOAD CONFIGURATION
