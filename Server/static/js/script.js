@@ -403,7 +403,20 @@ function updateInterface(data) {
 
     pendingMissionData = data;
 
+
     renderModules(data);
+
+    renderEngine(data);
+
+    renderAttitude(data);
+
+    renderSpeed(data);
+
+    renderNavigation(data);
+
+    renderAutopilot(data);
+
+    renderControls(data);
 
     renderDiagnostics(data);
 
