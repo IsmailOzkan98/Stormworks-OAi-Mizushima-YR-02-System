@@ -221,33 +221,24 @@ export async function refreshRecorderStatus() {
 function createRecorderInterface() {
 
     container.innerHTML = `
-        <section class="recorder-panel">
+        <div class="recorder-title section-header module-header">
+            TELEMETRY RECORDER
+        </div>
 
-            <span class="section-header module-header">
-                TELEMETRY RECORDER
-            </span>
+        <div class="recorder-panel">
 
             <div class="recorder-buttons">
-
-                <button
-                    id="recorderToggle"
-                    class="recorder-btn start"
-                    type="button"
-                >
+                <button id="recorderToggle" class="recorder-btn start" type="button">
                     <span class="recorder-dot"></span>
                     START
                 </button>
-
             </div>
 
-            <span
-                id="recorderStatus"
-                class="recorder-status"
-            >
+            <span id="recorderStatus" class="recorder-status">
                 RECORDER STANDBY
             </span>
 
-        </section>
+        </div>
     `;
 
     recorderButton =

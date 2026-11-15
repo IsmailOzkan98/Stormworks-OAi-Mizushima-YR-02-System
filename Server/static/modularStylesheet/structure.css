@@ -125,14 +125,6 @@ h1 {
     min-height: 68px;
 }
 
-.mission-bar,
-.recorder-panel {
-    box-sizing: border-box;
-    height: 100%;
-    min-height: 68px;
-    margin-top: 10px;
-    padding: 9px 18px;
-}
 
 
 
@@ -140,29 +132,36 @@ h1 {
    04. MISSION BAR
 ================================================== */
 
+.mission-bar-title {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 10px;
+    padding: 7px 12px;
+}
+
 .mission-bar {
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: minmax(190px, 1fr) minmax(0, 3fr);
-    grid-template-areas:
-        "title title"
-        "stage data";
+
+    grid-template-columns:
+        minmax(190px, 1fr)
+        minmax(0, 3fr);
+
+    grid-template-areas: "stage data";
 
     align-items: center;
     gap: 12px 24px;
+
     width: 100%;
     min-width: 0;
-}
+    min-height: 80px;
 
-.mission-bar-title {
-    grid-area: title;
-    box-sizing: border-box;
-    width: 100%;
-    margin: 0;
-    padding: 7px 12px;
+    padding: 9px 18px;
 }
 
 .mission-stage {
     grid-area: stage;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -174,8 +173,11 @@ h1 {
 
 .mission-data {
     grid-area: data;
+
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns:
+        repeat(auto-fit, minmax(100px, 1fr));
+
     align-items: stretch;
     gap: 8px;
 
@@ -190,6 +192,7 @@ h1 {
 
     min-width: 0;
     padding: 9px 12px;
+
     box-sizing: border-box;
 }
 
@@ -207,6 +210,7 @@ h1 {
 ================================================== */
 
 .recorder-panel {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -214,16 +218,22 @@ h1 {
     gap: 12px;
 
     width: 100%;
+    min-height: 80px;
+    padding: 12px 18px;
+    margin-top: 0;
 }
 
-.recorder-controls {
-    min-width: 155px;
+.recorder-title {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 10px;
+    padding: 7px 12px;
 }
 
 .recorder-buttons {
     display: flex;
+    justify-content: center;
     gap: 6px;
-    margin-top: 4px;
 }
 
 .recorder-dot {
@@ -235,8 +245,9 @@ h1 {
 
 .recorder-status {
     display: block;
-    margin-top: 5px;
+    margin: 0;
     font-size: 9px;
+    text-align: center;
 }
 
 
@@ -696,4 +707,13 @@ footer {
 
     font-size: 10px;
     letter-spacing: 1px;
+}
+
+/* ==================================================
+   MODULE HEADER SPACING
+================================================== */
+
+.mission-bar-title,
+.recorder-title {
+    margin-top: 10px;
 }

@@ -36,6 +36,7 @@ async function loadConfiguration() {
 // HTML GENERATION
 // ------------------------------------------------------------
 
+
 function createMissionBar() {
 
     if (!container) return;
@@ -49,12 +50,16 @@ function createMissionBar() {
 
     container.hidden = false;
 
-    const missionBar = document.createElement("section");
-
+    // MODULE HEADER
     const missionTitle = document.createElement("div");
-    missionTitle.className = "mission-bar-title section-header";
-    missionTitle.textContent = config.title ?? "MISSION BAR";
+    missionTitle.className =
+        "mission-bar-title section-header module-header";
 
+    missionTitle.textContent =
+        config.title ?? "MISSION BAR";
+
+    // MODULE CONTENT
+    const missionBar = document.createElement("section");
     missionBar.className = "mission-bar mission-status-bar";
 
     const stage = document.createElement("div");
@@ -93,10 +98,12 @@ function createMissionBar() {
         }
     });
 
-    missionBar.append(missionTitle, stage, data);
+    missionBar.append(stage, data);
 
-    container.appendChild(missionBar);
+    // FINAL MODULE STRUCTURE
+    container.append(missionTitle, missionBar);
 }
+
 
 
 // ------------------------------------------------------------
