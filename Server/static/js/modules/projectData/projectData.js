@@ -123,57 +123,51 @@ function updateUnitDesignation(config) {
 }
 
 
+
+
 /* ============================================================
    05. SYSTEM INFORMATION
    ============================================================ */
 
 function updateSystemInformation(config, moduleEnabled = true) {
 
+    const module = document.querySelector(".system-info-module");
+
+    if (!module) return;
+
     const data = config.systemInformation ?? {};
 
-    // Locate section heading 03.
+    // Visibility control.
 
-    const heading = [
-        ...document.querySelectorAll(".section-heading")
-    ].find(element => {
+    const enabled =
+        moduleEnabled !== false &&
+        data.enabled !== false;
 
-        return element.querySelector("span")?.textContent.trim()
-            === "03";
-
-    });
-
-    if (!heading) return;
-
-    const container = heading.nextElementSibling;
-
-    if (!container?.classList.contains("system-info")) {
-        return;
-    }
-
-    // Section visibility.
-
-    const enabled = moduleEnabled === true && data.enabled !== false;
-
-    setVisibility(heading, enabled);
-    setVisibility(container, enabled);
+    setVisibility(module, enabled);
 
     if (!enabled) return;
 
-    // Section title.
+    // Clear previous content.
 
-    const sectionNumber = heading.querySelector("span");
+    module.replaceChildren();
 
-    setText(sectionNumber, data.sectionNumber ?? "03");
+    // Create section heading.
 
-    heading.lastChild.textContent = " " + (
-        data.title ?? "SYSTEM INFORMATION"
+    const heading = document.createElement("div");
+    heading.className = "module-header section-header";
+
+    heading.append(
+        document.createTextNode(
+            " " + (data.title ?? "SYSTEM INFORMATION")
+        )
     );
 
-    // Clear existing blocks.
+    // Create information container.
 
-    container.replaceChildren();
+    const container = document.createElement("div");
+    container.className = "system-info";
 
-    // Generate enabled blocks dynamically.
+    // Generate items from JSON.
 
     const items = Array.isArray(data.items)
         ? data.items
@@ -181,7 +175,7 @@ function updateSystemInformation(config, moduleEnabled = true) {
 
     items.forEach(item => {
 
-        if (item.enabled === false) return;
+        if (!item || item.enabled === false) return;
 
         const block = document.createElement("div");
 
@@ -197,7 +191,13 @@ function updateSystemInformation(config, moduleEnabled = true) {
 
     });
 
+    // Assemble everything inside the HTML placeholder.
+
+    module.append(heading, container);
+
 }
+
+
 
 
 /* ============================================================

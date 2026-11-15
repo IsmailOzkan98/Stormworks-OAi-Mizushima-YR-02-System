@@ -44,7 +44,7 @@
             {
                 "enabled": true,
                 "label": "REFRESH RATE",
-                "value": "250 MS"
+                "value": "10 HZ"
             }
         ]
     },
