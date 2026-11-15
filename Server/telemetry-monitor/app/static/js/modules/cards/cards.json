@@ -48,11 +48,11 @@
           "style": "highlight"
         },
         {
-          "id": "autopilot",
-          "label": "AUTOPILOT",
-          "dataKey": "ap",
-          "unit": "NAVIGATION SYSTEM",
-          "type": "status",
+          "id": "absoluteSpeed",
+          "label": "ABSOLUTE SPEED",
+          "dataKey": "absolute_speed",
+          "unit": "KM/H",
+          "decimals": 1,
           "style": "normal"
         }
       ]
@@ -98,7 +98,7 @@
         },
         {
           "id": "yaw",
-          "label": "YAW TARGET",
+          "label": "YAW",
           "dataKey": "yaw",
           "unit": "ORIENTATION",
           "decimals": 2,
@@ -110,14 +110,6 @@
           "dataKey": "spoiler",
           "unit": "CONTROL VALUE",
           "decimals": 2,
-          "style": "normal"
-        },
-        {
-          "id": "absoluteSpeed",
-          "label": "ABSOLUTE SPEED",
-          "dataKey": "absolute_speed",
-          "unit": "KM/H",
-          "decimals": 1,
           "style": "normal"
         }
       ]

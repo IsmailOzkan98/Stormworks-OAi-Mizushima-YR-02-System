@@ -1,13 +1,11 @@
+name: stormworks-api-server
+
 services:
-  stormworks-test:
+  stormworks-api-server:
     build: .
-    container_name: stormworks-test
+    container_name: stormworks-telemetry
     ports:
       - "8080:8080"
     volumes:
-      - ./app.py:/app/app.py
-      - ./templates:/app/templates
-      - ./static:/app/static
-      - ./logs:/app/logs
-      - ./recorder_config.json:/app/recorder_config.json
+      - ./telemetry-monitor:/app
     restart: unless-stopped
