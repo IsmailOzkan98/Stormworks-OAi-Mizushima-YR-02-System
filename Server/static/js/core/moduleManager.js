@@ -19,108 +19,45 @@ const CONFIG = Object.freeze({
 
 
 /* ============================================================
-   02. MODULE REGISTRY
+   02. MODULE SPECIAL HOOKS
    ============================================================ */
 
-const MODULE_REGISTRY = [
+const MODULE_HOOKS = {
 
-    {
-        name: "MISSION BAR",
-        key: "missionBar",
-        configKey: "missionBar",
-        path: "../modules/missionBar/missionBar.js",
-        container: "missionBarContainer",
-        initializer: "initMissionBar",
-        updater: "updateMissionBarData"
-    },
+    missionMonitor(api) {
 
-    {
-        name: "MISSION MONITOR",
-        key: "missionMonitor",
-        configKey: "missionMonitor",
-        path: "../modules/missionMonitor/missionMonitor.js",
-        container: "missionMonitorContainer",
-        initializer: "initMissionMonitor",
-        updater: "updateMissionMonitorData",
+        if (state.pendingMissionData) {
+            api.updateMissionMonitorData(
+                state.pendingMissionData
+            );
+        }
 
-        onReady(module) {
+        api.updateMissionMonitorConnectionData(
+            state.previousConnection === true
+        );
 
-            if (state.pendingMissionData) {
+        if (state.latestTelemetryTimestamp) {
 
-                module.updateMissionMonitorData(
-                    state.pendingMissionData
-                );
+            const age = Date.now() -
+                state.latestTelemetryTimestamp * 1000;
 
-            }
-
-            module.updateMissionMonitorConnectionData(
-                state.previousConnection === true
+            api.updateMissionMonitorPacketAge(
+                Math.max(0, Math.round(age))
             );
 
-            if (state.latestTelemetryTimestamp) {
-
-                const age = Date.now() -
-                    state.latestTelemetryTimestamp * 1000;
-
-                module.updateMissionMonitorPacketAge(
-                    Math.max(0, Math.round(age))
-                );
-
-            }
-
         }
 
     },
 
-    {
-        name: "FLIGHT RECORDER",
-        key: null,
-        configKey: "flightRecorder",
-        path: "../modules/flightRecorder/flightRecorder.js",
-        container: "flightRecorderContainer",
-        initializer: "initFlightRecorder",
+    flightRecorder() {
 
-        getOptions() {
+        return {
+            onEvent: state.logEvent
+        };
 
-            return {
-                onEvent: state.logEvent
-            };
-
-        }
-
-    },
-
-    {
-        name: "SYSTEM DIAGNOSTICS",
-        key: "systemDiagnostics",
-        configKey: "systemDiagnostics",
-        path: "../modules/systemDiagnostics/systemDiagnostics.js",
-        container: "systemDiagnosticsContainer",
-        initializer: "initSystemDiagnostics",
-        updater: "updateSystemDiagnostics"
-    },
-
-    {
-        name: "TELEMETRY GRAPHS",
-        key: "telemetryGraphs",
-        configKey: "telemetryGraphs",
-        path: "../modules/telemetryGraphs/telemetryGraphs.js",
-        container: "telemetryGraphsContainer",
-        initializer: "initTelemetryGraphs",
-        updater: "updateTelemetryGraphsData"
-    },
-
-    {
-        name: "CARDS",
-        key: "cards",
-        configKey: "cardsModule",
-        path: "../modules/cards/cards.js",
-        container: "cardsContainer",
-        initializer: "initCards",
-        updater: "updateCards"
     }
 
-];
+};
 
 
 /* ============================================================
@@ -279,25 +216,46 @@ async function initializeModule(definition) {
 
 async function initializeRegisteredModules(configuration) {
 
-    const config = configuration.modules || {};
+    const enabled = configuration.modules || {};
+    const registry = configuration.registry || {};
 
     await Promise.all(
 
-        MODULE_REGISTRY.map(definition => {
+        Object.entries(registry).map(
+            async ([configKey, definition]) => {
 
-            if (config[definition.configKey] !== true) {
+                if (enabled[configKey] !== true) {
 
-                console.info(
-                    `[${definition.name}] Disabled by configuration.`
-                );
+                    console.info(
+                        `[${definition.name}] Disabled by configuration.`
+                    );
 
-                return null;
+                    return null;
+
+                }
+
+                const hook = MODULE_HOOKS[definition.special];
+
+                const moduleDefinition = {
+
+                    ...definition,
+
+                    key: definition.key || configKey,
+
+                    getOptions: definition.special === "flightRecorder"
+                        ? MODULE_HOOKS.flightRecorder
+                        : null,
+
+                    onReady: definition.special === "missionMonitor"
+                        ? hook
+                        : null
+
+                };
+
+                return initializeModule(moduleDefinition);
 
             }
-
-            return initializeModule(definition);
-
-        })
+        )
 
     );
 
