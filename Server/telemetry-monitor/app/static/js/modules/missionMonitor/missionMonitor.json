@@ -11,13 +11,6 @@
     "items": [
 
         {
-            "id": "connection",
-            "label": "TELEMETRY LINK",
-            "default": "OFFLINE",
-            "type": "connection"
-        },
-
-        {
             "id": "autopilot",
             "label": "AUTOPILOT",
             "source": "ap",
