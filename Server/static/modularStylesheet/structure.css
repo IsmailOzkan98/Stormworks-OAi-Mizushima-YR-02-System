@@ -25,6 +25,17 @@ body {
 }
 
 
+/* =========================================
+   GLOBAL BUTTON STRUCTURE
+========================================= */
+
+button,
+.button {
+    padding: 7px 11px;
+    font-size: 10px;
+}
+
+
 /* ==================================================
    02. HEADER
 ================================================== */
@@ -100,7 +111,7 @@ h1 {
 
 .mission-layout {
     display: grid;
-    grid-template-columns: minmax(0, 9fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 8.5fr) minmax(0, 1.5fr);
     align-items: stretch;
     gap: 10px;
 
@@ -213,11 +224,6 @@ h1 {
     display: flex;
     gap: 6px;
     margin-top: 4px;
-}
-
-.recorder-btn {
-    padding: 7px 11px;
-    font-size: 10px;
 }
 
 .recorder-dot {

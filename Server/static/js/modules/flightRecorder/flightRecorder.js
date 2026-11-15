@@ -23,8 +23,7 @@ let recording = false;
 let currentFilename = null;
 
 let container = null;
-let startButton = null;
-let stopButton = null;
+let recorderButton = null;
 let statusElement = null;
 
 let onEvent = (message, type = "normal") => {
@@ -50,12 +49,28 @@ function updateRecorderInterface(isRecording, filename = null) {
     recording = Boolean(isRecording);
     currentFilename = filename || null;
 
-    if (startButton) {
-        startButton.disabled = recording;
-    }
+    if (!recorderButton) return;
 
-    if (stopButton) {
-        stopButton.disabled = !recording;
+    recorderButton.disabled = false;
+
+    if (recording) {
+
+        recorderButton.innerHTML = `
+            <span class="recorder-dot"></span>
+            STOP
+        `;
+
+        recorderButton.className = "recorder-btn stop";
+
+    } else {
+
+        recorderButton.innerHTML = `
+            <span class="recorder-dot"></span>
+            START
+        `;
+
+        recorderButton.className = "recorder-btn start";
+
     }
 
     if (!statusElement) return;
@@ -84,8 +99,8 @@ export async function startFlightRecording() {
 
     if (recording) return;
 
-    if (startButton) {
-        startButton.disabled = true;
+    if (recorderButton) {
+        recorderButton.disabled = true;
     }
 
     try {
@@ -129,8 +144,8 @@ export async function stopFlightRecording() {
 
     if (!recording) return;
 
-    if (stopButton) {
-        stopButton.disabled = true;
+    if (recorderButton) {
+        recorderButton.disabled = true;
     }
 
     try {
@@ -208,26 +223,19 @@ function createRecorderInterface() {
     container.innerHTML = `
         <section class="recorder-panel">
 
-            <span class="micro-label">TELEMETRY RECORDER</span>
+            <span class="section-header module-header">
+                TELEMETRY RECORDER
+            </span>
 
             <div class="recorder-buttons">
 
                 <button
-                    id="startRecording"
+                    id="recorderToggle"
                     class="recorder-btn start"
                     type="button"
                 >
                     <span class="recorder-dot"></span>
                     START
-                </button>
-
-                <button
-                    id="stopRecording"
-                    class="recorder-btn stop"
-                    type="button"
-                    disabled
-                >
-                    STOP
                 </button>
 
             </div>
@@ -242,9 +250,20 @@ function createRecorderInterface() {
         </section>
     `;
 
-    startButton = container.querySelector("#startRecording");
-    stopButton = container.querySelector("#stopRecording");
-    statusElement = container.querySelector("#recorderStatus");
+    recorderButton =
+        container.querySelector("#recorderToggle");
+
+    statusElement =
+        container.querySelector("#recorderStatus");
+}
+
+async function toggleRecording() {
+
+    if (recording) {
+        await stopFlightRecording();
+    } else {
+        await startFlightRecording();
+    }
 }
 
 
@@ -273,7 +292,7 @@ export async function initFlightRecorder(targetContainer, options = {}) {
 
     createRecorderInterface();
 
-    if (!startButton || !stopButton || !statusElement) {
+    if (!recorderButton || !statusElement) {
 
         console.error(
             "[FLIGHT RECORDER] Required DOM elements not found."
@@ -282,14 +301,9 @@ export async function initFlightRecorder(targetContainer, options = {}) {
         return false;
     }
 
-    startButton.addEventListener(
+    recorderButton.addEventListener(
         "click",
-        startFlightRecording
-    );
-
-    stopButton.addEventListener(
-        "click",
-        stopFlightRecording
+        toggleRecording
     );
 
     initialized = true;

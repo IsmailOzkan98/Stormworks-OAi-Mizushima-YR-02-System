@@ -91,7 +91,6 @@ body::before {
     color: var(--text-secondary);
 }
 
-button,
 input,
 select,
 textarea {
@@ -538,100 +537,15 @@ h1 span {
 }
 
 /* =========================================
-   FLIGHT DATA RECORDER
+   FLIGHT DATA RECORDER BUTTON
 ========================================= */
 
-.recorder-btn {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-
-    border: 1px solid var(--border);
-    background: var(--paper-light);
-    color: var(--gold);
-
-    font-family: var(--mono);
-
-    box-shadow: none;
-
-    transition:
-        color var(--transition),
-        background-color var(--transition),
-        border-color var(--transition);
-}
-
-.recorder-btn.start {
-    color: var(--green);
-    border-color: var(--green);
-}
-
-.recorder-btn.stop {
-    color: var(--red);
-    border-color: var(--red);
-}
-
-.recorder-btn.start:not(:disabled):hover {
+.recorder-dot {
     background: var(--green);
-    color: var(--paper-light);
 }
 
-.recorder-btn.stop:not(:disabled):hover {
+.recorder-btn.stop .recorder-dot {
     background: var(--red);
-    color: var(--paper-light);
-}
-
-.recorder-btn:not(:disabled):active {
-    background: var(--paper-light);
-    color: var(--gold);
-}
-
-.recorder-status {
-    color: var(--muted);
-}
-
-/* =========================================
-   ORIGINAL TECHNICAL BUTTON EFFECT
-========================================= */
-
-button:not(:disabled),
-.button,
-.recorder-btn:not(:disabled) {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-}
-
-button:not(:disabled)::after,
-.button::after,
-.recorder-btn:not(:disabled)::after {
-    content: "";
-
-    position: absolute;
-    inset: 0 auto 0 0;
-
-    width: 0;
-
-    background: var(--gold);
-
-    z-index: -1;
-
-    transition: width var(--transition) ease-out;
-}
-
-button:not(:disabled):hover,
-.button:hover {
-    background: transparent;
-    color: var(--paper-light);
-}
-
-button:not(:disabled):hover::after,
-.button:hover::after {
-    width: 100%;
-}
-
-button:not(:disabled):active,
-.button:active {
-    color: var(--gold);
 }
 
 /* =========================================
@@ -710,6 +624,88 @@ textarea:focus {
     outline: 1px solid var(--gold);
     outline-offset: 2px;
 }
+
+
+
+/* =========================================
+   GLOBAL BUTTON SYSTEM
+========================================= */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0;
+
+    background: var(--text-shadow);
+    color: var(--text-primary);
+
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .03rem;
+
+    cursor: pointer;
+
+    box-shadow: none;
+
+    transition:
+        color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+/* Horizontal sweep */
+
+button::after,
+.button::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+
+    background: var(--text-primary);
+    z-index: -1;
+
+    transition: width .2s ease-out;
+}
+
+/* Hover */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: var(--text-secondary);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+/* Active */
+
+button:not(:disabled):active,
+.button:active {
+    color: var(--text-secondary);
+    box-shadow: none;
+}
+
+/* Disabled */
+
+button:disabled,
+.button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
 
 /* =========================================
    SCROLLBAR
