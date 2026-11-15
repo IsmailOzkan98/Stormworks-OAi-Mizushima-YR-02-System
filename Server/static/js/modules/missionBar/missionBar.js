@@ -50,6 +50,11 @@ function createMissionBar() {
     container.hidden = false;
 
     const missionBar = document.createElement("section");
+
+    const missionTitle = document.createElement("div");
+    missionTitle.className = "mission-bar-title  section-header";
+    missionTitle.textContent = config.title ?? "MISSION BAR";
+
     missionBar.className = "mission-bar mission-status-bar";
 
     const stage = document.createElement("div");
@@ -88,7 +93,7 @@ function createMissionBar() {
         }
     });
 
-    missionBar.append(stage, data);
+    missionBar.append(missionTitle, stage, data);
 
     container.appendChild(missionBar);
 }

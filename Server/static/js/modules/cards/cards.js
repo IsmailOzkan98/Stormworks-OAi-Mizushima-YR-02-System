@@ -27,6 +27,7 @@ export async function initCards(container) {
     // GENERATE HTML
     // ----------------------------------------
 
+    
     function renderCards() {
         container.innerHTML = "";
         cardElements.clear();
@@ -37,29 +38,28 @@ export async function initCards(container) {
         }
 
         config.sections.forEach(section => {
+
+            // SECTION CONTAINER
+
             const sectionElement = document.createElement("section");
             sectionElement.className = "dashboard-section";
             sectionElement.id = `section-${section.id}`;
 
-            // Section heading
-            const heading = document.createElement("div");
-            heading.className = "section-heading";
+            // SECTION HEADER
 
-            const number = document.createElement("span");
-            number.textContent = section.title?.number ?? "";
+            const cardHeader = document.createElement("div");
+            cardHeader.className = "card-header section-header";
+            cardHeader.textContent = section.title?.name ?? "";
 
-            heading.appendChild(number);
-            heading.append(
-                document.createTextNode(` ${section.title?.name ?? ""}`)
-            );
+            sectionElement.appendChild(cardHeader);
 
-            sectionElement.appendChild(heading);
+            // METRIC GRID
 
-            // Metric grid
             const grid = document.createElement("div");
             grid.className = "metric-grid";
 
             (section.cards ?? []).forEach(card => {
+
                 const cardElement = document.createElement("div");
                 cardElement.className = "card";
 
@@ -69,15 +69,18 @@ export async function initCards(container) {
                     cardElement.classList.add("cyan");
                 }
 
+                // Card label
                 const label = document.createElement("div");
                 label.className = "card-label";
                 label.textContent = card.label ?? "";
 
+                // Card value
                 const value = document.createElement("div");
                 value.className = "value";
                 value.id = card.id;
                 value.textContent = "--";
 
+                // Card unit
                 const unit = document.createElement("div");
                 unit.className = "unit";
                 unit.textContent = card.unit ?? "";
@@ -95,6 +98,7 @@ export async function initCards(container) {
             container.appendChild(sectionElement);
         });
     }
+
 
     // ----------------------------------------
     // VALUE FORMATTING

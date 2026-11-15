@@ -8,7 +8,7 @@
     --bg: #d1cdb7;
     --panel: #dcd8c0;
     --panel2: #c9c5ad;
-    --paper-light: #e8e4d0;
+    --paper-light: #dcd8c0;
     --paper-shadow: #bab5a1;
     --border: #bab5a1;
 
@@ -17,6 +17,15 @@
     --gold-light: #353329;
     --ivory: #454138;
     --muted: #777362;
+
+    /* ORIGINAL THEME COLORS */
+    --text-primary: #454138;
+    --text-secondary: #dcd8c0;
+    --text-shadow: #bab5a1;
+
+    --main-bg-color: #d1cdb7;
+    --bg-grid-color: #ccc8b1;
+    --bg-grid-2-color: rgba(204, 200, 177, 0);
 
     /* STATUS */
     --green: #65765b;
@@ -51,15 +60,23 @@ html {
 }
 
 body {
-    background-color: var(--bg);
+    background-color: var(--main-bg-color);
 
     background-image:
-        linear-gradient(to right, #ccc8b1 1px, transparent 1px),
-        linear-gradient(to bottom, #ccc8b1 1px, transparent 1px);
+        linear-gradient(
+            to right,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        ),
+        linear-gradient(
+            to bottom,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        );
 
     background-size: 20px 20px;
 
-    color: var(--ivory);
+    color: var(--text-primary);
     font-family: var(--display);
     font-weight: 300;
     letter-spacing: .03rem;
@@ -70,8 +87,8 @@ body::before {
 }
 
 ::selection {
-    background: var(--gold);
-    color: var(--paper-light);
+    background-color: var(--text-primary);
+    color: var(--text-secondary);
 }
 
 button,
@@ -81,6 +98,23 @@ textarea {
     font-family: inherit;
     letter-spacing: inherit;
 }
+
+
+/* =========================================
+   SECTION HEADER — REUSABLE
+========================================= */
+
+.section-header {
+    background: var(--text-primary);
+    color: var(--text-secondary);
+    border-left: 4px solid var(--text-shadow);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
 
 /* =========================================
    HEADER
@@ -131,9 +165,9 @@ h1 span {
 ========================================= */
 
 .mission-bar {
-    background: var(--paper-light);
-    border: 1px solid var(--border);
-    box-shadow: 3px 3px 0 var(--paper-shadow);
+    background: var(--text-secondary);
+    border: 1px solid var(--text-shadow);
+    box-shadow: 3px 3px 0 var(--text-shadow);
 }
 
 .micro-label {
@@ -142,7 +176,7 @@ h1 span {
 }
 
 .mission-stage strong {
-    color: var(--gold);
+    color: var(--text-primary);
     font-weight: 400;
 }
 

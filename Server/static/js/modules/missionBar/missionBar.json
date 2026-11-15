@@ -1,5 +1,6 @@
 {
     "enabled": true,
+    "title": "GENERAL INFO",
     "items": [
         {
             "id": "stage",
