@@ -576,18 +576,13 @@ async function loadModuleConfiguration() {
             modules: {
 
                 eventLog: false,
-
                 flightRecorder: false,
-
                 missionBar: false,
-
                 missionMonitor: false,
-
                 systemDiagnostics: false,
-
                 telemetryGraphs: false,
-
-                systemInformation: false
+                systemInformation: false,
+                cardsModule: false
 
             }
 
@@ -1113,6 +1108,21 @@ async function initializeModules() {
 
     const configuration =
         await loadModuleConfiguration();
+
+
+    // DASHBOARD ASSEMBLER
+
+    if (configuration.dashboard) {
+
+        const { initializeDashboardAssembler } = await import(
+            "./core/dashboardAssembler.js"
+        );
+
+        initializeDashboardAssembler(
+            configuration.dashboard
+        );
+
+    }
 
 
     const modules =

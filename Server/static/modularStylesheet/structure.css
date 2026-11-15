@@ -244,25 +244,43 @@ h1 {
    06. MAIN DASHBOARD GRID
 ================================================== */
 
-/* Main three-column layout */
-
 .dashboard-grid {
+
     display: grid;
-    grid-template-columns: 1.08fr 1fr .85fr;
+
+    grid-template-columns:
+        repeat(
+            var(--dashboard-columns, 3),
+            minmax(0, 1fr)
+        );
+
     align-items: start;
-    gap: var(--spacing-column);
+
+    gap: var(
+        --dashboard-gap,
+        var(--spacing-column)
+    );
 
     margin-top: 12px;
+
 }
 
-/* Universal spacing between modules */
-
 .column {
+
     display: flex;
+
     flex-direction: column;
+
     gap: var(--spacing-module);
 
     min-width: 0;
+
+}
+
+.dashboard-grid > *,
+.column > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 

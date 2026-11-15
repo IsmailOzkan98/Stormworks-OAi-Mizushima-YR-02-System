@@ -78,7 +78,7 @@ function updateBrand(config) {
 
         // Preserve the existing span and its styling.
         if (heading.firstChild?.nodeType === Node.TEXT_NODE) {
-            heading.firstChild.textContent = data.name + " ";
+            heading.firstChild.textContent = (data.name ?? "") + " ";
         } else {
             heading.insertBefore(
                 document.createTextNode(data.name + " "),
@@ -131,7 +131,9 @@ function updateUnitDesignation(config) {
 
 function updateSystemInformation(config, moduleEnabled = true) {
 
-    const module = document.querySelector(".system-info-module");
+    const module = document.getElementById(
+        "systemInformationContainer"
+    );
 
     if (!module) return;
 
