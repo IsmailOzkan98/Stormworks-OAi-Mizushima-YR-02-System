@@ -7,6 +7,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 
 CONFIG_FILE = os.path.join(DATA_DIR, "recorder_config.json")
+TELEMETRY_SCHEMA_FILE = os.path.join(DATA_DIR, "telemetry_schema.json")
 
 # Tiempo máximo sin telemetría para considerar
 # que el vehículo está desconectado.
