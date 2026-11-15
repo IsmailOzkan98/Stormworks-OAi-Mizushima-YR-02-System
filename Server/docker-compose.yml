@@ -5,9 +5,10 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./app.py:/app/app.py
-      - ./templates:/app/templates
-      - ./static:/app/static
-      - ./logs:/app/logs
-      - ./recorder_config.json:/app/recorder_config.json
+      - ./app/core:/app/core
+      - ./app/recorder:/app/recorder
+      - ./app/routes:/app/routes
+      - ./app/templates:/app/templates
+      - ./app/static:/app/static
+      - ./app/logs:/app/logs
     restart: unless-stopped
