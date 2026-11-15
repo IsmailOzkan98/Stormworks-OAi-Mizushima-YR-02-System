@@ -1,8 +1,7 @@
+
 /* ============================================================
    OAI MIZUSHIMA YR-02
    FLIGHT TELEMETRY MONITOR
-
-   VERSION: 2.1.0
 
    RESPONSIBILITY:
    Flight telemetry reception, visualization, diagnostics,
@@ -28,9 +27,10 @@ let missionMonitorModule = null;
 let systemDiagnosticsModule = null;
 let telemetryGraphsModule = null;
 let connectionManagerModule = null;
-let pendingMissionData = null;
 let systemEventDetectorModule = null;
 let cardsModule = null;
+
+let pendingMissionData = null;
 
 
 /* ============================================================
@@ -55,14 +55,21 @@ const state = {
     latestTelemetryTimestamp: 0,
 
     logEvent(message, type = "normal") {
+
         console.log(`[${type.toUpperCase()}]`, message);
+
     }
 
 };
 
 
+/* ============================================================
+   04. COMMON UTILITIES
+   ============================================================ */
+
+
 /* ------------------------------------------------------------
-   06.1 UPDATE TEXT
+   04.1 UPDATE DOM TEXT
    ------------------------------------------------------------ */
 
 function setValue(id, value) {
@@ -77,8 +84,59 @@ function setValue(id, value) {
 
 
 /* ============================================================
-   07. CONNECTION MANAGER
+   05. CONNECTION MANAGEMENT
    ============================================================ */
+
+
+/* ------------------------------------------------------------
+   05.1 UPDATE CONNECTION STATE
+   ------------------------------------------------------------ */
+
+function setConnection(online, detail) {
+
+    const light = document.getElementById("onlineLight");
+
+    if (light) {
+
+        light.classList.toggle("online", online);
+
+    }
+
+    setValue("onlineText", online ? "ONLINE" : "OFFLINE");
+
+    setValue("connectionDetail", detail);
+
+    if (missionMonitorModule) {
+
+        missionMonitorModule.updateMissionMonitorConnectionData(
+            online
+        );
+
+    }
+
+    if (
+        state.previousConnection !== null &&
+        state.previousConnection !== online
+    ) {
+
+        state.logEvent(
+            online
+                ? "Telemetry connection restored."
+                : "Telemetry connection lost.",
+            online ? "navigation-event" : "error"
+        );
+
+    }
+
+    state.previousConnection = online;
+
+}
+
+
+/* ------------------------------------------------------------
+   05.2 INITIALIZE CONNECTION MANAGER
+   ------------------------------------------------------------ */
+
 async function initializeConnectionManager() {
 
     try {
@@ -94,7 +152,8 @@ async function initializeConnectionManager() {
                 state.latestTelemetryTimestamp =
                     Number(data.timestamp);
 
-                // DETECT SYSTEM EVENTS
+                // PROCESS SYSTEM EVENTS
+
                 if (systemEventDetectorModule) {
 
                     systemEventDetectorModule.processTelemetry(data);
@@ -102,6 +161,7 @@ async function initializeConnectionManager() {
                 }
 
                 // UPDATE INTERFACE
+
                 updateInterface(data);
 
             },
@@ -142,43 +202,26 @@ async function initializeConnectionManager() {
 }
 
 
+/* ============================================================
+   06. TELEMETRY DATA MANAGEMENT
+   ============================================================ */
+
+
 /* ------------------------------------------------------------
-   07.1 UPDATE CONNECTION STATE
+   06.1 UPDATE APPLICATION DATA
    ------------------------------------------------------------ */
 
-function setConnection(online, detail) {
+function updateInterface(data) {
 
-    const light = document.getElementById("onlineLight");
+    pendingMissionData = data;
 
-    if (light) {
-        light.classList.toggle("online", online);
-    }
+    renderModules(data);
 
-    setValue("onlineText", online ? "ONLINE" : "OFFLINE");
-    setValue("connectionDetail", detail);
-
-    if (missionMonitorModule) {
-        missionMonitorModule.updateMissionMonitorConnectionData(online);
-    }
-
-    if (
-        state.previousConnection !== null &&
-        state.previousConnection !== online
-    ) {
-        state.logEvent(
-            online
-                ? "Telemetry connection restored."
-                : "Telemetry connection lost.",
-            online ? "navigation-event" : "error"
-        );
-    }
-
-    state.previousConnection = online;
 }
 
 
 /* ------------------------------------------------------------
-   09.8 MODULE DATA
+   06.2 RENDER MODULE DATA
    ------------------------------------------------------------ */
 
 function renderModules(data) {
@@ -216,20 +259,13 @@ function renderModules(data) {
 }
 
 
-/* ------------------------------------------------------------
-   09.10 COMPLETE INTERFACE UPDATE
-   ------------------------------------------------------------ */
+/* ============================================================
+   07. MODULE CONFIGURATION
+   ============================================================ */
 
-function updateInterface(data) {
-
-    pendingMissionData = data;
-
-    renderModules(data);
-
-}
 
 /* ------------------------------------------------------------
-   11.1 LOAD CONFIGURATION
+   07.1 LOAD CONFIGURATION
    ------------------------------------------------------------ */
 
 async function loadModuleConfiguration() {
@@ -237,15 +273,11 @@ async function loadModuleConfiguration() {
     try {
 
         const response = await fetch(
-
             CONFIG.CONFIG_ENDPOINT,
-
             {
                 cache: "no-store"
             }
-
         );
-
 
         if (!response.ok) {
 
@@ -255,9 +287,7 @@ async function loadModuleConfiguration() {
 
         }
 
-
         return await response.json();
-
 
     } catch (error) {
 
@@ -265,7 +295,6 @@ async function loadModuleConfiguration() {
             "[MODULE MANAGER] Configuration error:",
             error
         );
-
 
         // SAFE FALLBACK
 
@@ -291,8 +320,13 @@ async function loadModuleConfiguration() {
 }
 
 
+/* ============================================================
+   08. EVENT SYSTEM INITIALIZATION
+   ============================================================ */
+
+
 /* ------------------------------------------------------------
-   11.2 INITIALIZE EVENT LOG
+   08.1 INITIALIZE EVENT LOG
    ------------------------------------------------------------ */
 
 async function initializeEventLog(enabled) {
@@ -307,23 +341,17 @@ async function initializeEventLog(enabled) {
 
     }
 
-
     try {
 
         const { initEventLog } = await import(
-
             "./modules/eventLog/eventLog.js"
-
         );
-
 
         const container = document.getElementById(
             "eventLogContainer"
         );
 
-
         const eventLogger = initEventLog(container);
-
 
         if (typeof eventLogger === "function") {
 
@@ -335,7 +363,6 @@ async function initializeEventLog(enabled) {
             );
 
         }
-
 
     } catch (error) {
 
@@ -350,7 +377,7 @@ async function initializeEventLog(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.2.1 INITIALIZE SYSTEM EVENT DETECTOR
+   08.2 INITIALIZE SYSTEM EVENT DETECTOR
    ------------------------------------------------------------ */
 
 async function initializeSystemEventDetector(enabled) {
@@ -395,24 +422,23 @@ async function initializeSystemEventDetector(enabled) {
 }
 
 
+/* ============================================================
+   09. GENERIC MODULE INITIALIZATION
+   ============================================================ */
+
+
 /* ------------------------------------------------------------
-   11.3 GENERIC MODULE INITIALIZER
+   09.1 GENERIC MODULE INITIALIZER
    ------------------------------------------------------------ */
 
 async function initializeModule({
 
     name,
-
     enabled,
-
     path,
-
     containerId,
-
     initFunction,
-
     initOptions = undefined,
-
     onReady
 
 }) {
@@ -427,22 +453,18 @@ async function initializeModule({
 
     }
 
-
     try {
 
         const module = await import(path);
-
 
         const container = document.getElementById(
             containerId
         );
 
-
         const initialized = await module[initFunction](
             container,
             initOptions
         );
-
 
         if (!initialized) {
 
@@ -454,7 +476,6 @@ async function initializeModule({
 
         }
 
-
         // EXECUTE MODULE-SPECIFIC SETUP
 
         if (onReady) {
@@ -463,15 +484,12 @@ async function initializeModule({
 
         }
 
-
         state.logEvent(
             `${name} initialized.`,
             "system-event"
         );
 
-
         return module;
-
 
     } catch (error) {
 
@@ -487,8 +505,13 @@ async function initializeModule({
 }
 
 
+/* ============================================================
+   10. APPLICATION MODULE INITIALIZERS
+   ============================================================ */
+
+
 /* ------------------------------------------------------------
-   11.4 MISSION BAR
+   10.1 MISSION BAR
    ------------------------------------------------------------ */
 
 async function initializeMissionBar(enabled) {
@@ -523,7 +546,7 @@ async function initializeMissionBar(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.5 MISSION MONITOR
+   10.2 MISSION MONITOR
    ------------------------------------------------------------ */
 
 async function initializeMissionMonitor(enabled) {
@@ -573,7 +596,71 @@ async function initializeMissionMonitor(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.6 TELEMETRY GRAPHS
+   10.3 FLIGHT RECORDER
+   ------------------------------------------------------------ */
+
+async function initializeFlightRecorder(enabled) {
+
+    await initializeModule({
+
+        name: "FLIGHT RECORDER",
+
+        enabled,
+
+        path: "./modules/flightRecorder/flightRecorder.js",
+
+        containerId: "flightRecorderContainer",
+
+        initFunction: "initFlightRecorder",
+
+        initOptions: {
+
+            onEvent: state.logEvent
+
+        }
+
+    });
+
+}
+
+
+/* ------------------------------------------------------------
+   10.4 SYSTEM DIAGNOSTICS
+   ------------------------------------------------------------ */
+
+async function initializeSystemDiagnostics(enabled) {
+
+    systemDiagnosticsModule = await initializeModule({
+
+        name: "SYSTEM DIAGNOSTICS",
+
+        enabled,
+
+        path: "./modules/systemDiagnostics/systemDiagnostics.js",
+
+        containerId: "systemDiagnosticsContainer",
+
+        initFunction: "initSystemDiagnostics",
+
+        onReady(module) {
+
+            if (pendingMissionData) {
+
+                module.updateSystemDiagnostics(
+                    pendingMissionData
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ------------------------------------------------------------
+   10.5 TELEMETRY GRAPHS
    ------------------------------------------------------------ */
 
 async function initializeTelemetryGraphs(enabled) {
@@ -608,25 +695,33 @@ async function initializeTelemetryGraphs(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.7 FLIGHT RECORDER
+   10.6 CARDS
    ------------------------------------------------------------ */
 
-async function initializeFlightRecorder(enabled) {
+async function initializeCards(enabled) {
 
-    await initializeModule({
+    cardsModule = await initializeModule({
 
-        name: "FLIGHT RECORDER",
+        name: "CARDS",
 
         enabled,
 
-        path: "./modules/flightRecorder/flightRecorder.js",
+        path: "./modules/cards/cards.js",
 
-        containerId: "flightRecorderContainer",
+        containerId: "cardsContainer",
 
-        initFunction: "initFlightRecorder",
+        initFunction: "initCards",
 
-        initOptions: {
-            onEvent: state.logEvent
+        onReady(module) {
+
+            if (pendingMissionData) {
+
+                module.updateCards(
+                    pendingMissionData
+                );
+
+            }
+
         }
 
     });
@@ -635,72 +730,7 @@ async function initializeFlightRecorder(enabled) {
 
 
 /* ------------------------------------------------------------
-   11.8 SYSTEM DIAGNOSTICS
-   ------------------------------------------------------------ */
-
-async function initializeSystemDiagnostics(enabled) {
-
-    if (!enabled) {
-
-        console.info(
-            "[SYSTEM DIAGNOSTICS] Disabled by configuration."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        const { initSystemDiagnostics } = await import(
-
-            "./modules/systemDiagnostics/systemDiagnostics.js"
-
-        );
-
-
-        const container = document.getElementById(
-            "systemDiagnosticsContainer"
-        );
-
-
-        systemDiagnosticsModule =
-            await initSystemDiagnostics(container);
-
-
-        if (systemDiagnosticsModule) {
-
-            if (pendingMissionData) {
-
-                systemDiagnosticsModule.updateSystemDiagnostics(
-                    pendingMissionData
-                );
-
-            }
-
-            state.logEvent(
-                "System Diagnostics initialized.",
-                "success"
-            );
-
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "[SYSTEM DIAGNOSTICS] Initialization failed:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ------------------------------------------------------------
-   11.9 PROJECT DATA
+   10.7 PROJECT DATA
    ------------------------------------------------------------ */
 
 async function initializeProjectData(enabled) {
@@ -708,18 +738,14 @@ async function initializeProjectData(enabled) {
     try {
 
         const { initProjectData } = await import(
-
             "./modules/projectData/projectData.js"
-
         );
-
 
         await initProjectData({
 
             systemInformationEnabled: enabled
 
         });
-
 
     } catch (error) {
 
@@ -733,73 +759,14 @@ async function initializeProjectData(enabled) {
 }
 
 
-/* ------------------------------------------------------------
-   11.10 INITIALIZE CARDS
-   ------------------------------------------------------------ */
+/* ============================================================
+   11. APPLICATION MODULE ORCHESTRATION
+   ============================================================ */
 
-async function initializeCards(enabled) {
-
-    if (!enabled) {
-
-        console.info(
-            "[CARDS] Disabled by configuration."
-        );
-
-        return;
-
-    }
-
-    try {
-
-        const { initCards } = await import(
-            "./modules/cards/cards.js"
-        );
-
-        const container = document.getElementById(
-            "cardsContainer"
-        );
-
-        if (!container) {
-
-            throw new Error(
-                "cardsContainer element not found."
-            );
-
-        }
-
-        cardsModule = await initCards(container);
-
-        if (cardsModule) {
-
-            if (pendingMissionData) {
-
-                cardsModule.updateCards(
-                    pendingMissionData
-                );
-
-            }
-
-            state.logEvent(
-                "Cards initialized.",
-                "system-event"
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "[CARDS] Initialization failed:",
-            error
-        );
-
-    }
-
-}
 
 
 /* ------------------------------------------------------------
-   11.11 INITIALIZE ALL MODULES
+   11.1 INITIALIZE ALL MODULES
    ------------------------------------------------------------ */
 
 async function initializeModules() {
@@ -812,13 +779,28 @@ async function initializeModules() {
 
     if (configuration.dashboard) {
 
-        const { initializeDashboardAssembler } = await import(
-            "./core/dashboardAssembler.js"
-        );
+        try {
 
-        initializeDashboardAssembler(
-            configuration.dashboard
-        );
+            const { initializeDashboardAssembler } = await import(
+                "./core/dashboardAssembler.js"
+            );
+
+            await initializeDashboardAssembler(
+                configuration.dashboard
+            );
+
+            console.info(
+                "[DASHBOARD ASSEMBLER] Initialized successfully."
+            );
+
+        } catch (error) {
+
+            console.error(
+                "[DASHBOARD ASSEMBLER] Initialization failed:",
+                error
+            );
+
+        }
 
     }
 
@@ -827,13 +809,11 @@ async function initializeModules() {
         configuration.modules || {};
 
 
-    // EVENT LOG MUST INITIALIZE FIRST
+    // EVENT SYSTEM MUST INITIALIZE FIRST
 
     await initializeEventLog(
         modules.eventLog === true
     );
-
-    // SYSTEM EVENT DETECTOR
 
     await initializeSystemEventDetector(
         modules.eventLog === true
@@ -880,8 +860,9 @@ async function initializeModules() {
 }
 
 
+
 /* ============================================================
-   12. APPLICATION STARTUP
+   12. SYSTEM EVENT HANDLERS
    ============================================================ */
 
 
@@ -895,7 +876,8 @@ function initializeResizeHandler() {
 
         if (telemetryGraphsModule) {
 
-            telemetryGraphsModule.drawTelemetryGraphsOnResize();
+            telemetryGraphsModule
+                .drawTelemetryGraphsOnResize();
 
         }
 
@@ -904,10 +886,14 @@ function initializeResizeHandler() {
 }
 
 
-/* ------------------------------------------------------------
-   12.3 APPLICATION INITIALIZATION
-   ------------------------------------------------------------ */
+/* ============================================================
+   13. APPLICATION STARTUP
+   ============================================================ */
 
+
+/* ------------------------------------------------------------
+   13.1 APPLICATION INITIALIZATION
+   ------------------------------------------------------------ */
 
 async function initializeApplication() {
 
@@ -915,13 +901,16 @@ async function initializeApplication() {
         "[SYSTEM] Initializing OAI MIZUSHIMA YR-02..."
     );
 
-    // Initialize application modules
+    // INITIALIZE APPLICATION MODULES
+
     await initializeModules();
 
-    // Initialize independent connection services
+    // INITIALIZE CONNECTION SERVICES
+
     await initializeConnectionManager();
 
-    // Initialize graph resize handling
+    // INITIALIZE EVENT HANDLERS
+
     initializeResizeHandler();
 
     console.info(
@@ -929,6 +918,11 @@ async function initializeApplication() {
     );
 
 }
+
+
+/* ------------------------------------------------------------
+   13.2 START APPLICATION
+   ------------------------------------------------------------ */
 
 initializeApplication().catch(error => {
 
@@ -938,7 +932,6 @@ initializeApplication().catch(error => {
     );
 
 });
-
 
 
 /* ============================================================
