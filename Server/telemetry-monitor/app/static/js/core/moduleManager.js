@@ -336,7 +336,7 @@ async function initializeSystemEventDetector(enabled) {
         );
 
         modules.systemEventDetector =
-            initSystemEventDetector(state.logEvent);
+            await initSystemEventDetector(state.logEvent);
 
         if (modules.systemEventDetector) {
 
@@ -345,9 +345,15 @@ async function initializeSystemEventDetector(enabled) {
                 "system-event"
             );
 
+            console.info(
+                "[SYSTEM EVENT DETECTOR] Initialized successfully."
+            );
+
         }
 
     } catch (error) {
+
+        modules.systemEventDetector = null;
 
         console.error(
             "[SYSTEM EVENT DETECTOR] Initialization failed:",
@@ -441,7 +447,7 @@ export async function initializeModules() {
     // PRESERVE ORIGINAL INITIALIZATION CONDITION
 
     await initializeSystemEventDetector(
-        config.eventLog === true
+        config.systemEventDetector === true
     );
 
 

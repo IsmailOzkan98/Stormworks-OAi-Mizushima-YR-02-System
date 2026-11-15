@@ -82,6 +82,11 @@ def telemetry_graphs_config():
     return load_frontend_config("modules", "telemetryGraphs.json")
 
 
+@dashboard_bp.route("/api/systemEvents-config")
+def system_events_config():
+    return load_frontend_config("modules", "systemEvents.json")
+
+
 
 
 
