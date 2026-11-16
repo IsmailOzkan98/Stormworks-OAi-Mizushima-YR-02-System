@@ -55,24 +55,46 @@ const ThemeManager = (() => {
         link.id = "active-theme";
     }
 
+    
     async function loadScript(path) {
-        if (document.querySelector(`script[src="${CSS.escape(path)}"]`)) {
-            return;
+        const existing = document.querySelector(
+            `script[data-theme-module="${CSS.escape(path)}"]`
+        );
+
+        if (existing) {
+            if (existing.dataset.loaded === "true") return;
+
+            // Evita cargar dos veces el mismo módulo mientras sigue cargando.
+            if (existing._loadPromise) {
+                return existing._loadPromise;
+            }
         }
 
-        await new Promise((resolve, reject) => {
-            const script = document.createElement("script");
+        const script = existing || document.createElement("script");
 
-            script.src = path;
-            script.onload = resolve;
-            script.onerror = () => {
-                script.remove();
-                reject(new Error(`Failed to load: ${path}`));
+        script.type = "module";
+        script.src = path;
+        script.dataset.themeModule = path;
+
+        script._loadPromise = new Promise((resolve, reject) => {
+            script.onload = () => {
+                script.dataset.loaded = "true";
+                resolve();
             };
 
-            document.head.appendChild(script);
+            script.onerror = () => {
+                script.remove();
+                reject(new Error(`Failed to load module: ${path}`));
+            };
+
+            if (!existing) {
+                document.head.appendChild(script);
+            }
         });
+
+        return script._loadPromise;
     }
+
 
     async function initialize() {
         try {
