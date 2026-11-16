@@ -1,35 +1,36 @@
 {
+    "SelectedTheme": 5,
+
     "themes": [
         {
+            "id": 1,
             "name": "nier-automata",
-            "enabled": false,
             "path": "/static/modularStylesheet/themes/nier-automata.css"
         },
         {
+            "id": 2,
             "name": "cyberpunk-2077",
-            "enabled": false,
             "path": "/static/modularStylesheet/themes/cyberpunk-2077.css"
         },
         {
+            "id": 3,
             "name": "military",
-            "enabled": false,
             "path": "/static/modularStylesheet/themes/military.css"
         },
         {
+            "id": 4,
             "name": "final-fantasy-vii",
-            "enabled": false,
             "path": "/static/modularStylesheet/themes/final-fantasy-vii.css"
         },
         {
+            "id": 5,
             "name": "cyberpunk-glitch",
-            "enabled": false,
             "path": "/static/modularStylesheet/themes/cyberpunk-glitch.css"
         },
         {
+            "id": 6,
             "name": "retro-crt-terminal",
-            "enabled": true,
             "path": "/static/modularStylesheet/themes/retro-crt-terminal.css"
         }
     ]
 }
-

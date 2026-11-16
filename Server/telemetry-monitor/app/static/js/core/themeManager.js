@@ -4,13 +4,198 @@
    Modular Theme Management System
 ========================================= */
 
+
 /* =========================================
    CONFIGURATION
 ========================================= */
 
-const THEME_CONFIG_PATH = "/api/themes-config";
+const THEME_CONFIG = {
 
-const THEME_LOG_PREFIX = "[THEME]";
+    CONFIG_PATH: "/api/themes-config",
+
+    LOG_PREFIX: "[THEME]",
+
+    SELECTED_PROPERTY: "SelectedTheme",
+
+    THEMES_PROPERTY: "themes"
+
+};
+
+
+/* =========================================
+   LOGGING
+========================================= */
+
+const ThemeLogger = {
+
+    info(message) {
+
+        console.info(
+            `${THEME_CONFIG.LOG_PREFIX} ${message}`
+        );
+
+    },
+
+    error(message, error = null) {
+
+        console.error(
+            `${THEME_CONFIG.LOG_PREFIX} ERROR: ${message}`,
+            error ?? ""
+        );
+
+    }
+
+};
+
+
+/* =========================================
+   CONFIGURATION LOADER
+========================================= */
+
+async function loadThemeConfiguration() {
+
+    const response = await fetch(
+        THEME_CONFIG.CONFIG_PATH,
+        {
+            cache: "no-cache"
+        }
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Configuration request failed: HTTP ${response.status}`
+        );
+
+    }
+
+    const config = await response.json();
+
+    if (
+        !config ||
+        !Array.isArray(config[THEME_CONFIG.THEMES_PROPERTY])
+    ) {
+
+        throw new Error(
+            "Invalid theme configuration structure."
+        );
+
+    }
+
+    return config;
+
+}
+
+
+/* =========================================
+   THEME VALIDATION
+========================================= */
+
+function validateThemeConfiguration(config) {
+
+    const selectedId = config[THEME_CONFIG.SELECTED_PROPERTY];
+
+    if (
+        !Number.isInteger(selectedId) ||
+        selectedId < 1
+    ) {
+
+        throw new Error(
+            "SelectedTheme must be a positive integer."
+        );
+
+    }
+
+    const themes = config[THEME_CONFIG.THEMES_PROPERTY];
+
+    const selectedTheme = themes.find(
+        theme => theme.id === selectedId
+    );
+
+    if (!selectedTheme) {
+
+        throw new Error(
+            `Theme ID ${selectedId} does not exist.`
+        );
+
+    }
+
+    if (
+        typeof selectedTheme.name !== "string" ||
+        !selectedTheme.name.trim()
+    ) {
+
+        throw new Error(
+            "Selected theme name is invalid."
+        );
+
+    }
+
+    if (
+        typeof selectedTheme.path !== "string" ||
+        !selectedTheme.path.trim()
+    ) {
+
+        throw new Error(
+            "Selected theme CSS path is invalid."
+        );
+
+    }
+
+    const duplicateIds = themes.filter(
+        theme => theme.id === selectedId
+    );
+
+    if (duplicateIds.length !== 1) {
+
+        throw new Error(
+            `Theme ID ${selectedId} is duplicated.`
+        );
+
+    }
+
+    return selectedTheme;
+
+}
+
+
+/* =========================================
+   CSS LOADER
+========================================= */
+
+function loadThemeStylesheet(theme) {
+
+    return new Promise((resolve, reject) => {
+
+        const stylesheet = document.createElement("link");
+
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = theme.path;
+        stylesheet.dataset.themeManager = "active";
+
+        stylesheet.onload = () => {
+
+            resolve(stylesheet);
+
+        };
+
+        stylesheet.onerror = () => {
+
+            stylesheet.remove();
+
+            reject(
+                new Error(
+                    `Failed to load CSS: ${theme.path}`
+                )
+            );
+
+        };
+
+        document.head.appendChild(stylesheet);
+
+    });
+
+}
 
 
 /* =========================================
@@ -21,118 +206,31 @@ async function initializeThemeManager() {
 
     try {
 
-        // Load JSON configuration
-        const response = await fetch(THEME_CONFIG_PATH);
+        // Load configuration
+        const config = await loadThemeConfiguration();
 
-        if (!response.ok) {
-            throw new Error("Theme configuration file not found.");
-        }
 
-        const config = await response.json();
+        // Validate and retrieve selected theme
+        const selectedTheme = validateThemeConfiguration(config);
 
-        // Validate configuration
-        if (!config || !Array.isArray(config.themes)) {
-            throw new Error("Invalid theme configuration.");
-        }
 
-        // Find enabled themes
-        const enabledThemes = config.themes.filter(
-            theme => theme.enabled === true
+        // Load selected stylesheet
+        await loadThemeStylesheet(selectedTheme);
+
+
+        // Initialization successful
+        ThemeLogger.info("Initialized successfully.");
+
+        ThemeLogger.info(
+            `Active theme: ${selectedTheme.name} (ID: ${selectedTheme.id})`
         );
-
-
-        /* =====================================
-           NO THEME SELECTED
-        ===================================== */
-
-        if (enabledThemes.length === 0) {
-
-            console.error(
-                `${THEME_LOG_PREFIX} ERROR: No theme has been selected.`
-            );
-
-            return;
-        }
-
-
-        /* =====================================
-           MULTIPLE THEMES SELECTED
-        ===================================== */
-
-        if (enabledThemes.length > 1) {
-
-            console.error(
-                `${THEME_LOG_PREFIX} ERROR: Multiple themes are enabled. ` +
-                `Only the first enabled theme will be applied.`
-            );
-
-        }
-
-
-        /* =====================================
-           SELECT THEME
-        ===================================== */
-
-        const selectedTheme = enabledThemes[0];
-
-
-        /* =====================================
-           VALIDATE CSS PATH
-        ===================================== */
-
-        if (
-            typeof selectedTheme.path !== "string" ||
-            !selectedTheme.path.trim()
-        ) {
-
-            console.error(
-                `${THEME_LOG_PREFIX} ERROR: CSS file path is invalid.`
-            );
-
-            return;
-        }
-
-
-        /* =====================================
-           LOAD CSS
-        ===================================== */
-
-        const stylesheet = document.createElement("link");
-
-        stylesheet.rel = "stylesheet";
-        stylesheet.href = selectedTheme.path;
-
-        stylesheet.onload = () => {
-
-            console.info(
-                `${THEME_LOG_PREFIX} Initialized successfully.`
-            );
-
-            console.info(
-                `${THEME_LOG_PREFIX} Active theme: ${selectedTheme.name}`
-            );
-
-        };
-
-        stylesheet.onerror = () => {
-
-            console.error(
-                `${THEME_LOG_PREFIX} ERROR: CSS file not found: ` +
-                selectedTheme.path
-            );
-
-            stylesheet.remove();
-
-        };
-
-        document.head.appendChild(stylesheet);
 
     }
 
     catch (error) {
 
-        console.error(
-            `${THEME_LOG_PREFIX} ERROR: Failed to load theme configuration JSON.`,
+        ThemeLogger.error(
+            "Failed to initialize Theme Manager.",
             error
         );
 
