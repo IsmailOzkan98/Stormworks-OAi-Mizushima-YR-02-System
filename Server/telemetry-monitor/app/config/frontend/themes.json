@@ -1,5 +1,5 @@
 {
-    "SelectedTheme": 7,
+    "SelectedTheme": 9,
 
     "themes": [
         {
@@ -39,6 +39,16 @@
             "scripts": [
                 "/static/modularStylesheet/scripts/hydra.js"
             ]
+        },
+        {
+            "id": 8,
+            "name": "star-citizen",
+            "path": "/static/modularStylesheet/themes/star-citizen.css"
+        },
+        {
+            "id": 9,
+            "name": "resident-evil",
+            "path": "/static/modularStylesheet/themes/resident-evil.css"
         }
     ]
 }
