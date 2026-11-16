@@ -54,7 +54,10 @@
         {
             "id": 9,
             "name": "star-citizen",
-            "path": "/static/modularStylesheet/themes/star-citizen.css"
+            "path": "/static/modularStylesheet/themes/star-citizen/star-citizen.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/star-citizen/star-citizen.js"
+            ]
         },
         {
             "id": 10,
