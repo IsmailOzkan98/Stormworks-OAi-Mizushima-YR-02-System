@@ -1,0 +1,976 @@
+
+/* =========================================
+   CYBERPUNK OS — NEON CORPORATE INTERFACE
+   Full theme adaptation
+   Original Nier Automata structure preserved
+========================================= */
+
+/* =========================================
+   ROOT — DESIGN SYSTEM
+========================================= */
+
+:root {
+    /* BACKGROUNDS */
+
+    --bg: #050810;
+    --panel: #080d1a;
+    --panel2: #0c1424;
+    --paper-light: #101b2d;
+    --paper-shadow: #02050c;
+    --border: rgba(0, 245, 255, .20);
+
+    /* PRIMARY COLORS */
+
+    --gold: #00f5ff;
+    --gold-light: #b5fbff;
+    --ivory: #d5eaff;
+    --muted: #68849e;
+
+    /* ORIGINAL THEME COLORS */
+
+    --text-primary: #00f5ff;
+    --text-secondary: #d5eaff;
+    --text-shadow: rgba(0, 245, 255, .25);
+
+    /* BACKGROUND GRID */
+
+    --main-bg-color: #050810;
+    --bg-grid-color: rgba(0, 245, 255, .09);
+    --bg-grid-2-color: rgba(0, 245, 255, .015);
+
+    /* STATUS COLORS */
+
+    --green: #39ff6e;
+    --cyan: #00f5ff;
+    --yellow: #f5e642;
+    --red: #ff2d78;
+
+    /* EXTRA NEON COLORS */
+
+    --magenta: #ff2d78;
+    --blue: #287bff;
+    --purple: #a855f7;
+
+    /* TYPOGRAPHY */
+
+    --mono: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+    --display: 'Rajdhani', Arial, sans-serif;
+    --tech: 'Orbitron', monospace;
+
+    /* GRAPHS */
+
+    --graph-altitude: #00f5ff;
+    --graph-target: #39ff6e;
+    --graph-alt-error: #ff2d78;
+    --graph-vs-error: #f5e642;
+
+    /* ERROR READOUTS */
+
+    --alt-error-color: #f5e642;
+    --vs-error-color: #ff2d78;
+
+    /* EFFECTS */
+
+    --neon-glow: 0 0 8px rgba(0, 245, 255, .35);
+    --neon-glow-strong: 0 0 15px rgba(0, 245, 255, .5);
+    --panel-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+
+    --transition: .2s ease;
+}
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+html {
+    background: var(--bg);
+}
+
+body {
+    background-color: var(--main-bg-color);
+
+    background-image:
+        linear-gradient(
+            to right,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        ),
+        linear-gradient(
+            to bottom,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        );
+
+    background-size: 24px 24px;
+
+    color: var(--text-secondary);
+    font-family: var(--display);
+    font-weight: 400;
+    letter-spacing: .04rem;
+}
+
+/* Ambient lighting */
+
+body::before {
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(0, 245, 255, .055),
+            transparent 65%
+        );
+    pointer-events: none;
+}
+
+::selection {
+    background-color: var(--cyan);
+    color: #050810;
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    letter-spacing: inherit;
+}
+
+/* =========================================
+   SECTION HEADER — REUSABLE
+========================================= */
+
+.section-header {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 245, 255, .13),
+        rgba(0, 245, 255, .025)
+    );
+
+    color: var(--cyan);
+    border-left: 3px solid var(--cyan);
+
+    font-family: var(--tech);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    text-shadow: 0 0 8px rgba(0, 245, 255, .45);
+}
+
+.module-header > span {
+    color: var(--muted);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+header {
+    position: relative;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(12, 20, 36, .98),
+            rgba(5, 8, 16, .98)
+        );
+
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 25px rgba(0, 245, 255, .025),
+        0 0 12px rgba(0, 245, 255, .04);
+}
+
+.eyebrow,
+.subtitle {
+    color: var(--muted);
+}
+
+h1 {
+    color: var(--text-secondary);
+    font-family: var(--tech);
+    font-weight: 500;
+
+    text-shadow:
+        0 0 10px rgba(0, 245, 255, .25);
+
+    letter-spacing: .35rem;
+    text-transform: uppercase;
+}
+
+h1 span {
+    color: var(--cyan);
+    text-shadow: 0 0 12px rgba(0, 245, 255, .6);
+}
+
+.connection {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+
+    box-shadow:
+        inset 0 0 12px rgba(0, 245, 255, .035),
+        var(--neon-glow);
+}
+
+.connection strong {
+    color: var(--cyan);
+}
+
+.connection small {
+    color: var(--muted);
+}
+
+/* =========================================
+   MISSION BAR
+========================================= */
+
+.mission-bar {
+    background: linear-gradient(
+        110deg,
+        #0c1424,
+        #080d1a
+    );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 15px rgba(0, 245, 255, .025);
+}
+
+.micro-label {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.mission-stage strong {
+    color: var(--cyan);
+    font-weight: 500;
+}
+
+.state-pill.running {
+    color: var(--green) !important;
+    text-shadow: 0 0 8px rgba(57, 255, 110, .5);
+}
+
+.state-pill.completed {
+    color: var(--cyan) !important;
+    text-shadow: 0 0 8px rgba(0, 245, 255, .5);
+}
+
+.state-pill.idle {
+    color: var(--yellow) !important;
+    text-shadow: 0 0 8px rgba(245, 230, 66, .35);
+}
+
+/* MISSION INFORMATION */
+
+.mission-stage {
+    background: rgba(0, 245, 255, .045);
+    border-left: 3px solid var(--cyan);
+}
+
+.mission-stage .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.mission-stage strong {
+    color: var(--cyan);
+    font-family: var(--mono);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 1px;
+
+    text-shadow: 0 0 8px rgba(0, 245, 255, .3);
+}
+
+/* DATA CELLS */
+
+.mission-data > div {
+    background: var(--panel2);
+    border: 1px solid rgba(0, 245, 255, .12);
+
+    box-shadow:
+        inset 0 0 12px rgba(0, 245, 255, .025);
+}
+
+.mission-data .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.mission-data strong {
+    color: var(--text-secondary);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.mission-data .state-pill {
+    color: var(--green);
+    font-size: 11px;
+}
+
+/* =========================================
+   RECORDER PANEL
+========================================= */
+
+.recorder-panel {
+    background:
+        linear-gradient(
+            145deg,
+            var(--panel2),
+            var(--panel)
+        );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 20px rgba(0, 245, 255, .025);
+}
+
+/* =========================================
+   METRIC CARDS
+========================================= */
+
+.card {
+    position: relative;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101b2d,
+            #080d1a
+        );
+
+    border: 1px solid rgba(0, 245, 255, .16);
+
+    box-shadow:
+        0 5px 18px rgba(0, 0, 0, .3),
+        inset 0 0 15px rgba(0, 245, 255, .02);
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+}
+
+.card:hover {
+    background: #101f32;
+    border-color: var(--cyan);
+
+    box-shadow:
+        0 0 12px rgba(0, 245, 255, .15),
+        0 8px 25px rgba(0, 0, 0, .4),
+        inset 0 0 20px rgba(0, 245, 255, .035);
+
+    transform: translateY(-2px);
+}
+
+.card::after {
+    background: linear-gradient(
+        90deg,
+        var(--cyan),
+        var(--magenta)
+    );
+
+    box-shadow: 0 0 10px var(--cyan);
+}
+
+.card-label {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.value {
+    color: var(--cyan);
+    font-family: var(--mono);
+    font-weight: 400;
+
+    text-shadow: 0 0 10px rgba(0, 245, 255, .25);
+}
+
+.unit {
+    color: var(--muted);
+}
+
+.highlight {
+    color: var(--cyan);
+}
+
+.cyan {
+    color: var(--cyan);
+    text-shadow: 0 0 8px rgba(0, 245, 255, .4);
+}
+
+.yellow {
+    color: var(--yellow);
+    text-shadow: 0 0 8px rgba(245, 230, 66, .3);
+}
+
+/* =========================================
+   DIAGNOSTICS
+========================================= */
+
+.diagnostics-panel {
+    background: linear-gradient(
+        145deg,
+        var(--panel2),
+        var(--panel)
+    );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 20px rgba(0, 245, 255, .02);
+}
+
+.diagnostic-header {
+    color: var(--cyan);
+    font-family: var(--tech);
+    font-weight: 500;
+}
+
+.diagnostic-row {
+    border-top: 1px solid rgba(0, 245, 255, .12);
+}
+
+.diagnostic-status b {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.diagnostic-status b.active-text {
+    color: var(--green);
+    text-shadow: 0 0 7px rgba(57, 255, 110, .4);
+}
+
+.indicator {
+    background: #26364a;
+    border: 1px solid rgba(0, 245, 255, .15);
+    box-shadow: none;
+}
+
+.indicator.active {
+    background: var(--green);
+    border-color: var(--green);
+
+    box-shadow:
+        0 0 5px var(--green),
+        0 0 12px rgba(57, 255, 110, .5);
+
+    animation: indicator-pulse 2s infinite ease-in-out;
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--border);
+    color: var(--cyan);
+}
+
+/* =========================================
+   DIRECTIONAL BOOSTERS
+========================================= */
+
+.booster {
+    background: var(--panel2);
+    border: 1px solid rgba(0, 245, 255, .15);
+
+    transition: all var(--transition);
+}
+
+.booster.pulse {
+    background: rgba(0, 245, 255, .07);
+    border-color: var(--cyan);
+
+    box-shadow:
+        inset 0 0 15px rgba(0, 245, 255, .08),
+        0 0 10px rgba(0, 245, 255, .08);
+}
+
+.booster.pulse span {
+    color: var(--cyan);
+    text-shadow: 0 0 8px rgba(0, 245, 255, .4);
+}
+
+.booster.pulse .indicator {
+    background: var(--cyan);
+    border-color: var(--cyan);
+
+    box-shadow: 0 0 10px var(--cyan);
+}
+
+/* =========================================
+   MONITOR
+========================================= */
+
+.monitor-panel {
+    background: linear-gradient(
+        145deg,
+        var(--panel2),
+        var(--panel)
+    );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 15px rgba(0, 245, 255, .025);
+}
+
+.monitor-title,
+.event-header {
+    color: var(--cyan);
+    border-bottom: 1px solid var(--border);
+
+    font-family: var(--tech);
+    font-weight: 500;
+}
+
+.monitor-item {
+    border-bottom: 1px solid rgba(0, 245, 255, .10);
+}
+
+.monitor-item span {
+    color: var(--muted);
+}
+
+.monitor-item strong {
+    color: var(--text-secondary);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+/* =========================================
+   EVENT LOG
+========================================= */
+
+.event-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 15px rgba(0, 245, 255, .025);
+}
+
+.event-header span:last-child {
+    color: var(--green);
+    text-shadow: 0 0 8px rgba(57, 255, 110, .4);
+}
+
+.event-entry {
+    border-bottom: 1px solid rgba(0, 245, 255, .08);
+
+    transition: background-color var(--transition);
+}
+
+.event-entry:hover {
+    background: rgba(0, 245, 255, .045);
+}
+
+.event-time {
+    color: var(--muted);
+    font-family: var(--mono);
+}
+
+.event-entry span:last-child {
+    color: var(--text-secondary);
+}
+
+/* FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid var(--border);
+    border-left-color: var(--cyan);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--cyan);
+}
+
+/* ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--green);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--green);
+}
+
+/* DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--muted);
+}
+
+/* ERRORS */
+
+.event-entry.error {
+    border-left-color: var(--red);
+    background: rgba(255, 45, 120, .07);
+}
+
+.event-entry.error span:last-child {
+    color: var(--red);
+    text-shadow: 0 0 7px rgba(255, 45, 120, .35);
+}
+
+/* NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--cyan);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--cyan);
+}
+
+/* WARNINGS */
+
+.event-entry.warning {
+    border-left-color: var(--yellow);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--yellow);
+}
+
+/* NORMAL EVENTS */
+
+.event-entry.normal {
+    border-left-color: var(--border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--muted);
+}
+
+/* =========================================
+   SYSTEM INFO
+========================================= */
+
+.system-info > div {
+    background: var(--panel2);
+    border: 1px solid rgba(0, 245, 255, .13);
+
+    box-shadow:
+        inset 0 0 12px rgba(0, 245, 255, .025);
+}
+
+.system-info span {
+    color: var(--muted);
+}
+
+.system-info strong {
+    color: var(--cyan);
+    font-family: var(--mono);
+    font-weight: 400;
+}
+
+/* =========================================
+   FLIGHT DATA RECORDER BUTTON
+========================================= */
+
+.recorder-dot {
+    background: var(--green);
+
+    box-shadow:
+        0 0 6px var(--green),
+        0 0 12px rgba(57, 255, 110, .35);
+}
+
+.recorder-btn.stop .recorder-dot {
+    background: var(--red);
+
+    box-shadow:
+        0 0 6px var(--red),
+        0 0 12px rgba(255, 45, 120, .35);
+}
+
+/* =========================================
+   TELEMETRY GRAPHS
+========================================= */
+
+.telemetry-chart-panel {
+    background: linear-gradient(
+        145deg,
+        #0c1424,
+        #080d1a
+    );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--panel-shadow),
+        inset 0 0 20px rgba(0, 245, 255, .025);
+}
+
+.telemetry-chart-panel::after {
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+}
+
+.telemetry-chart-header {
+    color: var(--cyan);
+    border-bottom: 1px solid var(--border);
+
+    font-family: var(--tech);
+    font-weight: 500;
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--muted);
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--cyan);
+    font-family: var(--mono);
+    font-weight: 400;
+
+    text-shadow: 0 0 8px rgba(0, 245, 255, .25);
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--green);
+    text-shadow: 0 0 8px rgba(57, 255, 110, .3);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--yellow);
+    text-shadow: 0 0 8px rgba(245, 230, 66, .25);
+}
+
+.legend-alt {
+    color: var(--cyan);
+}
+
+.legend-target {
+    color: var(--green);
+}
+
+.legend-error {
+    color: var(--red);
+}
+
+/* =========================================
+   INPUTS AND CONTROLS
+========================================= */
+
+input,
+select,
+textarea {
+    border: 1px solid rgba(0, 245, 255, .25);
+    border-radius: 0;
+
+    background: #080d1a;
+    color: var(--cyan);
+
+    font-family: var(--mono);
+    font-weight: 400;
+
+    box-shadow: inset 0 0 10px rgba(0, 245, 255, .025);
+
+    transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background-color var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+
+    border-color: var(--cyan);
+
+    background: #0c1424;
+
+    box-shadow:
+        0 0 0 1px rgba(0, 245, 255, .2),
+        0 0 12px rgba(0, 245, 255, .15);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #52677e;
+}
+
+/* =========================================
+   GLOBAL BUTTON SYSTEM
+========================================= */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: 1px solid var(--cyan);
+    border-radius: 0;
+
+    background: rgba(0, 245, 255, .08);
+    color: var(--cyan);
+
+    font-family: var(--tech);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .08rem;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 12px rgba(0, 245, 255, .04),
+        0 0 5px rgba(0, 245, 255, .08);
+
+    transition:
+        color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+/* Horizontal sweep */
+
+button::after,
+.button::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+
+    background: var(--cyan);
+    z-index: -1;
+
+    transition: width .2s ease-out;
+}
+
+/* Hover */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: #050810;
+
+    border-color: var(--cyan);
+
+    box-shadow:
+        0 0 8px rgba(0, 245, 255, .4),
+        0 0 18px rgba(0, 245, 255, .15);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+/* Active */
+
+button:not(:disabled):active,
+.button:active {
+    color: #050810;
+
+    box-shadow:
+        0 0 15px rgba(0, 245, 255, .4);
+}
+
+/* Disabled */
+
+button:disabled,
+.button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.event-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: #080d1a;
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: var(--cyan);
+
+    box-shadow: 0 0 6px rgba(0, 245, 255, .5);
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes indicator-pulse {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 6px var(--green);
+    }
+
+    50% {
+        opacity: .55;
+        box-shadow: 0 0 2px var(--green);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .45;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
