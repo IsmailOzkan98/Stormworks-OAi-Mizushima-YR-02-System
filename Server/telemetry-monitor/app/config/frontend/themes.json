@@ -1,0 +1,19 @@
+{
+    "themes": [
+        {
+            "name": "nier-automata",
+            "enabled": true,
+            "path": "/static/modularStylesheet/themes/nier-automata.css"
+        },
+        {
+            "name": "cyberpunk",
+            "enabled": false,
+            "path": "/static/modularStylesheet/themes/cyberpunk.css"
+        },
+        {
+            "name": "military",
+            "enabled": false,
+            "path": "/static/modularStylesheet/themes/military.css"
+        }
+    ]
+}

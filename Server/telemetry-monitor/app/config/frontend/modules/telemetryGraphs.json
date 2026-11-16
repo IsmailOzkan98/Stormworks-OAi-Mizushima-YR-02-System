@@ -2,7 +2,6 @@
 {
     "enabled": true,
     "sectionHeading": {
-        "number": "04",
         "title": "FLIGHT TELEMETRY"
     },
     "history": {

@@ -87,6 +87,11 @@ def system_events_config():
     return load_frontend_config("modules", "systemEvents.json")
 
 
+@dashboard_bp.route("/api/themes-config")
+def themes_config():
+    return load_frontend_config("themes.json")
+
+
 
 
 
