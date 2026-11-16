@@ -96,48 +96,48 @@
     /* TYPOGRAPHY — COMPONENTS */
 
     /* HEADER */
-    --font-size-header-title: clamp(2.8rem, 6vw, 4.5rem);
-    --font-size-header-subtitle: 1.15rem;
+    --font-size-header-title: clamp(2.2rem, 4vw, 3.2rem);
+    --font-size-header-subtitle: 0.85rem;
 
     /* MISSION BAR */
-    --font-size-mission-label: 0.95rem;
-    --font-size-mission-value: 1.5rem;
-    --font-size-mission-data: 1.5rem;
+    --font-size-mission-label: 0.9rem;
+    --font-size-mission-value: 0.8rem;
+    --font-size-mission-data: 0.8rem;
 
     /* METRIC CARDS */
-    --font-size-card-label: 1rem;
-    --font-size-card-value: 2.6rem;
-    --font-size-card-unit: 1rem;
+    --font-size-card-label: 0.8rem;
+    --font-size-card-value: 0.85rem;
+    --font-size-card-unit: 0.8rem;
 
     /* DIAGNOSTICS */
-    --font-size-diagnostic-header: 1.2rem;
-    --font-size-diagnostic-label: 1rem;
-    --font-size-diagnostic-status: 1rem;
+    --font-size-diagnostic-header: 0.85rem;
+    --font-size-diagnostic-label: 0.8rem;
+    --font-size-diagnostic-status: 0.8rem;
 
     /* BOOSTERS */
-    --font-size-booster-label: 1rem;
+    --font-size-booster-label: 0.8rem;
 
     /* MONITOR */
-    --font-size-monitor-title: 1.3rem;
-    --font-size-monitor-label: 1rem;
-    --font-size-monitor-value: 1rem;
+    --font-size-monitor-title: 0.85rem;
+    --font-size-monitor-label: 0.8rem;
+    --font-size-monitor-value: 0.8rem;
 
     /* EVENT LOG */
-    --font-size-event-header: 1.2rem;
-    --font-size-event-time: 0.95rem;
-    --font-size-event-entry: 1rem;
+    --font-size-event-header: 0.85rem;
+    --font-size-event-time: 0.9rem;
+    --font-size-event-entry: 0.8rem;
 
     /* SYSTEM INFO */
-    --font-size-system-label: 0.95rem;
-    --font-size-system-value: 1rem;
+    --font-size-system-label: 0.9rem;
+    --font-size-system-value: 0.8rem;
 
     /* TELEMETRY */
-    --font-size-telemetry-title: 1.2rem;
-    --font-size-telemetry-label: 0.95rem;
-    --font-size-telemetry-value: 1.4rem;
+    --font-size-telemetry-title: 0.85rem;
+    --font-size-telemetry-label: 0.9rem;
+    --font-size-telemetry-value: 0.85rem;
 
     /* FOOTER */
-    --font-size-footer: 0.95rem;
+    --font-size-footer: 0.9rem;
 
 
     /* TYPOGRAPHY — WEIGHTS */
