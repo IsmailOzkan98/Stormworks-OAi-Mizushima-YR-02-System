@@ -38,7 +38,10 @@
         {
             "id": 7,
             "name": "retro-crt-terminal",
-            "path": "/static/modularStylesheet/themes/retro-crt-terminal.css"
+            "path": "/static/modularStylesheet/themes/retro-crt-terminal/retro-crt-terminal.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/retro-crt-terminal/retro-crt-terminal.js"
+            ]
         },
         {
             "id": 8,
