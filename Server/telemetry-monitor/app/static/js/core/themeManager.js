@@ -1,218 +1,124 @@
 
 "use strict";
 
-/* =====================================================
-   CONFIG
-===================================================== */
-
 const CONFIG = {
     API: "/api/themes-config",
     STORAGE_KEY: "ActiveDashboardTheme",
-    TRIGGER_ID: "theme-selector-trigger",
-    MODAL_ID: "theme-selector-modal"
+    TRIGGER_ID: "theme-selector-trigger"
 };
-
-
-/* =====================================================
-   THEME MANAGER
-===================================================== */
 
 const ThemeManager = (() => {
 
-    let configPromise = null;
-    let activeStylesheet = null;
+    let config;
 
-    const loadedScripts = new Map();
-
-
-    // Get themes configuration
     async function getConfig() {
-
-        if (!configPromise) {
-
-            configPromise = fetch(CONFIG.API, {
+        if (!config) {
+            const response = await fetch(CONFIG.API, {
                 cache: "no-store"
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
+            });
 
-                    return response.json();
-                })
-                .then(config => {
-
-                    if (!Array.isArray(config.themes)) {
-                        throw new Error("Invalid themes configuration.");
-                    }
-
-                    return config;
-                })
-                .catch(error => {
-                    configPromise = null;
-                    throw error;
-                });
-        }
-
-        return configPromise;
-    }
-
-
-    // Get selected theme
-    function getSelectedTheme(config) {
-
-        const storedId = localStorage.getItem(CONFIG.STORAGE_KEY);
-
-        return config.themes.find(theme =>
-            String(theme.id) === storedId
-        ) || config.themes.find(theme =>
-            theme.id === config.SelectedTheme
-        ) || config.themes[0];
-    }
-
-
-    // Load stylesheet
-    function loadStylesheet(theme) {
-
-        return new Promise((resolve, reject) => {
-
-            if (!theme?.path) {
-                reject(new Error("Invalid theme stylesheet."));
-                return;
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
             }
 
-            const link = document.createElement("link");
+            config = await response.json();
 
-            link.rel = "stylesheet";
-            link.href = theme.path;
-
-            link.onload = () => {
-
-                activeStylesheet?.remove();
-                activeStylesheet = link;
-
-                console.info(`[THEME] Loaded: ${theme.name}`);
-
-                resolve();
-            };
-
-            link.onerror = () => {
-                link.remove();
-                reject(new Error(`Failed to load: ${theme.path}`));
-            };
-
-            document.head.appendChild(link);
-        });
-    }
-
-
-    // Load script only once
-    function loadScript(path) {
-
-        if (loadedScripts.has(path)) {
-            return loadedScripts.get(path);
+            if (!Array.isArray(config.themes) || !config.themes.length) {
+                throw new Error("Invalid themes configuration.");
+            }
         }
 
-        const promise = new Promise((resolve, reject) => {
+        return config;
+    }
 
+    function getSelectedTheme(config) {
+        const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+
+        return config.themes.find(t => String(t.id) === stored)
+            || config.themes.find(t => t.id === config.SelectedTheme)
+            || config.themes[0];
+    }
+
+    async function loadStylesheet(path) {
+        const link = document.createElement("link");
+
+        link.rel = "stylesheet";
+        link.href = path;
+
+        await new Promise((resolve, reject) => {
+            link.onload = resolve;
+            link.onerror = reject;
+            document.head.appendChild(link);
+        });
+
+        document.querySelector("#active-theme")?.remove();
+        link.id = "active-theme";
+    }
+
+    async function loadScript(path) {
+        if (document.querySelector(`script[src="${CSS.escape(path)}"]`)) {
+            return;
+        }
+
+        await new Promise((resolve, reject) => {
             const script = document.createElement("script");
 
             script.src = path;
-            script.async = false;
-
             script.onload = resolve;
-
             script.onerror = () => {
                 script.remove();
-                reject(new Error(`Failed to load script: ${path}`));
+                reject(new Error(`Failed to load: ${path}`));
             };
 
             document.head.appendChild(script);
         });
-
-        loadedScripts.set(path, promise);
-
-        promise.catch(() => loadedScripts.delete(path));
-
-        return promise;
     }
 
-
-    // Initialize theme
     async function initialize() {
-
         try {
-
             const config = await getConfig();
             const theme = getSelectedTheme(config);
 
-            if (!theme) {
-                throw new Error("No themes available.");
-            }
+            await loadStylesheet(theme.path);
 
-            await loadStylesheet(theme);
-
-            for (const script of theme.scripts ?? []) {
+            for (const script of theme.scripts || []) {
                 await loadScript(script);
             }
-
-            console.info(`[THEME] Active: ${theme.name}`);
 
             return theme;
 
         } catch (error) {
-
-            console.error("[THEME] Initialization failed:", error);
-
+            console.error("[THEME]", error);
             return null;
         }
     }
 
-
-    return {
-        initialize,
-        getConfig,
-        getSelectedTheme
-    };
+    return { initialize, getConfig, getSelectedTheme };
 
 })();
 
 
-/* =====================================================
-   THEME SELECTOR
-===================================================== */
 
 const ThemeSelector = (() => {
 
-    let modal = null;
-
-
     function createElement(tag, text = "") {
-
         const element = document.createElement(tag);
-
         element.textContent = text;
-
         return element;
     }
 
-
-    function close() {
-        modal?.close();
-    }
-
-
     function createModal() {
+        let modal = document.querySelector("#theme-selector-modal");
 
         if (modal) return modal;
 
         modal = document.createElement("dialog");
-        modal.id = CONFIG.MODAL_ID;
+        modal.id = "theme-selector-modal";
         modal.style.background = "var(--panel)";
 
         const closeButton = createElement("button", "×");
         closeButton.type = "button";
-        closeButton.addEventListener("click", close);
+        closeButton.onclick = () => modal.close();
 
         const title = createElement("h1", "THEME SELECTOR");
 
@@ -235,7 +141,7 @@ const ThemeSelector = (() => {
         modal.append(closeButton, title, description, list);
 
         modal.addEventListener("click", event => {
-            if (event.target === modal) close();
+            if (event.target === modal) modal.close();
         });
 
         document.body.appendChild(modal);
@@ -243,108 +149,71 @@ const ThemeSelector = (() => {
         return modal;
     }
 
-
     async function renderThemes() {
-
-        const list = modal.querySelector("#ts-theme-list");
-
+        const list = document.querySelector("#ts-theme-list");
         list.replaceChildren();
 
         try {
-
             const config = await ThemeManager.getConfig();
-            const activeTheme = ThemeManager.getSelectedTheme(config);
+            const active = ThemeManager.getSelectedTheme(config);
 
             config.themes.forEach(theme => {
-
                 const button = createElement(
                     "button",
-                    `${theme.name}${theme.id === activeTheme?.id ? " ✓ ACTIVE" : ""}`
+                    theme.name + (theme.id === active.id ? " ✓ ACTIVE" : "")
                 );
 
                 button.type = "button";
-
-                button.addEventListener("click", () => selectTheme(theme));
+                button.onclick = () => selectTheme(theme);
 
                 list.appendChild(button);
             });
 
         } catch (error) {
+            list.appendChild(
+                createElement("p", "Unable to load themes.")
+            );
 
-            list.appendChild(createElement("p", "Unable to load themes."));
-
-            console.error("[THEME] Selector error:", error);
+            console.error("[THEME]", error);
         }
     }
 
-
     function selectTheme(theme) {
-
-        if (!window.confirm(`Apply "${theme.name}"?\n\nThe dashboard will reload.`)) {
+        if (!confirm(`Apply "${theme.name}"?\n\nThe dashboard will reload.`)) {
             return;
         }
 
         try {
-
-            localStorage.setItem(
-                CONFIG.STORAGE_KEY,
-                String(theme.id)
-            );
-
-            window.location.reload();
-
+            localStorage.setItem(CONFIG.STORAGE_KEY, String(theme.id));
+            location.reload();
         } catch (error) {
-
-            console.error("[THEME] Unable to save theme:", error);
+            console.error("[THEME]", error);
             alert("Unable to save the selected theme.");
         }
     }
 
-
     async function open() {
+        const modal = createModal();
 
-        const dialog = createModal();
-
-        if (!dialog.open) {
-            dialog.showModal();
-        }
+        if (!modal.open) modal.showModal();
 
         await renderThemes();
     }
 
-
     function initialize() {
-
-        const trigger = document.getElementById(CONFIG.TRIGGER_ID);
-
-        if (!trigger) {
-            console.warn("[THEME] Theme selector button not found.");
-            return;
-        }
-
-        trigger.addEventListener("click", open);
+        document.getElementById(CONFIG.TRIGGER_ID)
+            ?.addEventListener("click", open);
     }
 
-
-    return {
-        initialize,
-        open,
-        close
-    };
+    return { initialize, open, close: () => {
+        document.querySelector("#theme-selector-modal")?.close();
+    } };
 
 })();
 
 
-/* =====================================================
-   START
-===================================================== */
 
-async function initializeThemeSystem() {
+/* START */
 
-    ThemeSelector.initialize();
-
-    await ThemeManager.initialize();
-
-}
-
-initializeThemeSystem();
+ThemeSelector.initialize();
+ThemeManager.initialize();
