@@ -1,5 +1,5 @@
 {
-    "SelectedTheme": 5,
+    "SelectedTheme": 7,
 
     "themes": [
         {
@@ -31,6 +31,11 @@
             "id": 6,
             "name": "retro-crt-terminal",
             "path": "/static/modularStylesheet/themes/retro-crt-terminal.css"
+        },
+        {
+            "id": 7,
+            "name": "minecraft-classic",
+            "path": "/static/modularStylesheet/themes/minecraft-classic.css"
         }
     ]
 }
