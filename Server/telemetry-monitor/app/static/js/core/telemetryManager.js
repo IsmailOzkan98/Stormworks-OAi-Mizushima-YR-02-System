@@ -125,9 +125,16 @@ export async function initializeTelemetry() {
 
                 // PROCESS SYSTEM EVENTS
 
-                if (modules.systemEventDetector) {
+                try {
 
-                    modules.systemEventDetector.processTelemetry(data);
+                    modules.systemEventDetector?.processTelemetry(data);
+
+                } catch (error) {
+
+                    console.error(
+                        "[SYSTEM EVENT DETECTOR] Processing failed:",
+                        error
+                    );
 
                 }
 

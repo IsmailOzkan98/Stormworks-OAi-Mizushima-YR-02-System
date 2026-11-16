@@ -1,0 +1,876 @@
+
+/* =========================================
+   MILITARY TACTICAL OS
+   Full theme adaptation
+========================================= */
+
+:root {
+    /* BACKGROUNDS */
+
+    --bg: #111811;
+    --panel: #1a2319;
+    --panel2: #252e20;
+    --paper-light: #303a29;
+    --paper-shadow: #0a100b;
+    --border: rgba(169, 183, 130, .22);
+
+    /* PRIMARY COLORS */
+
+    --gold: #c2b477;
+    --gold-light: #e0d5a5;
+    --ivory: #d1d5bc;
+    --muted: #89917c;
+
+    /* ORIGINAL THEME COLORS */
+
+    --text-primary: #c2b477;
+    --text-secondary: #d1d5bc;
+    --text-shadow: rgba(169, 183, 130, .22);
+
+    /* BACKGROUND GRID */
+
+    --main-bg-color: #111811;
+    --bg-grid-color: rgba(169, 183, 130, .065);
+    --bg-grid-2-color: rgba(169, 183, 130, .01);
+
+    /* STATUS COLORS */
+
+    --green: #a8c879;
+    --cyan: #91a9a0;
+    --yellow: #d5b75c;
+    --red: #c15a49;
+
+    /* ADDITIONAL MILITARY COLORS */
+
+    --olive: #65734c;
+    --khaki: #b5a36a;
+    --phosphor: #c5d0a0;
+    --steel: #788b83;
+
+    /* TYPOGRAPHY */
+
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Rajdhani', Arial, sans-serif;
+
+    /* GRAPHS */
+
+    --graph-altitude: #c2b477;
+    --graph-target: #a8c879;
+    --graph-alt-error: #c15a49;
+    --graph-vs-error: #d5b75c;
+
+    /* ERROR READOUTS */
+
+    --alt-error-color: #d5b75c;
+    --vs-error-color: #c15a49;
+
+    /* EFFECTS */
+
+    --neon-glow: 0 0 5px rgba(168, 200, 121, .12);
+    --neon-glow-strong: 0 0 10px rgba(168, 200, 121, .2);
+    --panel-shadow: 3px 3px 0 rgba(0, 0, 0, .35);
+
+    /* MOTION */
+
+    --transition: .2s ease;
+}
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+html {
+    background: var(--bg);
+}
+
+body {
+    background-color: var(--main-bg-color);
+
+    background-image:
+        linear-gradient(
+            to right,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        ),
+        linear-gradient(
+            to bottom,
+            var(--bg-grid-color) 1px,
+            var(--bg-grid-2-color) 1px
+        );
+
+    background-size: 24px 24px;
+
+    color: var(--text-secondary);
+    font-family: var(--display);
+    font-weight: 500;
+    letter-spacing: .035rem;
+}
+
+body::before {
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(169, 183, 130, .045),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+::selection {
+    background-color: var(--gold);
+    color: var(--bg);
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    letter-spacing: inherit;
+}
+
+/* =========================================
+   SECTION HEADER — REUSABLE
+========================================= */
+
+.section-header {
+    background: #303a29;
+    color: var(--gold-light);
+
+    border-left: 4px solid var(--olive);
+
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.module-header > span {
+    color: var(--muted);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+header {
+    position: relative;
+
+    background: linear-gradient(
+        135deg,
+        #252e20,
+        #1a2319
+    );
+
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--khaki);
+
+    box-shadow:
+        3px 3px 0 var(--paper-shadow),
+        inset 0 0 20px rgba(169, 183, 130, .025);
+}
+
+.eyebrow,
+.subtitle {
+    color: var(--muted);
+}
+
+h1 {
+    color: var(--gold-light);
+    font-family: var(--display);
+    font-weight: 600;
+
+    text-shadow: 2px 2px 0 #111811;
+
+    letter-spacing: .4rem;
+    text-transform: uppercase;
+}
+
+h1 span {
+    color: var(--gold);
+}
+
+.connection {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.connection strong {
+    color: var(--green);
+}
+
+.connection small {
+    color: var(--muted);
+}
+
+/* =========================================
+   MISSION BAR
+========================================= */
+
+.mission-bar {
+    background: #252e20;
+
+    border: 1px solid var(--border);
+
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.micro-label {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.mission-stage strong {
+    color: var(--gold-light);
+    font-weight: 600;
+}
+
+.state-pill.running {
+    color: var(--green) !important;
+}
+
+.state-pill.completed {
+    color: var(--cyan) !important;
+}
+
+.state-pill.idle {
+    color: var(--yellow) !important;
+}
+
+/* MISSION INFORMATION */
+
+.mission-stage {
+    background: #303a29;
+    border-left: 3px solid var(--khaki);
+}
+
+.mission-stage .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.mission-stage strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* DATA CELLS */
+
+.mission-data > div {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 1px 1px 0 var(--paper-shadow);
+}
+
+.mission-data .micro-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.mission-data strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.mission-data .state-pill {
+    color: var(--green);
+    font-size: 11px;
+}
+
+/* =========================================
+   RECORDER PANEL
+========================================= */
+
+.recorder-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+/* =========================================
+   METRIC CARDS
+========================================= */
+
+.card {
+    position: relative;
+
+    background: linear-gradient(
+        145deg,
+        #252e20,
+        #1a2319
+    );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        2px 2px 0 var(--paper-shadow),
+        inset 0 0 15px rgba(169, 183, 130, .015);
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+}
+
+.card:hover {
+    background: #303a29;
+    border-color: var(--khaki);
+
+    box-shadow:
+        3px 3px 0 var(--paper-shadow),
+        inset 0 0 15px rgba(169, 183, 130, .04);
+
+    transform: translateY(-1px);
+}
+
+.card::after {
+    background: var(--khaki);
+}
+
+.card-label {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.value {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.unit {
+    color: var(--muted);
+}
+
+.highlight {
+    color: var(--gold);
+}
+
+.cyan {
+    color: var(--cyan);
+}
+
+.yellow {
+    color: var(--yellow);
+}
+
+/* =========================================
+   DIAGNOSTICS
+========================================= */
+
+.diagnostics-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.diagnostic-header {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.diagnostic-row {
+    border-top: 1px solid var(--border);
+}
+
+.diagnostic-status b {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.diagnostic-status b.active-text {
+    color: var(--green);
+}
+
+.indicator {
+    background: #414b38;
+    border: 1px solid #65704f;
+    box-shadow: none;
+}
+
+.indicator.active {
+    background: var(--green);
+    border-color: var(--green);
+
+    box-shadow:
+        0 0 4px rgba(168, 200, 121, .3);
+
+    animation: indicator-pulse 2s infinite ease-in-out;
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--border);
+    color: var(--gold);
+}
+
+/* =========================================
+   DIRECTIONAL BOOSTERS
+========================================= */
+
+.booster {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+
+    transition: all var(--transition);
+}
+
+.booster.pulse {
+    background: #303a29;
+    border-color: var(--khaki);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(181, 163, 106, .12);
+}
+
+.booster.pulse span {
+    color: var(--gold-light);
+}
+
+.booster.pulse .indicator {
+    background: var(--green);
+    border-color: var(--green);
+
+    box-shadow: 0 0 5px rgba(168, 200, 121, .3);
+}
+
+/* =========================================
+   MONITOR
+========================================= */
+
+.monitor-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.monitor-title,
+.event-header {
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.monitor-item {
+    border-bottom: 1px solid rgba(169, 183, 130, .12);
+}
+
+.monitor-item span {
+    color: var(--muted);
+}
+
+.monitor-item strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+/* =========================================
+   EVENT LOG
+========================================= */
+
+.event-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.event-header span:last-child {
+    color: var(--green);
+}
+
+.event-entry {
+    border-bottom: 1px solid rgba(169, 183, 130, .10);
+
+    transition: background-color var(--transition);
+}
+
+.event-entry:hover {
+    background: rgba(169, 183, 130, .045);
+}
+
+.event-time {
+    color: var(--muted);
+    font-family: var(--mono);
+}
+
+.event-entry span:last-child {
+    color: var(--text-secondary);
+}
+
+/* FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid var(--border);
+    border-left-color: var(--khaki);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--gold);
+}
+
+/* ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--green);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--green);
+}
+
+/* DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--muted);
+}
+
+/* ERRORS */
+
+.event-entry.error {
+    border-left-color: var(--red);
+    background: rgba(193, 90, 73, .09);
+}
+
+.event-entry.error span:last-child {
+    color: var(--red);
+}
+
+/* NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--cyan);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--cyan);
+}
+
+/* WARNINGS */
+
+.event-entry.warning {
+    border-left-color: var(--yellow);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--yellow);
+}
+
+/* NORMAL EVENTS */
+
+.event-entry.normal {
+    border-left-color: var(--border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--muted);
+}
+
+/* =========================================
+   SYSTEM INFO
+========================================= */
+
+.system-info > div {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.system-info span {
+    color: var(--muted);
+}
+
+.system-info strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+/* =========================================
+   FLIGHT DATA RECORDER BUTTON
+========================================= */
+
+.recorder-dot {
+    background: var(--green);
+}
+
+.recorder-btn.stop .recorder-dot {
+    background: var(--red);
+}
+
+/* =========================================
+   TELEMETRY GRAPHS
+========================================= */
+
+.telemetry-chart-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.telemetry-chart-panel::after {
+    background: var(--khaki);
+}
+
+.telemetry-chart-header {
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--muted);
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--green);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--yellow);
+}
+
+.legend-alt {
+    color: var(--gold);
+}
+
+.legend-target {
+    color: var(--green);
+}
+
+.legend-error {
+    color: var(--red);
+}
+
+/* =========================================
+   INPUTS AND CONTROLS
+========================================= */
+
+input,
+select,
+textarea {
+    border: 1px solid var(--border);
+    border-radius: 0;
+
+    background: #161e15;
+    color: var(--gold-light);
+
+    font-family: var(--mono);
+    font-weight: 400;
+
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, .2);
+
+    transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background-color var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 1px solid var(--khaki);
+    outline-offset: 2px;
+
+    border-color: var(--khaki);
+
+    box-shadow:
+        0 0 0 2px rgba(181, 163, 106, .12);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #727c68;
+}
+
+/* =========================================
+   GLOBAL BUTTON SYSTEM
+========================================= */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: 1px solid #65734c;
+    border-radius: 0;
+
+    background: #303a29;
+    color: var(--gold-light);
+
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05rem;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    box-shadow:
+        2px 2px 0 var(--paper-shadow);
+
+    transition:
+        color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+/* Horizontal sweep */
+
+button::after,
+.button::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+
+    background: var(--khaki);
+    z-index: -1;
+
+    transition: width .2s ease-out;
+}
+
+/* Hover */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: #111811;
+
+    border-color: var(--khaki);
+
+    box-shadow:
+        2px 2px 0 var(--paper-shadow),
+        0 0 8px rgba(181, 163, 106, .12);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+/* Active */
+
+button:not(:disabled):active,
+.button:active {
+    color: #111811;
+    box-shadow: none;
+}
+
+/* Disabled */
+
+button:disabled,
+.button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.event-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: var(--panel);
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: var(--olive);
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes indicator-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .45;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

@@ -8,20 +8,9 @@
    to the Event Log.
    ============================================================ */
 
-const SYSTEMS = [
+const CONFIG_URL = "/api/systemEvents-config";
 
-    ["main", "MAIN PROPULSION"],
-    ["alt_hold", "ALTITUDE HOLD"],
-    ["roll_stab", "ROLL STABILIZER"],
-    ["afterburner", "AFTERBURNER"],
-    ["descent", "DESCENT ENABLE"],
-
-    ["north", "NORTH BOOSTER"],
-    ["east", "EAST BOOSTER"],
-    ["south", "SOUTH BOOSTER"],
-    ["west", "WEST BOOSTER"]
-
-];
+let SYSTEMS = [];
 
 // Previous states
 let previousSnapshot = {};
@@ -29,6 +18,31 @@ let previousSnapshot = {};
 let previousStage = null;
 
 let previousStatus = null;
+
+
+/* ------------------------------------------------------------
+   LOAD SYSTEM CONFIGURATION
+   ------------------------------------------------------------ */
+
+async function loadSystems() {
+
+    const response = await fetch(CONFIG_URL, {
+        cache: "no-store"
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+
+    const config = await response.json();
+
+    if (!Array.isArray(config.systems)) {
+        throw new Error("Invalid systems configuration.");
+    }
+
+    SYSTEMS = config.systems;
+
+}
 
 
 /* ------------------------------------------------------------
@@ -64,7 +78,7 @@ function getSystemState(value) {
    INITIALIZE DETECTOR
    ------------------------------------------------------------ */
 
-export function initSystemEventDetector(logEvent) {
+export async function initSystemEventDetector(logEvent) {
 
     if (typeof logEvent !== "function") {
 
@@ -75,6 +89,8 @@ export function initSystemEventDetector(logEvent) {
         return null;
 
     }
+
+    await loadSystems();
 
 
     /* --------------------------------------------------------
@@ -88,16 +104,16 @@ export function initSystemEventDetector(logEvent) {
 
         // SYSTEM ACTIVATION / DEACTIVATION
 
-        SYSTEMS.forEach(([key, label]) => {
+        SYSTEMS.forEach(system => {
+
+            const { key, label } = system;
 
             const current = getSystemState(data[key]);
 
-            // Ignore missing or non-boolean values
             if (current === null) return;
 
             const previous = previousSnapshot[key];
 
-            // Only report actual transitions
             if (
                 previous !== undefined &&
                 previous !== current

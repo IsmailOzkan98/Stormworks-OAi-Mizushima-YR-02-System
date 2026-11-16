@@ -1,0 +1,484 @@
+
+/* ==========================================
+   STAR CITIZEN
+    Full theme adaptation
+   ========================================== */
+
+:root {
+  --bg: #080604;
+  --panel: #100b06;
+  --panel2: #1b1008;
+  --paper-light: #29190b;
+  --paper-shadow: #050302;
+  --border: #654018;
+
+  --gold: #e08400;
+  --gold-light: #ffcf72;
+  --ivory: #fff4d8;
+  --muted: #98734a;
+
+  --text-primary: #ffcf80;
+  --text-secondary: #d99a48;
+  --text-shadow: 0 0 12px rgba(255, 153, 24, .38);
+
+  --main-bg-color: #080604;
+  --bg-grid-color: rgba(224, 132, 0, .075);
+  --bg-grid-2-color: rgba(255, 169, 40, .035);
+
+  --green: #e8ad51;
+  --cyan: #ffc66d;
+  --yellow: #ffb347;
+  --red: #ff5722;
+
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --display: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --graph-altitude: #ffb347;
+  --graph-target: #fff0c2;
+  --graph-alt-error: #ff6a20;
+  --graph-vs-error: #e08400;
+  --alt-error-color: #ff6a20;
+  --vs-error-color: #e08400;
+
+  --transition: .25s ease;
+}
+
+/* BASE */
+
+html {
+  background: #080604;
+  color: var(--text-primary);
+  font-family: var(--mono);
+  text-shadow: 0 0 5px rgba(255, 153, 24, .2);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(92, 42, 0, .2), transparent 65%),
+    linear-gradient(145deg, #100a04, #050302 75%);
+  color: var(--text-primary);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: .13;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 174, 65, .08) 4px
+  );
+}
+
+::selection {
+  color: #100700;
+  background: #ffb347;
+}
+
+/* HEADERS */
+
+.section-header,
+.module-header > span,
+header {
+  color: #ffcf80;
+  text-shadow: 0 0 12px rgba(255, 153, 24, .4);
+}
+
+.eyebrow,
+.subtitle {
+  color: #c18b48;
+}
+
+h1,
+h1 span {
+  color: #ffe0a1;
+  text-shadow:
+    0 0 8px rgba(255, 153, 24, .45),
+    0 0 22px rgba(224, 132, 0, .2);
+}
+
+h1 {
+  letter-spacing: .08em;
+}
+
+.connection,
+.connection strong,
+.connection small {
+  color: #c28a45;
+}
+
+.connection strong {
+  color: #ffe0a1;
+}
+
+/* MISSION */
+
+.mission-bar,
+.recorder-panel,
+.card,
+.diagnostics-panel,
+.monitor-panel,
+.event-panel,
+.telemetry-chart-panel {
+  background:
+    linear-gradient(145deg, rgba(40, 24, 10, .96), rgba(12, 8, 4, .98));
+  border: 1px solid #69431b;
+  box-shadow:
+    0 0 12px rgba(224, 132, 0, .09),
+    inset 0 0 18px rgba(224, 132, 0, .035);
+}
+
+.micro-label,
+.mission-stage .micro-label,
+.mission-data .micro-label {
+  color: #a77b45;
+}
+
+.mission-stage,
+.mission-data > div {
+  border-color: #533516;
+}
+
+.mission-stage strong,
+.mission-data strong {
+  color: #ffe0a1;
+  text-shadow: 0 0 8px rgba(255, 153, 24, .25);
+}
+
+.state-pill.running,
+.state-pill.completed,
+.state-pill.idle,
+.mission-data .state-pill {
+  background: rgba(224, 132, 0, .09);
+  border: 1px solid #88531d;
+  color: #ffc66d;
+}
+
+.state-pill.running {
+  box-shadow: 0 0 10px rgba(255, 153, 24, .2);
+}
+
+.state-pill.completed {
+  color: #ffe0a1;
+}
+
+.state-pill.idle {
+  color: #98734a;
+}
+
+/* CARDS */
+
+.card {
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: #e9a13b;
+  box-shadow:
+    0 0 18px rgba(224, 132, 0, .2),
+    inset 0 0 14px rgba(224, 132, 0, .06);
+}
+
+.card::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 169, 40, .22),
+    transparent
+  );
+}
+
+.card-label,
+.unit {
+  color: #b58a54;
+}
+
+.value,
+.highlight {
+  color: #ffe0a1;
+  text-shadow: 0 0 10px rgba(255, 153, 24, .35);
+}
+
+.cyan {
+  color: #ffd28b;
+}
+
+.yellow {
+  color: #ffb347;
+}
+
+/* DIAGNOSTICS */
+
+.diagnostic-header,
+.diagnostic-row {
+  color: #d5a365;
+}
+
+.diagnostic-status b,
+.diagnostic-status b.active-text {
+  color: #ffc66d;
+  text-shadow: 0 0 7px rgba(255, 153, 24, .5);
+}
+
+.indicator {
+  background: #4c2a0e;
+  box-shadow: 0 0 4px rgba(224, 132, 0, .25);
+}
+
+.indicator.active {
+  background: #ff9d22;
+  box-shadow:
+    0 0 8px #e08400,
+    0 0 18px rgba(255, 153, 24, .5);
+}
+
+.diagnostic-separator {
+  border-color: #573817;
+}
+
+.booster {
+  border-color: #714719;
+}
+
+.booster.pulse {
+  box-shadow: 0 0 14px rgba(255, 153, 24, .3);
+}
+
+.booster.pulse span,
+.booster.pulse .indicator {
+  color: #ffe0a1;
+  background-color: #e08400;
+}
+
+/* MONITOR */
+
+.monitor-title,
+.event-header {
+  color: #e7b36c;
+}
+
+.monitor-item {
+  border-color: #503415;
+}
+
+.monitor-item span,
+.event-time,
+.system-info span {
+  color: #a77b45;
+}
+
+.monitor-item strong,
+.system-info strong {
+  color: #ffcf80;
+}
+
+/* EVENTS */
+
+.event-header span:last-child {
+  color: #ffc66d;
+}
+
+.event-entry {
+  border-bottom: 1px solid rgba(224, 132, 0, .13);
+  transition: var(--transition);
+}
+
+.event-entry:hover {
+  background: rgba(224, 132, 0, .08);
+}
+
+.event-entry span:last-child {
+  color: #d5a365;
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+  color: #ffe0a1;
+}
+
+.event-entry.activation span:last-child {
+  color: #ffc66d;
+}
+
+.event-entry.deactivation span:last-child {
+  color: #b58a54;
+}
+
+.event-entry.error span:last-child {
+  color: #ff5722;
+}
+
+.event-entry.navigation-event span:last-child {
+  color: #ffcf80;
+}
+
+.event-entry.warning span:last-child {
+  color: #ffb347;
+}
+
+.event-entry.normal span:last-child {
+  color: #d5a365;
+}
+
+/* SYSTEM INFO */
+
+.system-info > div {
+  border-color: #533516;
+}
+
+.recorder-dot {
+  background: #ff9d22;
+  box-shadow: 0 0 9px #e08400;
+}
+
+.recorder-btn.stop .recorder-dot {
+  background: #ff5722;
+  box-shadow: 0 0 9px #ff5722;
+}
+
+/* TELEMETRY */
+
+.telemetry-chart-panel::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(224, 132, 0, .16),
+    transparent
+  );
+}
+
+.telemetry-chart-header span:last-child {
+  color: #ffc66d;
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+  color: #a77b45;
+}
+
+.telemetry-readouts strong,
+.telemetry-readouts > div:nth-child(2) strong,
+.telemetry-readouts > div:nth-child(3) strong {
+  color: #ffcf80;
+  text-shadow: 0 0 8px rgba(255, 153, 24, .3);
+}
+
+.legend-alt {
+  color: #ffb347;
+}
+
+.legend-target {
+  color: #fff0c2;
+}
+
+.legend-error {
+  color: #ff6a20;
+}
+
+/* INPUTS */
+
+input,
+select,
+textarea {
+  color: #ffe0a1;
+  background: #100a04;
+  border: 1px solid #704719;
+  font-family: var(--mono);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #ffb347;
+  box-shadow: 0 0 10px rgba(224, 132, 0, .3);
+}
+
+/* BUTTONS */
+
+button,
+.button {
+  color: #ffe0a1;
+  background: linear-gradient(180deg, #39230e, #1a1007);
+  border: 1px solid #88551f;
+  font-family: var(--mono);
+  text-shadow: 0 0 5px rgba(255, 153, 24, .25);
+  transition: var(--transition);
+}
+
+button:hover,
+.button:hover {
+  color: #fff4d8;
+  background: linear-gradient(180deg, #59350f, #2b1909);
+  border-color: #ffb347;
+  box-shadow: 0 0 13px rgba(224, 132, 0, .25);
+}
+
+button::before,
+button::after,
+.button::before,
+.button::after {
+  border-color: #e08400;
+}
+
+/* SCROLLBAR */
+
+.event-list {
+  scrollbar-color: #88551f #100a04;
+  scrollbar-width: thin;
+}
+
+.event-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event-list::-webkit-scrollbar-track {
+  background: #100a04;
+}
+
+.event-list::-webkit-scrollbar-thumb {
+  background: #88551f;
+}
+
+/* FOOTER */
+
+footer {
+  color: #98734a;
+  border-color: #533516;
+}
+
+/* ANIMATIONS */
+
+@keyframes indicator-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(224, 132, 0, .5);
+  }
+  50% {
+    opacity: .45;
+    box-shadow: 0 0 2px rgba(224, 132, 0, .15);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(224, 132, 0, .2);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 169, 40, .55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -8,10 +8,7 @@
    telemetry monitoring.
    ============================================================ */
 
-const CONFIG_URL = new URL(
-    "./missionMonitor.json",
-    import.meta.url
-);
+const CONFIG_URL = "/api/missionMonitor-config";
 
 let config = null;
 let container = null;

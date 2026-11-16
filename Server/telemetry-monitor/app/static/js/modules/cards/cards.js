@@ -1,9 +1,16 @@
-const CONFIG_URL = new URL("./cards.json", import.meta.url);
+const CONFIG_URL = "/api/cards-config";
 
-export async function initCards(container) {
-    if (!container) {
-        console.error("[CARDS] Container not found.");
+export async function initCards(containers) {
+    if (!Array.isArray(containers) || containers.length === 0) {
+        console.error("[CARDS] No containers provided.");
         return null;
+    }
+
+    for (const item of containers) {
+        if (!item.element) {
+            console.error(`[CARDS] Container not found for section: ${item.section}`);
+            return null;
+        }
     }
 
     let config;
@@ -23,13 +30,13 @@ export async function initCards(container) {
 
     const cardElements = new Map();
 
+    
     // ----------------------------------------
     // GENERATE HTML
     // ----------------------------------------
 
-    
     function renderCards() {
-        container.innerHTML = "";
+
         cardElements.clear();
 
         if (!Array.isArray(config.sections)) {
@@ -37,7 +44,24 @@ export async function initCards(container) {
             return;
         }
 
-        config.sections.forEach(section => {
+        containers.forEach(item => {
+
+            const section = config.sections.find(
+                section => section.id === item.section
+            );
+
+            if (!section) {
+                console.warn(
+                    `[CARDS] Section not found: ${item.section}`
+                );
+                return;
+            }
+
+            const container = item.element;
+
+            // CLEAR CONTAINER
+
+            container.innerHTML = "";
 
             // SECTION CONTAINER
 
@@ -69,18 +93,15 @@ export async function initCards(container) {
                     cardElement.classList.add("cyan");
                 }
 
-                // Card label
                 const label = document.createElement("div");
                 label.className = "card-label";
                 label.textContent = card.label ?? "";
 
-                // Card value
                 const value = document.createElement("div");
                 value.className = "value";
                 value.id = card.id;
                 value.textContent = "--";
 
-                // Card unit
                 const unit = document.createElement("div");
                 unit.className = "unit";
                 unit.textContent = card.unit ?? "";
@@ -92,12 +113,16 @@ export async function initCards(container) {
                     element: value,
                     config: card
                 });
+
             });
 
             sectionElement.appendChild(grid);
             container.appendChild(sectionElement);
+
         });
+
     }
+
 
 
     // ----------------------------------------

@@ -13,7 +13,7 @@ import { state, modules } from "./state.js";
 
 const CONFIG = Object.freeze({
 
-    CONFIG_ENDPOINT: "/static/config.json"
+    CONFIG_ENDPOINT: "/api/frontend-config"
 
 });
 
@@ -114,18 +114,16 @@ async function loadModuleConfiguration() {
 }
 
 
+
 /* ============================================================
    04. GENERIC MODULE INITIALIZATION
    ============================================================ */
 
-
-async function initializeModule(definition) {
+async function initializeModule(definition, instances = []) {
 
     const {
         name,
-        configKey,
         path,
-        container,
         initializer
     } = definition;
 
@@ -133,14 +131,40 @@ async function initializeModule(definition) {
 
         const module = await import(path);
 
-        const element = document.getElementById(container);
+        // BUILD MODULE INPUT
+
+        let input;
+
+        if (definition.multiple === true) {
+
+            input = instances.map(item => ({
+                id: item.id,
+                section: item.section,
+                element: item.element
+            }));
+
+        } else {
+
+            input =
+                instances[0]?.element ??
+                (
+                    definition.container
+                        ? document.getElementById(definition.container)
+                        : null
+                );
+
+        }
+
+        // MODULE OPTIONS
 
         const options = definition.getOptions
             ? definition.getOptions()
             : undefined;
 
+        // INITIALIZE MODULE
+
         const initialized = await module[initializer](
-            element,
+            input,
             options
         );
 
@@ -166,9 +190,7 @@ async function initializeModule(definition) {
         // REGISTER MODULE
 
         if (definition.key) {
-
             modules[definition.key] = api;
-
         }
 
         // MODULE-SPECIFIC SETUP
@@ -179,7 +201,8 @@ async function initializeModule(definition) {
 
         } else if (
             definition.updater &&
-            state.pendingMissionData
+            state.pendingMissionData &&
+            typeof api[definition.updater] === "function"
         ) {
 
             api[definition.updater](
@@ -188,7 +211,7 @@ async function initializeModule(definition) {
 
         }
 
-        state.logEvent(
+        state.logEvent?.(
             `${name} initialized.`,
             "system-event"
         );
@@ -214,15 +237,29 @@ async function initializeModule(definition) {
    05. INITIALIZE REGISTERED MODULES
    ============================================================ */
 
-async function initializeRegisteredModules(configuration) {
+async function initializeRegisteredModules(
+    configuration,
+    dashboardItems = []
+) {
 
     const enabled = configuration.modules || {};
     const registry = configuration.registry || {};
+
+    const specialModules = new Set([
+        "eventLog",
+        "systemInformation"
+    ]);
 
     await Promise.all(
 
         Object.entries(registry).map(
             async ([configKey, definition]) => {
+
+                // SPECIAL MODULES ARE INITIALIZED SEPARATELY
+
+                if (specialModules.has(configKey)) {
+                    return null;
+                }
 
                 if (enabled[configKey] !== true) {
 
@@ -234,6 +271,14 @@ async function initializeRegisteredModules(configuration) {
 
                 }
 
+                // FIND DASHBOARD INSTANCES
+
+                const instances = dashboardItems.filter(
+                    item => item.module === configKey
+                );
+
+                // MODULE HOOKS
+
                 const hook = MODULE_HOOKS[definition.special];
 
                 const moduleDefinition = {
@@ -242,17 +287,22 @@ async function initializeRegisteredModules(configuration) {
 
                     key: definition.key || configKey,
 
-                    getOptions: definition.special === "flightRecorder"
-                        ? MODULE_HOOKS.flightRecorder
-                        : null,
+                    getOptions:
+                        definition.special === "flightRecorder"
+                            ? MODULE_HOOKS.flightRecorder
+                            : null,
 
-                    onReady: definition.special === "missionMonitor"
-                        ? hook
-                        : null
+                    onReady:
+                        definition.special === "missionMonitor"
+                            ? hook
+                            : null
 
                 };
 
-                return initializeModule(moduleDefinition);
+                return initializeModule(
+                    moduleDefinition,
+                    instances
+                );
 
             }
         )
@@ -262,11 +312,12 @@ async function initializeRegisteredModules(configuration) {
 }
 
 
+
 /* ============================================================
    06. INITIALIZE EVENT SYSTEM
    ============================================================ */
 
-async function initializeEventLog(enabled) {
+async function initializeEventLog(enabled, dashboardItems = []) {
 
     if (!enabled) {
 
@@ -280,26 +331,44 @@ async function initializeEventLog(enabled) {
 
     try {
 
+        const item = dashboardItems.find(
+            item => item.module === "eventLog"
+        );
+
+        const container = item?.element;
+
+        if (!container) {
+
+            throw new Error(
+                "Dashboard container not found."
+            );
+
+        }
+
         const { initEventLog } = await import(
             "../modules/eventLog/eventLog.js"
         );
 
-        const container = document.getElementById(
-            "eventLogContainer"
-        );
-
         const eventLogger = initEventLog(container);
 
-        if (typeof eventLogger === "function") {
+        if (typeof eventLogger !== "function") {
 
-            state.logEvent = eventLogger;
-
-            state.logEvent(
-                "Flight monitoring initialized.",
-                "system-event"
+            throw new Error(
+                "Event logger initialization failed."
             );
 
         }
+
+        state.logEvent = eventLogger;
+
+        state.logEvent(
+            "Flight monitoring initialized.",
+            "system-event"
+        );
+
+        console.info(
+            "[EVENT LOG] Initialized successfully."
+        );
 
     } catch (error) {
 
@@ -336,7 +405,7 @@ async function initializeSystemEventDetector(enabled) {
         );
 
         modules.systemEventDetector =
-            initSystemEventDetector(state.logEvent);
+            await initSystemEventDetector(state.logEvent);
 
         if (modules.systemEventDetector) {
 
@@ -345,9 +414,15 @@ async function initializeSystemEventDetector(enabled) {
                 "system-event"
             );
 
+            console.info(
+                "[SYSTEM EVENT DETECTOR] Initialized successfully."
+            );
+
         }
 
     } catch (error) {
+
+        modules.systemEventDetector = null;
 
         console.error(
             "[SYSTEM EVENT DETECTOR] Initialization failed:",
@@ -359,11 +434,15 @@ async function initializeSystemEventDetector(enabled) {
 }
 
 
+
 /* ============================================================
    08. PROJECT DATA
    ============================================================ */
 
-async function initializeProjectData(enabled) {
+async function initializeProjectData(
+    enabled,
+    dashboardItems = []
+) {
 
     try {
 
@@ -371,9 +450,16 @@ async function initializeProjectData(enabled) {
             "../modules/projectData/projectData.js"
         );
 
+        const systemInformationContainer =
+            dashboardItems.find(
+                item => item.module === "systemInformation"
+            )?.element ?? null;
+
         await initProjectData({
 
-            systemInformationEnabled: enabled
+            systemInformationEnabled: enabled,
+
+            systemInformationContainer
 
         });
 
@@ -389,15 +475,18 @@ async function initializeProjectData(enabled) {
 }
 
 
+
 /* ============================================================
    09. APPLICATION MODULE ORCHESTRATION
    ============================================================ */
+
 
 export async function initializeModules() {
 
     const configuration =
         await loadModuleConfiguration();
 
+    let dashboardItems = [];
 
     // DASHBOARD ASSEMBLER
 
@@ -409,7 +498,7 @@ export async function initializeModules() {
                 "./dashboardAssembler.js"
             );
 
-            await initializeDashboardAssembler(
+            dashboardItems = await initializeDashboardAssembler(
                 configuration.dashboard
             );
 
@@ -424,39 +513,41 @@ export async function initializeModules() {
                 error
             );
 
+            return;
+
         }
 
     }
 
-
     const config = configuration.modules || {};
-
 
     // EVENT SYSTEM MUST INITIALIZE FIRST
 
     await initializeEventLog(
-        config.eventLog === true
+        config.eventLog === true,
+        dashboardItems
     );
-
-    // PRESERVE ORIGINAL INITIALIZATION CONDITION
 
     await initializeSystemEventDetector(
-        config.eventLog === true
+        config.systemEventDetector === true
     );
-
 
     // PROJECT DATA
 
     await initializeProjectData(
-        config.systemInformation === true
+        config.systemInformation === true,
+        dashboardItems
     );
 
+    // REGISTERED MODULES
 
-    // INDEPENDENT MODULES
-
-    await initializeRegisteredModules(configuration);
+    await initializeRegisteredModules(
+        configuration,
+        dashboardItems
+    );
 
 }
+
 
 
 /* ============================================================

@@ -3,10 +3,7 @@
    PROJECT DATA MODULE
    ============================================================ */
 
-const CONFIG_URL = new URL(
-    "./projectData.json",
-    import.meta.url
-);
+const CONFIG_URL = "/api/projectData-config";
 
 
 /* ============================================================
@@ -129,17 +126,25 @@ function updateUnitDesignation(config) {
    05. SYSTEM INFORMATION
    ============================================================ */
 
-function updateSystemInformation(config, moduleEnabled = true) {
 
-    const module = document.getElementById(
-        "systemInformationContainer"
-    );
+/* ============================================================
+   05. SYSTEM INFORMATION
+   ============================================================ */
 
-    if (!module) return;
+function updateSystemInformation(
+    config,
+    moduleEnabled = true,
+    module = null
+) {
+
+    if (!module) {
+        console.warn(
+            "[PROJECT DATA] System information container not provided."
+        );
+        return;
+    }
 
     const data = config.systemInformation ?? {};
-
-    // Visibility control.
 
     const enabled =
         moduleEnabled !== false &&
@@ -149,11 +154,7 @@ function updateSystemInformation(config, moduleEnabled = true) {
 
     if (!enabled) return;
 
-    // Clear previous content.
-
-    module.replaceChildren();
-
-    // Create section heading.
+    // CREATE SECTION HEADING
 
     const heading = document.createElement("div");
     heading.className = "module-header section-header";
@@ -164,12 +165,12 @@ function updateSystemInformation(config, moduleEnabled = true) {
         )
     );
 
-    // Create information container.
+    // CREATE INFORMATION CONTAINER
 
     const container = document.createElement("div");
     container.className = "system-info";
 
-    // Generate items from JSON.
+    // GENERATE ITEMS FROM CONFIGURATION
 
     const items = Array.isArray(data.items)
         ? data.items
@@ -193,13 +194,11 @@ function updateSystemInformation(config, moduleEnabled = true) {
 
     });
 
-    // Assemble everything inside the HTML placeholder.
+    // MOUNT MODULE CONTENT
 
     module.append(heading, container);
 
 }
-
-
 
 
 /* ============================================================
@@ -243,7 +242,8 @@ function updateFooter(config) {
 export async function initProjectData(options = {}) {
 
     const {
-        systemInformationEnabled = true
+        systemInformationEnabled = true,
+        systemInformationContainer = null
     } = options;
 
     try {
@@ -264,7 +264,8 @@ export async function initProjectData(options = {}) {
 
         updateSystemInformation(
             config,
-            systemInformationEnabled
+            systemInformationEnabled,
+            systemInformationContainer
         );
 
         updateFooter(config.footer);

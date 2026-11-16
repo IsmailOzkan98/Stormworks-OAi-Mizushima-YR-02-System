@@ -7,7 +7,7 @@
    Configuration, HTML generation and mission data display.
    ============================================================ */
 
-const CONFIG_URL = new URL("./missionBar.json", import.meta.url);
+const CONFIG_URL = "/api/missionBar-config";
 
 let config = null;
 let container = null;

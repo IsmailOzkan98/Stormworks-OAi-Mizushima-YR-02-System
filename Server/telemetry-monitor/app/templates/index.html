@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PROJECT NAME | TYPE MONITOR</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/theme.css') }}">
+    <!-- Style -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script type="module"src="{{ url_for('static', filename='js/core/themeManager.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/structure.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/responsive.css') }}">
+
+
     <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 
@@ -21,6 +25,15 @@
                 <h1>PROJECT NAME <span>PROJECT-IDPROJECT-ID</span></h1>
                 <div class="subtitle">PROJECT DESCRIPTION</div>
             </div>
+
+            <!-- THEME SELECTOR -->
+            <button
+                type="button"
+                id="theme-selector-trigger"
+                aria-label="Select dashboard theme"
+            >
+                ◈ THEMES
+            </button>
 
             <div class="header-right">
                 <div class="unit-designation">
@@ -53,29 +66,7 @@
 
         <!-- DASHBOARD -->
 
-        <main id="dashboardGrid" class="dashboard-grid">
-
-            <!-- EVENT LOG MODULE -->
-            <div id="eventLogContainer"></div>
-
-            <!-- SYSTEM DIAGNOSTICS -->
-            <div id="systemDiagnosticsContainer"></div>
-
-            <!-- SYSTEM INFORMATION -->
-            <div id="systemInformationContainer" class="system-info-module"></div>
-
-            <!-- FLIGHT TELEMETRY -->
-            <div id="telemetryGraphsContainer"></div>
-
-            <!-- MISSION MONITOR -->
-            <div id="missionMonitorContainer"></div>
-
-            <!-- Cards -->
-            <div id="cardsContainer"></div>
-
-
-
-        </main>
+        <main id="dashboardGrid" class="dashboard-grid"></main>
 
         <!-- FOOTER -->
 

@@ -3,10 +3,10 @@
    OAI MIZUSHIMA YR-02
    DASHBOARD ASSEMBLER
 
-   VERSION: 1.0.0
+   VERSION: 2.1.0
 
    RESPONSIBILITY:
-   Dynamic dashboard composition.
+   Dynamic dashboard construction from configuration.
 
    ============================================================ */
 
@@ -22,26 +22,30 @@ export function initializeDashboardAssembler(config) {
         throw new Error("[DASHBOARD] Invalid configuration.");
     }
 
+    if (dashboard.children.length > 0) {
+        throw new Error("[DASHBOARD] Dashboard already initialized.");
+    }
+
     const columns = Number(config.columns);
+    const gap = Number(config.gap ?? 14);
 
     if (!Number.isInteger(columns) || columns < 1) {
         throw new Error("[DASHBOARD] Invalid column count.");
     }
 
-    const gap = Number(config.gap ?? 14);
-
     if (!Number.isFinite(gap) || gap < 0) {
-        throw new Error("[DASHBOARD] Invalid column gap.");
+        throw new Error("[DASHBOARD] Invalid gap.");
     }
 
-    // VALIDATE ITEMS
-
     const ids = new Set();
+
+    // VALIDATE AND PREPARE ITEMS
 
     const items = config.items.map(item => {
 
         if (
             !item.id ||
+            !item.module ||
             !Number.isInteger(item.column) ||
             item.column < 1 ||
             item.column > columns ||
@@ -49,7 +53,7 @@ export function initializeDashboardAssembler(config) {
             item.order < 1
         ) {
             throw new Error(
-                `[DASHBOARD] Invalid item configuration: ${item.id}`
+                `[DASHBOARD] Invalid item: ${item.id}`
             );
         }
 
@@ -61,39 +65,14 @@ export function initializeDashboardAssembler(config) {
 
         ids.add(item.id);
 
-        return item;
+        return {
+            ...item,
+            element: document.createElement("div")
+        };
 
     });
 
-    // RESOLVE DOM ELEMENTS BEFORE REBUILDING
-
-    const resolvedItems = items.map(item => ({
-
-        ...item,
-
-        element: document.getElementById(item.id)
-
-    }));
-
-    // CREATE COLUMNS
-
-    const columnElements = [];
-
-    for (let i = 0; i < columns; i++) {
-
-        const column = document.createElement("section");
-
-        column.className = "column";
-
-        column.dataset.column = i + 1;
-
-        columnElements.push(column);
-
-    }
-
     // CONFIGURE DASHBOARD
-
-    dashboard.replaceChildren();
 
     dashboard.style.setProperty(
         "--dashboard-columns",
@@ -105,40 +84,47 @@ export function initializeDashboardAssembler(config) {
         `${gap}px`
     );
 
-    // SORT AND DISTRIBUTE MODULES
+    // BUILD COLUMNS DIRECTLY
 
-    resolvedItems
-        .sort((a, b) =>
-            a.column - b.column ||
-            a.order - b.order
-        )
-        .forEach(item => {
+    for (let columnIndex = 1; columnIndex <= columns; columnIndex++) {
 
-            if (!item.element) {
+        const column = document.createElement("section");
 
-                console.warn(
-                    `[DASHBOARD] Missing container: ${item.id}`
-                );
+        column.className = "column";
+        column.dataset.column = columnIndex;
 
-                return;
+        // GET ITEMS FOR THIS COLUMN IN FINAL ORDER
 
-            }
+        const columnItems = items
+            .filter(item => item.column === columnIndex)
+            .sort((a, b) => a.order - b.order);
 
-            columnElements[item.column - 1]
-                .appendChild(item.element);
+        // CREATE AND MOUNT MODULE CONTAINERS
+
+        columnItems.forEach(item => {
+
+            item.element.id = item.id;
+            item.element.dataset.module = item.module;
+
+            column.appendChild(item.element);
 
         });
 
-    // MOUNT COLUMNS
-
-    columnElements.forEach(column => {
+        // MOUNT COMPLETED COLUMN
 
         dashboard.appendChild(column);
 
-    });
+    }
 
     console.info(
-        `[DASHBOARD] Initialized with ${columns} columns.`
+        `[DASHBOARD] Generated ${items.length} containers across ${columns} columns.`
     );
 
+    return items;
+
 }
+
+
+/* ============================================================
+   END OF DASHBOARD ASSEMBLER
+   ============================================================ */

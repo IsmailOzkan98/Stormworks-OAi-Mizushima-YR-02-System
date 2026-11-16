@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from threading import Lock
 
-from app.config import CONFIG_FILE, LOG_DIR
+from app.config import RECORDER_CONFIG_FILE, LOG_DIR
 
 
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -20,7 +20,7 @@ recording_filename = None
 def load_recorder_config():
 
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as file:
+        with open(RECORDER_CONFIG_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
 
     except Exception as error:

@@ -1,0 +1,882 @@
+/* =========================================
+   CHATGPT // COGNITIVE CORE
+   A living intelligence interface
+========================================= */
+
+:root {
+    /* CORE */
+    --bg: #080c12;
+    --panel: #101722;
+    --panel2: #172231;
+    --paper-light: #1c2938;
+    --paper-shadow: #05080d;
+    --border: rgba(133, 169, 194, .17);
+
+    /* TEXT */
+    --gold: #10a37f;
+    --gold-light: #63e6c1;
+    --ivory: #e7f0f5;
+    --muted: #8295a7;
+
+    --text-primary: #e7f0f5;
+    --text-secondary: #080c12;
+    --text-shadow: rgba(16, 163, 127, .35);
+
+    /* BACKGROUND */
+    --main-bg-color: #080c12;
+    --bg-grid-color: rgba(92, 181, 174, .045);
+    --bg-grid-2-color: rgba(92, 181, 174, .012);
+
+    /* SIGNAL COLORS */
+    --green: #48d9ad;
+    --cyan: #65c8e8;
+    --yellow: #e8c77a;
+    --red: #ff7185;
+
+    /* TYPOGRAPHY */
+    --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    --display: "Inter", "Segoe UI", sans-serif;
+
+    /* GRAPHS */
+    --graph-altitude: #10a37f;
+    --graph-target: #8e9cff;
+    --graph-alt-error: #ff7185;
+    --graph-vs-error: #e8c77a;
+
+    /* ERROR READOUTS */
+    --alt-error-color: #e8c77a;
+    --vs-error-color: #ff7185;
+
+    /* MOTION */
+    --transition: .28s cubic-bezier(.2, .7, .2, 1);
+
+    /* ATMOSPHERE */
+    --glow: 0 0 22px rgba(16, 163, 127, .13);
+    --shadow: 0 12px 35px rgba(0, 0, 0, .24);
+}
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+html {
+    background: var(--bg);
+    color: var(--text-primary);
+    color-scheme: dark;
+}
+
+body {
+    position: relative;
+    isolation: isolate;
+
+    background:
+        radial-gradient(
+            ellipse at 50% -25%,
+            rgba(16, 163, 127, .15),
+            transparent 55%
+        ),
+        radial-gradient(
+            ellipse at 100% 100%,
+            rgba(92, 116, 190, .09),
+            transparent 45%
+        ),
+        var(--main-bg-color);
+
+    color: var(--text-primary);
+    font-family: var(--display);
+    font-weight: 400;
+    letter-spacing: -.015em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            rgba(255, 255, 255, .012) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, .012) 1px,
+            transparent 1px
+        );
+
+    background-size: 42px 42px;
+    opacity: .55;
+}
+
+::selection {
+    background: rgba(16, 163, 127, .8);
+    color: #04100d;
+}
+
+input,
+select,
+textarea {
+    font-family: var(--display);
+    letter-spacing: inherit;
+}
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.section-header {
+    background: linear-gradient(
+        100deg,
+        rgba(16, 163, 127, .14),
+        rgba(16, 163, 127, .025)
+    );
+
+    color: var(--gold-light);
+    border-left: 2px solid var(--gold);
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.module-header > span {
+    color: var(--cyan);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+header {
+    background:
+        radial-gradient(
+            ellipse at 90% 0%,
+            rgba(16, 163, 127, .10),
+            transparent 50%
+        ),
+        linear-gradient(145deg, #15212d, #0e151f);
+
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+
+    box-shadow:
+        var(--shadow),
+        inset 0 1px 0 rgba(255, 255, 255, .035);
+}
+
+.eyebrow,
+.subtitle {
+    color: var(--muted);
+}
+
+h1 {
+    color: var(--ivory);
+    font-family: var(--display);
+    font-weight: 750;
+    letter-spacing: -.065em;
+    text-shadow: 0 0 28px rgba(16, 163, 127, .15);
+}
+
+h1 span {
+    color: var(--gold-light);
+}
+
+.connection {
+    background: rgba(16, 163, 127, .055);
+    border: 1px solid rgba(16, 163, 127, .25);
+    box-shadow: inset 0 0 20px rgba(16, 163, 127, .025);
+}
+
+.connection strong {
+    color: var(--green);
+}
+
+.connection small {
+    color: var(--muted);
+}
+
+/* =========================================
+   MISSION BAR
+========================================= */
+
+.mission-bar {
+    background: linear-gradient(110deg, #15242c, #111923);
+    border: 1px solid rgba(16, 163, 127, .22);
+    box-shadow: var(--shadow);
+}
+
+.micro-label {
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: .07em;
+}
+
+.mission-stage strong {
+    color: var(--ivory);
+    font-weight: 600;
+}
+
+.state-pill.running {
+    color: var(--green) !important;
+}
+
+.state-pill.completed {
+    color: var(--cyan) !important;
+}
+
+.state-pill.idle {
+    color: var(--yellow) !important;
+}
+
+/* MISSION INFORMATION */
+
+.mission-stage {
+    background: rgba(16, 163, 127, .07);
+    border-left: 2px solid var(--gold);
+}
+
+.mission-stage .micro-label {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .12em;
+    font-weight: 600;
+}
+
+.mission-stage strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -.04em;
+}
+
+/* DATA CELLS */
+
+.mission-data > div {
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.mission-data .micro-label {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.mission-data strong {
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.mission-data .state-pill {
+    color: var(--green);
+    font-size: 11px;
+}
+
+/* =========================================
+   RECORDER PANEL
+========================================= */
+
+.recorder-panel {
+    background: linear-gradient(145deg, #151f2b, #0d141e);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+/* =========================================
+   METRIC CARDS
+========================================= */
+
+.card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(26, 40, 53, .96),
+            rgba(15, 23, 33, .98)
+        );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        0 8px 26px rgba(0, 0, 0, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .035);
+
+    transition:
+        background var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+}
+
+.card:hover {
+    background: linear-gradient(145deg, #203747, #121e2b);
+    border-color: rgba(99, 230, 193, .42);
+
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, .25),
+        0 0 25px rgba(16, 163, 127, .07);
+
+    transform: translateY(-2px);
+}
+
+.card::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(99, 230, 193, .8),
+        rgba(142, 156, 255, .5),
+        transparent
+    );
+}
+
+.card-label {
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: .035em;
+}
+
+.value {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+    letter-spacing: -.06em;
+    text-shadow: 0 0 20px rgba(16, 163, 127, .13);
+}
+
+.unit {
+    color: var(--muted);
+}
+
+.highlight {
+    color: var(--gold-light);
+}
+
+.cyan {
+    color: var(--cyan);
+}
+
+.yellow {
+    color: var(--yellow);
+}
+
+/* =========================================
+   DIAGNOSTICS
+========================================= */
+
+.diagnostics-panel {
+    background: linear-gradient(145deg, #141e29, #101720);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.diagnostic-header {
+    color: var(--gold-light);
+    font-weight: 600;
+}
+
+.diagnostic-row {
+    border-top: 1px solid rgba(133, 169, 194, .1);
+}
+
+.diagnostic-status b {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.diagnostic-status b.active-text {
+    color: var(--green);
+}
+
+.indicator {
+    background: #344451;
+    border: 1px solid #506574;
+    box-shadow: none;
+}
+
+.indicator.active {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 11px rgba(72, 217, 173, .55);
+    animation: indicator-pulse 2.5s infinite ease-in-out;
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--border);
+    color: var(--gold);
+}
+
+/* =========================================
+   DIRECTIONAL BOOSTERS
+========================================= */
+
+.booster {
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.booster.pulse {
+    background: rgba(16, 163, 127, .09);
+    border-color: rgba(99, 230, 193, .48);
+
+    box-shadow:
+        inset 0 0 20px rgba(16, 163, 127, .055),
+        0 0 18px rgba(16, 163, 127, .06);
+}
+
+.booster.pulse span {
+    color: var(--gold-light);
+}
+
+.booster.pulse .indicator {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 12px rgba(99, 230, 193, .55);
+}
+
+/* =========================================
+   MONITOR
+========================================= */
+
+.monitor-panel {
+    background: linear-gradient(145deg, #141e29, #0e151e);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.monitor-title,
+.event-header {
+    color: var(--gold-light);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    letter-spacing: .025em;
+}
+
+.monitor-item {
+    border-bottom: 1px solid rgba(133, 169, 194, .09);
+}
+
+.monitor-item span {
+    color: var(--muted);
+}
+
+.monitor-item strong {
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+/* =========================================
+   EVENT LOG
+========================================= */
+
+.event-panel {
+    background: linear-gradient(145deg, #151f2b, #101720);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.event-header span:last-child {
+    color: var(--green);
+}
+
+.event-entry {
+    border-bottom: 1px solid rgba(133, 169, 194, .08);
+    transition: background-color var(--transition);
+}
+
+.event-entry:hover {
+    background: rgba(16, 163, 127, .055);
+}
+
+.event-time {
+    color: #778b9c;
+    font-family: var(--mono);
+}
+
+.event-entry span:last-child {
+    color: var(--ivory);
+}
+
+/* FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid var(--border);
+    border-left-color: var(--gold);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--gold-light);
+}
+
+/* ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--green);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--green);
+}
+
+/* DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--muted);
+}
+
+/* ERRORS */
+
+.event-entry.error {
+    border-left-color: var(--red);
+    background: rgba(255, 113, 133, .055);
+}
+
+.event-entry.error span:last-child {
+    color: var(--red);
+}
+
+/* NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--cyan);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--cyan);
+}
+
+/* WARNINGS */
+
+.event-entry.warning {
+    border-left-color: var(--yellow);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--yellow);
+}
+
+/* NORMAL EVENTS */
+
+.event-entry.normal {
+    border-left-color: var(--border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--muted);
+}
+
+/* =========================================
+   SYSTEM INFO
+========================================= */
+
+.system-info > div {
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.system-info span {
+    color: var(--muted);
+}
+
+.system-info strong {
+    color: var(--ivory);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+/* =========================================
+   FLIGHT DATA RECORDER
+========================================= */
+
+.recorder-dot {
+    background: var(--green);
+    box-shadow: 0 0 9px rgba(72, 217, 173, .55);
+}
+
+.recorder-btn.stop .recorder-dot {
+    background: var(--red);
+    box-shadow: 0 0 9px rgba(255, 113, 133, .5);
+}
+
+/* =========================================
+   TELEMETRY GRAPHS
+========================================= */
+
+.telemetry-chart-panel {
+    background: linear-gradient(145deg, #15212c, #0e151e);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.telemetry-chart-panel::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(16, 163, 127, .75),
+        rgba(142, 156, 255, .45),
+        transparent
+    );
+}
+
+.telemetry-chart-header {
+    color: var(--gold-light);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--muted);
+}
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--gold-light);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--cyan);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--yellow);
+}
+
+.legend-alt {
+    color: var(--gold);
+}
+
+.legend-target {
+    color: #a5aaff;
+}
+
+.legend-error {
+    color: var(--red);
+}
+
+/* =========================================
+   INPUTS AND CONTROLS
+========================================= */
+
+input,
+select,
+textarea {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #0d151f;
+    color: var(--ivory);
+    font-family: var(--display);
+    font-weight: 400;
+    caret-color: var(--gold);
+
+    transition:
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background-color var(--transition);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #687e90;
+    opacity: 1;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: rgba(99, 230, 193, .7);
+    background: #12212a;
+    box-shadow: 0 0 0 3px rgba(16, 163, 127, .1);
+}
+
+/* =========================================
+   GLOBAL BUTTON SYSTEM
+========================================= */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: 1px solid rgba(99, 230, 193, .25);
+    border-radius: 9px;
+
+    background: linear-gradient(135deg, #17372f, #14262a);
+    color: var(--gold-light);
+
+    font-family: var(--display);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: .025em;
+
+    cursor: pointer;
+
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+
+    transition:
+        color var(--transition),
+        background-color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
+}
+
+/* LIGHT SWEEP */
+
+button::after,
+.button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 0;
+
+    background: linear-gradient(
+        100deg,
+        rgba(99, 230, 193, .22),
+        rgba(101, 200, 232, .12),
+        rgba(142, 156, 255, .16)
+    );
+
+    z-index: -1;
+    transition: width .35s ease;
+}
+
+/* HOVER */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: #1c403a;
+    color: #d8fff4;
+    border-color: rgba(99, 230, 193, .6);
+
+    box-shadow:
+        0 0 20px rgba(16, 163, 127, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .06);
+
+    transform: translateY(-1px);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+/* ACTIVE */
+
+button:not(:disabled):active,
+.button:active {
+    color: var(--gold-light);
+    background: #102a26;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, .25);
+    transform: translateY(0);
+}
+
+/* DISABLED */
+
+button:disabled,
+.button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.event-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: #0b1119;
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: #304b50;
+    border: 1px solid #0b1119;
+    border-radius: 8px;
+}
+
+.event-list::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes indicator-pulse {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 9px rgba(72, 217, 173, .5);
+    }
+
+    50% {
+        opacity: .55;
+        box-shadow: 0 0 3px rgba(72, 217, 173, .15);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .45;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
