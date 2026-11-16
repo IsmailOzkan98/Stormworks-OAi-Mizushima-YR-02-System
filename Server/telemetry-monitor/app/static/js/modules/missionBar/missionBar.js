@@ -1,6 +1,5 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    MISSION BAR MODULE
 
    RESPONSIBILITY:
@@ -50,7 +49,6 @@ function createMissionBar() {
 
     container.hidden = false;
 
-    // MODULE HEADER
     const missionTitle = document.createElement("div");
     missionTitle.className =
         "mission-bar-title section-header module-header";
@@ -58,7 +56,6 @@ function createMissionBar() {
     missionTitle.textContent =
         config.title ?? "MISSION BAR";
 
-    // MODULE CONTENT
     const missionBar = document.createElement("section");
     missionBar.className = "mission-bar mission-status-bar";
 
@@ -100,7 +97,6 @@ function createMissionBar() {
 
     missionBar.append(stage, data);
 
-    // FINAL MODULE STRUCTURE
     container.append(missionTitle, missionBar);
 }
 
@@ -162,6 +158,14 @@ function formatValue(item, data) {
 // DATA UPDATE
 // ------------------------------------------------------------
 
+/**
+ * Updates the mission bar with the latest telemetry data.
+ *
+ * Stores the received data and refreshes the interface
+ * when the module configuration is available.
+ *
+ * @param {Object} data - Latest mission telemetry data.
+ */
 function updateMissionBar(data) {
 
     if (!config || !container || config.enabled === false) {
@@ -217,6 +221,15 @@ export function updateMissionBarData(data) {
 }
 
 
+/**
+ * Initializes the mission bar module.
+ *
+ * Loads its configuration, generates the HTML interface
+ * and applies the latest available telemetry data.
+ *
+ * @param {HTMLElement} targetContainer - Container for the mission bar.
+ * @returns {Promise<boolean>} True if initialization succeeds.
+ */
 export async function initMissionBar(targetContainer) {
 
     try {

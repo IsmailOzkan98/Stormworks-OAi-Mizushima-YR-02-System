@@ -11,6 +11,9 @@ telemetry_lock = Lock()
 
 
 def load_telemetry_schema():
+    """
+    Load the telemetry data schema from the JSON configuration file.
+    """
 
     try:
         with open(TELEMETRY_SCHEMA_FILE, "r", encoding="utf-8") as file:
@@ -25,6 +28,15 @@ telemetry = load_telemetry_schema()
 
 
 def update_telemetry(received):
+    """
+    Update telemetry values using the received vehicle data.
+
+    Converts numerical values to floats, preserves textual
+    fields and updates the telemetry timestamp.
+
+    Returns:
+        dict: Updated telemetry snapshot.
+    """
 
     with telemetry_lock:
 
@@ -48,12 +60,14 @@ def update_telemetry(received):
 
 
 def get_telemetry():
+    """Return a copy of the current telemetry data."""
 
     with telemetry_lock:
         return telemetry.copy()
 
 
 def get_last_update():
+    """Return the timestamp of the last telemetry update."""
 
     with telemetry_lock:
         return telemetry["timestamp"]

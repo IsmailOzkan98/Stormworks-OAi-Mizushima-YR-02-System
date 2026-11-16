@@ -18,6 +18,15 @@ def home():
 # 02. FRONTEND CONFIGURATION LOADER
 
 def load_frontend_config(*path_parts):
+    """
+    Load a frontend JSON configuration file.
+
+    Returns the configuration as a JSON response.
+    Handles missing files and invalid JSON data.
+
+    Args:
+        *path_parts: Relative path components of the configuration file.
+    """
 
     config_path = os.path.join(
         current_app.root_path,

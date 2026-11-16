@@ -1,3 +1,7 @@
+/* ============================================================
+   THEME MANAGER
+   Dashboard theme loading and selection.
+   ============================================================ */
 
 "use strict";
 
@@ -64,7 +68,7 @@ const ThemeManager = (() => {
         if (existing) {
             if (existing.dataset.loaded === "true") return;
 
-            // Evita cargar dos veces el mismo módulo mientras sigue cargando.
+            // Prevents the same module from loading multiple times concurrently.
             if (existing._loadPromise) {
                 return existing._loadPromise;
             }
@@ -96,6 +100,13 @@ const ThemeManager = (() => {
     }
 
 
+    /**
+     * Initializes the selected dashboard theme.
+     *
+     * Loads its stylesheet and associated JavaScript modules.
+     *
+     * @returns {Promise<Object|null>} Loaded theme configuration.
+     */
     async function initialize() {
         try {
             const config = await getConfig();
@@ -214,6 +225,11 @@ const ThemeSelector = (() => {
         }
     }
 
+    /**
+     * Opens the theme selector dialog and renders available themes.
+     *
+     * @returns {Promise<void>}
+     */
     async function open() {
         const modal = createModal();
 
@@ -234,8 +250,9 @@ const ThemeSelector = (() => {
 })();
 
 
-
-/* START */
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
 
 ThemeSelector.initialize();
 ThemeManager.initialize();

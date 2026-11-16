@@ -14,6 +14,11 @@ telemetry_bp = Blueprint("telemetry", __name__)
 
 @telemetry_bp.route("/telemetry", methods=["GET"])
 def receive_telemetry():
+    """
+    Receive and process incoming vehicle telemetry.
+
+    Updates the telemetry state and records flight events.
+    """
 
     received = request.args.to_dict()
 
@@ -37,6 +42,7 @@ def receive_telemetry():
 
 @telemetry_bp.route("/api/telemetry")
 def get_telemetry_data():
+    """Return the latest telemetry data as JSON."""
 
     data = get_telemetry()
 

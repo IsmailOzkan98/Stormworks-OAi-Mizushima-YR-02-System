@@ -18,6 +18,11 @@ recording_filename = None
 
 
 def load_recorder_config():
+    """
+    Load recorder settings from the JSON configuration file.
+
+    Returns an empty fields configuration if loading fails.
+    """
 
     try:
         with open(RECORDER_CONFIG_FILE, "r", encoding="utf-8") as file:
@@ -32,6 +37,15 @@ recorder_config = load_recorder_config()
 
 
 def start_recording():
+    """
+    Start a new flight recording session.
+
+    Creates a timestamped JSON file and initializes
+    the recording state.
+
+    Returns:
+        tuple: Operation status and filename or error message.
+    """
 
     global recording
     global recording_file
@@ -62,6 +76,14 @@ def start_recording():
 
 
 def stop_recording():
+    """
+    Stop the active recording session.
+
+    Finalizes and closes the JSON recording file.
+
+    Returns:
+        tuple: Operation status and filename or error message.
+    """
 
     global recording
     global recording_file
@@ -86,6 +108,12 @@ def stop_recording():
 
 
 def save_flight_event(data):
+    """
+    Save a filtered telemetry event to the active recording.
+
+    Applies the configured field selection and adds
+    a local timestamp to each recorded event.
+    """
 
     with recording_lock:
 
@@ -120,6 +148,7 @@ def save_flight_event(data):
 
 
 def get_recorder_status():
+    """Return the current recording state and filename."""
 
     with recording_lock:
 

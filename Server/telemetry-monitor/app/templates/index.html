@@ -6,13 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PROJECT NAME | TYPE MONITOR</title>
 
-    <!-- Style -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <script type="module"src="{{ url_for('static', filename='js/core/themeManager.js') }}"></script>
+    <!-- External fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+
+    <!-- Theme management -->
+    <script type="module" src="{{ url_for('static', filename='js/core/themeManager.js') }}"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/structure.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modularStylesheet/responsive.css') }}">
 
-
+    <!-- Main application script -->
     <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 
@@ -20,18 +25,16 @@
     <div class="container">
 
         <header>
+
+            <!-- Project identification -->
             <div class="brand">
                 <div class="eyebrow">PROJECT CATEGORY</div>
                 <h1>PROJECT NAME <span>PROJECT-IDPROJECT-ID</span></h1>
                 <div class="subtitle">PROJECT DESCRIPTION</div>
             </div>
 
-            <!-- THEME SELECTOR -->
-            <button
-                type="button"
-                id="theme-selector-trigger"
-                aria-label="Select dashboard theme"
-            >
+            <!-- Dashboard theme selector -->
+            <button type="button" id="theme-selector-trigger" aria-label="Select dashboard theme">
                 ◈ THEMES
             </button>
 
@@ -42,6 +45,7 @@
                     <small>UNIT DESCRIPTION</small>
                 </div>
 
+                <!-- Vehicle connection status -->
                 <div class="connection">
                     <div class="light" id="onlineLight"></div>
                     <div>
@@ -52,23 +56,18 @@
             </div>
         </header>
 
-
         <section class="mission-layout">
 
-            <!-- MISSION BAR MODULE -->
+            <!-- Mission bar module container -->
             <div id="missionBarContainer"></div>
 
-            <!-- FLIGHT RECORDER MODULE -->
+            <!-- Flight recorder module container -->
             <div id="flightRecorderContainer"></div>
 
         </section>
 
-
-        <!-- DASHBOARD -->
-
+        <!-- Dynamic dashboard content -->
         <main id="dashboardGrid" class="dashboard-grid"></main>
-
-        <!-- FOOTER -->
 
         <footer class="footer">
             <span>ORGANIZATION</span>
@@ -76,6 +75,7 @@
             <span>DATA ACCESS</span>
         </footer>
 
+    </div>
 
 </body>
 

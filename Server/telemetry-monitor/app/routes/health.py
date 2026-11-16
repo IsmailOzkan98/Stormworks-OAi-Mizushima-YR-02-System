@@ -13,6 +13,9 @@ health_bp = Blueprint("health", __name__)
 
 @health_bp.route("/health")
 def health():
+    """
+    Return server and vehicle connection status.
+    """
 
     last_update = get_last_update()
 

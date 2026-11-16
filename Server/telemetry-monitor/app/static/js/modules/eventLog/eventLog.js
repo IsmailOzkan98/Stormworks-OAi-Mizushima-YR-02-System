@@ -1,9 +1,6 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    EVENT LOG MODULE
-
-   VERSION: 1.1.0
 
    RESPONSIBILITY:
    Event creation, formatting and display.
@@ -25,6 +22,15 @@ const MAX_EVENTS = 30;
    02. MODULE INITIALIZATION
    ============================================================ */
 
+/**
+ * Initializes the event log interface inside the given container.
+ *
+ * Creates the event display and returns a function
+ * for registering new events.
+ *
+ * @param {HTMLElement} container - Target event log container.
+ * @returns {Function|null} Event logging function or null if initialization fails.
+ */
 export function initEventLog(container) {
 
     if (!container) {
@@ -106,16 +112,12 @@ export function initEventLog(container) {
         }
 
 
-        // CREATE EVENT ENTRY
-
         const entry =
             document.createElement("div");
 
         entry.className =
             `event-entry ${type}`;
 
-
-        // EVENT TIME
 
         const time =
             document.createElement("span");
@@ -126,15 +128,11 @@ export function initEventLog(container) {
             new Date().toLocaleTimeString();
 
 
-        // EVENT MESSAGE
-
         const content =
             document.createElement("span");
 
         content.textContent = message;
 
-
-        // ADD CONTENT
 
         entry.append(
             time,
@@ -172,8 +170,3 @@ export function initEventLog(container) {
     return logEvent;
 
 }
-
-
-/* ============================================================
-   END OF MODULE
-   ============================================================ */

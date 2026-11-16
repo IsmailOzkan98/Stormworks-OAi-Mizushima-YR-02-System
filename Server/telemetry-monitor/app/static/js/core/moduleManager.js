@@ -1,6 +1,5 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    MODULE MANAGER
    ============================================================ */
 
@@ -155,13 +154,11 @@ async function initializeModule(definition, instances = []) {
 
         }
 
-        // MODULE OPTIONS
 
         const options = definition.getOptions
             ? definition.getOptions()
             : undefined;
 
-        // INITIALIZE MODULE
 
         const initialized = await module[initializer](
             input,
@@ -271,7 +268,6 @@ async function initializeRegisteredModules(
 
                 }
 
-                // FIND DASHBOARD INSTANCES
 
                 const instances = dashboardItems.filter(
                     item => item.module === configKey
@@ -532,14 +528,12 @@ export async function initializeModules() {
         config.systemEventDetector === true
     );
 
-    // PROJECT DATA
 
     await initializeProjectData(
         config.systemInformation === true,
         dashboardItems
     );
 
-    // REGISTERED MODULES
 
     await initializeRegisteredModules(
         configuration,
@@ -547,9 +541,3 @@ export async function initializeModules() {
     );
 
 }
-
-
-
-/* ============================================================
-   END OF MODULE MANAGER
-   ============================================================ */

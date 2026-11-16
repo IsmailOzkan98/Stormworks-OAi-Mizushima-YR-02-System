@@ -1,6 +1,6 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
+   OAI ELECTRONICS
    FLIGHT TELEMETRY MONITOR
    MAIN APPLICATION ENTRY POINT
    ============================================================ */
@@ -20,6 +20,12 @@ import {
    01. SYSTEM EVENT HANDLERS
    ============================================================ */
 
+/**
+ * Initialize global system event listeners.
+ *
+ * Updates telemetry graphs whenever the browser window
+ * dimensions change.
+ */
 function initializeResizeHandler() {
 
     window.addEventListener("resize", () => {
@@ -40,21 +46,24 @@ function initializeResizeHandler() {
    02. APPLICATION STARTUP
    ============================================================ */
 
+/**
+ * Initialize the main application.
+ *
+ * Loads application modules, initializes telemetry
+ * services and registers global event handlers.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 async function initializeApplication() {
 
     console.info(
         "[SYSTEM] Initializing OAI MIZUSHIMA YR-02..."
     );
 
-    // INITIALIZE APPLICATION MODULES
-
     await initializeModules();
 
-    // INITIALIZE CONNECTION SERVICES
-
     await initializeTelemetry();
-
-    // INITIALIZE EVENT HANDLERS
 
     initializeResizeHandler();
 
@@ -77,9 +86,3 @@ initializeApplication().catch(error => {
     );
 
 });
-
-
-/* ============================================================
-   END OF OAI MIZUSHIMA YR-02
-   FLIGHT TELEMETRY MONITOR
-   ============================================================ */

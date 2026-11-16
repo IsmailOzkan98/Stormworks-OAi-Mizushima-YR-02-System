@@ -1,6 +1,5 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    SYSTEM EVENT DETECTOR
 
    RESPONSIBILITY:
@@ -78,6 +77,17 @@ function getSystemState(value) {
    INITIALIZE DETECTOR
    ------------------------------------------------------------ */
 
+/**
+ * Initializes the system event detector.
+ *
+ * Loads the system configuration and returns a telemetry
+ * processor that detects state changes and reports them
+ * through the Event Log callback.
+ *
+ * @param {Function} logEvent - Callback used to report detected events.
+ * @returns {Promise<Object|null>} Detector interface containing
+ * the telemetry processor and current state accessor.
+ */
 export async function initSystemEventDetector(logEvent) {
 
     if (typeof logEvent !== "function") {

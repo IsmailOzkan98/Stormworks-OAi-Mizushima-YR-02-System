@@ -1,9 +1,6 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    FLIGHT DATA RECORDER MODULE
-
-   VERSION: 1.1.0
    ============================================================ */
 
 
@@ -95,6 +92,11 @@ function updateRecorderInterface(isRecording, filename = null) {
    05. START RECORDING
    ============================================================ */
 
+/**
+ * Starts flight data recording through the backend API.
+ *
+ * @returns {Promise<void>}
+ */
 export async function startFlightRecording() {
 
     if (recording) return;
@@ -140,6 +142,11 @@ export async function startFlightRecording() {
    06. STOP RECORDING
    ============================================================ */
 
+/**
+ * Stops the current flight recording and saves the recorded data.
+ *
+ * @returns {Promise<void>}
+ */
 export async function stopFlightRecording() {
 
     if (!recording) return;
@@ -185,6 +192,11 @@ export async function stopFlightRecording() {
    07. RECORDER STATUS
    ============================================================ */
 
+/**
+ * Retrieves the current recording status from the backend.
+ *
+ * @returns {Promise<void>}
+ */
 export async function refreshRecorderStatus() {
 
     try {
@@ -262,6 +274,17 @@ async function toggleRecording() {
    09. MODULE INITIALIZATION
    ============================================================ */
 
+/**
+ * Initializes the flight recorder module.
+ *
+ * Creates the recorder interface, registers event handlers
+ * and retrieves the current recording status.
+ *
+ * @param {HTMLElement} targetContainer - Recorder container.
+ * @param {Object} options - Module initialization options.
+ * @param {Function} [options.onEvent] - Event notification callback.
+ * @returns {Promise<boolean>} Whether initialization succeeded.
+ */
 export async function initFlightRecorder(targetContainer, options = {}) {
 
     if (initialized) return true;
@@ -307,8 +330,3 @@ export async function initFlightRecorder(targetContainer, options = {}) {
 
     return true;
 }
-
-
-/* ============================================================
-   END OF MODULE
-   ============================================================ */

@@ -1,6 +1,5 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    MISSION MONITOR MODULE
 
    RESPONSIBILITY:
@@ -290,6 +289,14 @@ function updateMissionMonitorAge(age) {
 // PUBLIC API
 // ------------------------------------------------------------
 
+/**
+ * Updates the mission monitor with the latest telemetry data.
+ *
+ * Stores the received data and refreshes the interface
+ * when the module configuration is available.
+ *
+ * @param {Object} data - Latest mission telemetry data.
+ */
 export function updateMissionMonitorData(data) {
 
     if (!data) return;
@@ -302,6 +309,11 @@ export function updateMissionMonitorData(data) {
 }
 
 
+/**
+ * Updates the displayed connection status.
+ *
+ * @param {boolean} online - Whether the telemetry connection is online.
+ */
 export function updateMissionMonitorConnectionData(online) {
 
     updateMissionMonitorConnection(online);
@@ -309,6 +321,11 @@ export function updateMissionMonitorConnectionData(online) {
 }
 
 
+/**
+ * Updates the displayed telemetry packet age.
+ *
+ * @param {number|null} age - Packet age in milliseconds.
+ */
 export function updateMissionMonitorPacketAge(age) {
 
     updateMissionMonitorAge(age);
@@ -320,6 +337,16 @@ export function updateMissionMonitorPacketAge(age) {
 // MODULE INITIALIZATION
 // ------------------------------------------------------------
 
+/**
+ * Initializes the mission monitor module.
+ *
+ * Loads the configuration, generates the interface
+ * and applies the latest available telemetry data,
+ * connection status and packet age.
+ *
+ * @param {HTMLElement} targetContainer - Container for the monitor.
+ * @returns {Promise<boolean>} True if the module is enabled and initialized.
+ */
 export async function initMissionMonitor(targetContainer) {
 
     try {

@@ -120,13 +120,6 @@ function updateUnitDesignation(config) {
 }
 
 
-
-
-/* ============================================================
-   05. SYSTEM INFORMATION
-   ============================================================ */
-
-
 /* ============================================================
    05. SYSTEM INFORMATION
    ============================================================ */
@@ -239,6 +232,19 @@ function updateFooter(config) {
    07. INITIALIZATION
    ============================================================ */
 
+/**
+ * Initializes the project data module.
+ *
+ * Loads the project configuration and updates the page,
+ * brand, unit designation, system information and footer.
+ *
+ * @param {Object} [options={}] - Module initialization options.
+ * @param {boolean} [options.systemInformationEnabled=true]
+ *        Whether system information is enabled.
+ * @param {HTMLElement|null} [options.systemInformationContainer=null]
+ *        Container for the system information section.
+ * @returns {Promise<void>}
+ */
 export async function initProjectData(options = {}) {
 
     const {
