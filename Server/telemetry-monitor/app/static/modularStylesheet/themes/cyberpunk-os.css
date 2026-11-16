@@ -1,84 +1,430 @@
+/* =====================================================
+   CYBERPUNK OS
+   NEON CORPORATE INTERFACE
+   DESIGN SYSTEM & FULL THEME
+===================================================== */
 
-/* =========================================
-   CYBERPUNK OS — NEON CORPORATE INTERFACE
-   Full theme adaptation
-========================================= */
+
+/* =====================================================
+   01. DESIGN TOKENS
+===================================================== */
 
 :root {
-    /* BACKGROUNDS */
 
-    --bg: #050810;
-    --panel: #080d1a;
-    --panel2: #0c1424;
+    /* ---------------------------------
+       COLORS — BACKGROUNDS
+    --------------------------------- */
+
+    --color-background: #050810;
+    --color-background-grid: rgba(0, 245, 255, .09);
+
+    --color-surface: #080d1a;
+    --color-surface-secondary: #0c1424;
+    --color-surface-hover: #101f32;
+    --color-surface-inverted: #00f5ff;
+
+
+    /* ---------------------------------
+       COLORS — TEXT
+    --------------------------------- */
+
+    --color-text-primary: #00f5ff;
+    --color-text-secondary: #d5eaff;
+    --color-text-muted: #68849e;
+    --color-text-inverted: #050810;
+
+
+    /* ---------------------------------
+       COLORS — ACCENTS
+    --------------------------------- */
+
+    --color-accent: #00f5ff;
+    --color-accent-hover: #b5fbff;
+    --color-accent-muted: rgba(0, 245, 255, .20);
+
+    --color-accent-secondary: #ff2d78;
+    --color-accent-tertiary: #a855f7;
+
+
+    /* ---------------------------------
+       COLORS — BORDERS & SHADOWS
+    --------------------------------- */
+
+    --color-border: rgba(0, 245, 255, .20);
+    --color-border-strong: rgba(0, 245, 255, .45);
+    --color-border-subtle: rgba(0, 245, 255, .10);
+
+    --color-shadow: rgba(0, 0, 0, .45);
+
+
+    /* ---------------------------------
+       COLORS — SYSTEM STATUS
+    --------------------------------- */
+
+    --color-status-success: #39ff6e;
+    --color-status-info: #00f5ff;
+    --color-status-warning: #f5e642;
+    --color-status-error: #ff2d78;
+    --color-status-idle: #68849e;
+
+
+    /* ---------------------------------
+       COLORS — TELEMETRY
+    --------------------------------- */
+
+    --color-chart-primary: #00f5ff;
+    --color-chart-target: #39ff6e;
+    --color-chart-warning: #f5e642;
+    --color-chart-error: #ff2d78;
+
+
+    /* ---------------------------------
+       COLORS — ORIGINAL THEME PALETTE
+    --------------------------------- */
+
+    --color-neon-cyan: #00f5ff;
+    --color-neon-magenta: #ff2d78;
+    --color-neon-green: #39ff6e;
+    --color-neon-yellow: #f5e642;
+    --color-neon-blue: #287bff;
+    --color-neon-purple: #a855f7;
+
+    --color-ivory: #d5eaff;
+    --color-muted-blue: #68849e;
+    --color-dark-blue: #101b2d;
+
+
+    /* ---------------------------------
+       COLORS — NEON EFFECTS
+    --------------------------------- */
+
+    --neon-glow: 0 0 8px rgba(0, 245, 255, .35);
+    --neon-glow-strong: 0 0 15px rgba(0, 245, 255, .5);
+
+    --neon-glow-green: 0 0 8px rgba(57, 255, 110, .4);
+    --neon-glow-magenta: 0 0 8px rgba(255, 45, 120, .4);
+    --neon-glow-yellow: 0 0 8px rgba(245, 230, 66, .3);
+
+    --panel-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — FONTS
+    --------------------------------- */
+
+    --font-primary: 'Rajdhani', Arial, sans-serif;
+    --font-monospace: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+    --font-display: 'Orbitron', monospace;
+
+    --mono: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+    --display: 'Rajdhani', Arial, sans-serif;
+    --tech: 'Orbitron', monospace;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — GLOBAL SIZES
+    --------------------------------- */
+
+    --font-size-xs: 9px;
+    --font-size-sm: 10px;
+    --font-size-base: 12px;
+    --font-size-md: 14px;
+    --font-size-lg: 19px;
+    --font-size-xl: 24px;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — HEADINGS
+    --------------------------------- */
+
+    --font-size-h1: 36px;
+    --font-size-h2: 22px;
+    --font-size-h3: 16px;
+    --font-size-h4: 13px;
+    --font-size-h5: 12px;
+    --font-size-h6: 10px;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — COMPONENTS
+    --------------------------------- */
+
+    /* HEADER */
+
+    --font-size-header-title: 36px;
+    --font-size-header-subtitle: 12px;
+
+    /* SECTION HEADERS */
+
+    --font-size-section-header: 10px;
+
+    /* MISSION BAR */
+
+    --font-size-mission-label: 9px;
+    --font-size-mission-value: 19px;
+    --font-size-mission-data: 14px;
+
+    /* METRIC CARDS */
+
+    --font-size-card-label: 10px;
+    --font-size-card-value: 24px;
+    --font-size-card-unit: 10px;
+
+    /* DIAGNOSTICS */
+
+    --font-size-diagnostic-header: 14px;
+    --font-size-diagnostic-label: 11px;
+    --font-size-diagnostic-status: 11px;
+
+    /* BOOSTERS */
+
+    --font-size-booster-label: 12px;
+
+    /* MONITOR */
+
+    --font-size-monitor-title: 13px;
+    --font-size-monitor-label: 11px;
+    --font-size-monitor-value: 12px;
+
+    /* EVENT LOG */
+
+    --font-size-event-header: 13px;
+    --font-size-event-time: 10px;
+    --font-size-event-entry: 11px;
+
+    /* SYSTEM INFO */
+
+    --font-size-system-label: 10px;
+    --font-size-system-value: 12px;
+
+    /* TELEMETRY */
+
+    --font-size-telemetry-title: 13px;
+    --font-size-telemetry-label: 10px;
+    --font-size-telemetry-value: 12px;
+
+    /* BUTTONS */
+
+    --font-size-button: 9px;
+
+    /* FOOTER */
+
+    --font-size-footer: 10px;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — WEIGHTS
+    --------------------------------- */
+
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — LETTER SPACING
+    --------------------------------- */
+
+    --letter-spacing-tight: 0;
+    --letter-spacing-normal: .04rem;
+    --letter-spacing-wide: 1px;
+    --letter-spacing-wider: 1.5px;
+    --letter-spacing-heading: .35rem;
+
+    --letter-spacing-section: 2px;
+    --letter-spacing-button: .08rem;
+
+
+    /* ---------------------------------
+       TYPOGRAPHY — TRANSFORMS
+    --------------------------------- */
+
+    --text-transform-heading: uppercase;
+    --text-transform-label: uppercase;
+
+
+    /* ---------------------------------
+       BORDERS
+    --------------------------------- */
+
+    --border-width: 1px;
+    --border-width-accent: 3px;
+    --border-radius: 0;
+
+
+    /* ---------------------------------
+       SHADOWS
+    --------------------------------- */
+
+    --shadow-sm: 0 0 5px rgba(0, 245, 255, .08);
+    --shadow-md: 0 5px 18px rgba(0, 0, 0, .3);
+    --shadow-lg: var(--panel-shadow);
+
+    --shadow-inset-sm: inset 0 0 12px rgba(0, 245, 255, .025);
+    --shadow-inset-md: inset 0 0 15px rgba(0, 245, 255, .025);
+    --shadow-inset-lg: inset 0 0 25px rgba(0, 245, 255, .025);
+
+
+    /* ---------------------------------
+       SPACING
+    --------------------------------- */
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+
+    /* ---------------------------------
+       MOTION
+    --------------------------------- */
+
+    --transition: .2s ease;
+
+    --transition-fast: .2s ease;
+    --transition-normal: .3s ease;
+
+    --transition-button: .2s ease;
+    --transition-button-sweep: .2s ease-out;
+
+    --animation-indicator: 2s infinite ease-in-out;
+
+
+    /* ---------------------------------
+       LAYOUT
+    --------------------------------- */
+
+    --grid-size: 24px;
+
+
+    /* ---------------------------------
+       ORIGINAL THEME ALIASES
+    --------------------------------- */
+
+    --bg: var(--color-background);
+    --panel: var(--color-surface);
+    --panel2: var(--color-surface-secondary);
+
     --paper-light: #101b2d;
     --paper-shadow: #02050c;
-    --border: rgba(0, 245, 255, .20);
 
-    /* PRIMARY COLORS */
+    --border: var(--color-border);
 
-    --gold: #00f5ff;
+    --gold: var(--color-accent);
     --gold-light: #b5fbff;
     --ivory: #d5eaff;
     --muted: #68849e;
-
-    /* ORIGINAL THEME COLORS */
 
     --text-primary: #00f5ff;
     --text-secondary: #d5eaff;
     --text-shadow: rgba(0, 245, 255, .25);
 
-    /* BACKGROUND GRID */
-
     --main-bg-color: #050810;
     --bg-grid-color: rgba(0, 245, 255, .09);
     --bg-grid-2-color: rgba(0, 245, 255, .015);
-
-    /* STATUS COLORS */
 
     --green: #39ff6e;
     --cyan: #00f5ff;
     --yellow: #f5e642;
     --red: #ff2d78;
 
-    /* EXTRA NEON COLORS */
-
     --magenta: #ff2d78;
     --blue: #287bff;
     --purple: #a855f7;
-
-    /* TYPOGRAPHY */
-
-    --mono: 'Share Tech Mono', 'IBM Plex Mono', monospace;
-    --display: 'Rajdhani', Arial, sans-serif;
-    --tech: 'Orbitron', monospace;
-
-    /* GRAPHS */
 
     --graph-altitude: #00f5ff;
     --graph-target: #39ff6e;
     --graph-alt-error: #ff2d78;
     --graph-vs-error: #f5e642;
 
-    /* ERROR READOUTS */
-
     --alt-error-color: #f5e642;
     --vs-error-color: #ff2d78;
 
-    /* EFFECTS */
-
-    --neon-glow: 0 0 8px rgba(0, 245, 255, .35);
-    --neon-glow-strong: 0 0 15px rgba(0, 245, 255, .5);
-    --panel-shadow: 0 8px 30px rgba(0, 0, 0, .45);
-
-    --transition: .2s ease;
 }
 
-/* =========================================
-   GLOBAL
-========================================= */
+
+/* =====================================================
+   02. TYPOGRAPHY SYSTEM
+===================================================== */
+
+
+/* ---------------------------------
+   GLOBAL TEXT
+--------------------------------- */
+
+body {
+    color: var(--color-text-secondary);
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-normal);
+}
+
+
+/* ---------------------------------
+   HEADINGS
+--------------------------------- */
+
+h1 {
+    color: var(--color-text-secondary);
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
+
+    letter-spacing: var(--letter-spacing-heading);
+    text-transform: var(--text-transform-heading);
+
+    text-shadow: 0 0 10px rgba(0, 245, 255, .25);
+}
+
+
+/* ---------------------------------
+   LABELS
+--------------------------------- */
+
+.eyebrow,
+.subtitle {
+    color: var(--color-text-muted);
+}
+
+.micro-label {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+.card-label {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+
+/* ---------------------------------
+   DATA TYPOGRAPHY
+--------------------------------- */
+
+.value,
+.mission-stage strong,
+.mission-data strong,
+.monitor-item strong,
+.system-info strong,
+.telemetry-readouts strong {
+    font-family: var(--font-monospace);
+}
+
+
+/* =====================================================
+   03. GLOBAL STYLES
+===================================================== */
+
+
+/* ---------------------------------
+   DOCUMENT
+--------------------------------- */
 
 html {
-    background: var(--bg);
+    background: var(--color-background);
 }
 
 body {
@@ -96,15 +442,13 @@ body {
             var(--bg-grid-2-color) 1px
         );
 
-    background-size: 24px 24px;
-
-    color: var(--text-secondary);
-    font-family: var(--display);
-    font-weight: 400;
-    letter-spacing: .04rem;
+    background-size: var(--grid-size) var(--grid-size);
 }
 
-/* Ambient lighting */
+
+/* ---------------------------------
+   AMBIENT LIGHTING
+--------------------------------- */
 
 body::before {
     background:
@@ -113,24 +457,29 @@ body::before {
             rgba(0, 245, 255, .055),
             transparent 65%
         );
+
     pointer-events: none;
 }
 
+
+/* ---------------------------------
+   TEXT SELECTION
+--------------------------------- */
+
 ::selection {
-    background-color: var(--cyan);
-    color: #050810;
+    background-color: var(--color-accent);
+    color: var(--color-text-inverted);
 }
 
-input,
-select,
-textarea {
-    font-family: inherit;
-    letter-spacing: inherit;
-}
 
-/* =========================================
-   SECTION HEADER — REUSABLE
-========================================= */
+/* =====================================================
+   04. REUSABLE COMPONENTS
+===================================================== */
+
+
+/* ---------------------------------
+   SECTION HEADERS
+--------------------------------- */
 
 .section-header {
     background: linear-gradient(
@@ -139,25 +488,199 @@ textarea {
         rgba(0, 245, 255, .025)
     );
 
-    color: var(--cyan);
-    border-left: 3px solid var(--cyan);
+    color: var(--color-accent);
 
-    font-family: var(--tech);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    border-left: var(--border-width-accent) solid var(--color-accent);
+
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+
+    letter-spacing: var(--letter-spacing-section);
+    text-transform: var(--text-transform-heading);
 
     text-shadow: 0 0 8px rgba(0, 245, 255, .45);
 }
 
 .module-header > span {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
-/* =========================================
+
+/* ---------------------------------
+   INPUTS & FORM CONTROLS
+--------------------------------- */
+
+input,
+select,
+textarea {
+    border: var(--border-width) solid rgba(0, 245, 255, .25);
+    border-radius: var(--border-radius);
+
+    background: var(--color-surface);
+    color: var(--color-accent);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: inherit;
+
+    box-shadow: inset 0 0 10px rgba(0, 245, 255, .025);
+
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+
+    border-color: var(--color-accent);
+
+    background: var(--color-surface-secondary);
+
+    box-shadow:
+        0 0 0 1px rgba(0, 245, 255, .2),
+        0 0 12px rgba(0, 245, 255, .15);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #52677e;
+}
+
+
+/* ---------------------------------
+   BUTTON SYSTEM
+--------------------------------- */
+
+button,
+.button {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    overflow: hidden;
+
+    border: var(--border-width) solid var(--color-accent);
+    border-radius: var(--border-radius);
+
+    background: rgba(0, 245, 255, .08);
+    color: var(--color-accent);
+
+    font-family: var(--font-display);
+    font-size: var(--font-size-button);
+    font-weight: var(--font-weight-medium);
+
+    letter-spacing: var(--letter-spacing-button);
+    text-transform: var(--text-transform-label);
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 12px rgba(0, 245, 255, .04),
+        0 0 5px rgba(0, 245, 255, .08);
+
+    transition:
+        color var(--transition-button),
+        background-color var(--transition-button),
+        box-shadow var(--transition-button),
+        border-color var(--transition-button);
+}
+
+
+/* BUTTON — HORIZONTAL SWEEP */
+
+button::after,
+.button::after {
+    content: "";
+
+    position: absolute;
+    inset: 0 auto 0 0;
+
+    width: 0;
+
+    background: var(--color-accent);
+    z-index: -1;
+
+    transition: width var(--transition-button-sweep);
+}
+
+
+/* BUTTON — HOVER */
+
+button:not(:disabled):hover,
+.button:hover {
+    background: transparent;
+    color: var(--color-text-inverted);
+
+    border-color: var(--color-accent);
+
+    box-shadow:
+        0 0 8px rgba(0, 245, 255, .4),
+        0 0 18px rgba(0, 245, 255, .15);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    width: 100%;
+}
+
+
+/* BUTTON — ACTIVE */
+
+button:not(:disabled):active,
+.button:active {
+    color: var(--color-text-inverted);
+
+    box-shadow:
+        0 0 15px rgba(0, 245, 255, .4);
+}
+
+
+/* BUTTON — DISABLED */
+
+button:disabled,
+.button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+/* ---------------------------------
+   INDICATORS
+--------------------------------- */
+
+.indicator {
+    background: #26364a;
+
+    border: var(--border-width) solid rgba(0, 245, 255, .15);
+
+    box-shadow: none;
+}
+
+.indicator.active {
+    background: var(--color-status-success);
+    border-color: var(--color-status-success);
+
+    box-shadow:
+        0 0 5px var(--color-status-success),
+        0 0 12px rgba(57, 255, 110, .5);
+
+    animation: indicator-pulse var(--animation-indicator);
+}
+
+
+/* =====================================================
+   05. APPLICATION LAYOUT
+===================================================== */
+
+
+/* ---------------------------------
    HEADER
-========================================= */
+--------------------------------- */
 
 header {
     position: relative;
@@ -169,8 +692,8 @@ header {
             rgba(5, 8, 16, .98)
         );
 
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--cyan);
+    border: var(--border-width) solid var(--color-border);
+    border-left: var(--border-width-accent) solid var(--color-accent);
 
     box-shadow:
         var(--panel-shadow),
@@ -178,31 +701,15 @@ header {
         0 0 12px rgba(0, 245, 255, .04);
 }
 
-.eyebrow,
-.subtitle {
-    color: var(--muted);
-}
-
-h1 {
-    color: var(--text-secondary);
-    font-family: var(--tech);
-    font-weight: 500;
-
-    text-shadow:
-        0 0 10px rgba(0, 245, 255, .25);
-
-    letter-spacing: .35rem;
-    text-transform: uppercase;
-}
-
 h1 span {
-    color: var(--cyan);
+    color: var(--color-accent);
     text-shadow: 0 0 12px rgba(0, 245, 255, .6);
 }
 
 .connection {
-    background: var(--panel2);
-    border: 1px solid var(--border);
+    background: var(--color-surface-secondary);
+
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         inset 0 0 12px rgba(0, 245, 255, .035),
@@ -210,16 +717,17 @@ h1 span {
 }
 
 .connection strong {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .connection small {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
-/* =========================================
+
+/* ---------------------------------
    MISSION BAR
-========================================= */
+--------------------------------- */
 
 .mission-bar {
     background: linear-gradient(
@@ -228,115 +736,101 @@ h1 span {
         #080d1a
     );
 
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
         inset 0 0 15px rgba(0, 245, 255, .025);
 }
 
-.micro-label {
-    color: var(--muted);
-    font-weight: 500;
-}
 
-.mission-stage strong {
-    color: var(--cyan);
-    font-weight: 500;
-}
-
-.state-pill.running {
-    color: var(--green) !important;
-    text-shadow: 0 0 8px rgba(57, 255, 110, .5);
-}
-
-.state-pill.completed {
-    color: var(--cyan) !important;
-    text-shadow: 0 0 8px rgba(0, 245, 255, .5);
-}
-
-.state-pill.idle {
-    color: var(--yellow) !important;
-    text-shadow: 0 0 8px rgba(245, 230, 66, .35);
-}
-
-/* MISSION INFORMATION */
+/* MISSION STAGE */
 
 .mission-stage {
     background: rgba(0, 245, 255, .045);
-    border-left: 3px solid var(--cyan);
+
+    border-left: var(--border-width-accent) solid var(--color-accent);
 }
 
 .mission-stage .micro-label {
-    color: var(--muted);
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    font-weight: 600;
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-mission-label);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wider);
 }
 
 .mission-stage strong {
-    color: var(--cyan);
-    font-family: var(--mono);
-    font-size: 19px;
-    font-weight: 600;
-    letter-spacing: 1px;
+    color: var(--color-accent);
+
+    font-size: var(--font-size-mission-value);
+    font-weight: var(--font-weight-semibold);
+
+    letter-spacing: var(--letter-spacing-wide);
 
     text-shadow: 0 0 8px rgba(0, 245, 255, .3);
 }
 
-/* DATA CELLS */
+
+/* MISSION DATA */
 
 .mission-data > div {
-    background: var(--panel2);
-    border: 1px solid rgba(0, 245, 255, .12);
+    background: var(--color-surface-secondary);
+
+    border: var(--border-width) solid rgba(0, 245, 255, .12);
 
     box-shadow:
         inset 0 0 12px rgba(0, 245, 255, .025);
 }
 
 .mission-data .micro-label {
-    color: var(--muted);
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-mission-label);
+    font-weight: var(--font-weight-semibold);
+
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: var(--text-transform-label);
 }
 
 .mission-data strong {
-    color: var(--text-secondary);
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
+    color: var(--color-text-secondary);
+
+    font-size: var(--font-size-mission-data);
+    font-weight: var(--font-weight-medium);
+
     overflow-wrap: anywhere;
 }
 
 .mission-data .state-pill {
-    color: var(--green);
-    font-size: 11px;
+    color: var(--color-status-success);
+    font-size: var(--font-size-sm);
 }
 
-/* =========================================
+
+/* ---------------------------------
    RECORDER PANEL
-========================================= */
+--------------------------------- */
 
 .recorder-panel {
     background:
         linear-gradient(
             145deg,
-            var(--panel2),
-            var(--panel)
+            var(--color-surface-secondary),
+            var(--color-surface)
         );
 
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
         inset 0 0 20px rgba(0, 245, 255, .025);
 }
 
-/* =========================================
+
+/* ---------------------------------
    METRIC CARDS
-========================================= */
+--------------------------------- */
 
 .card {
     position: relative;
@@ -348,22 +842,23 @@ h1 span {
             #080d1a
         );
 
-    border: 1px solid rgba(0, 245, 255, .16);
+    border: var(--border-width) solid rgba(0, 245, 255, .16);
 
     box-shadow:
         0 5px 18px rgba(0, 0, 0, .3),
         inset 0 0 15px rgba(0, 245, 255, .02);
 
     transition:
-        background-color var(--transition),
-        border-color var(--transition),
-        box-shadow var(--transition),
-        transform var(--transition);
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .card:hover {
-    background: #101f32;
-    border-color: var(--cyan);
+    background: var(--color-surface-hover);
+
+    border-color: var(--color-accent);
 
     box-shadow:
         0 0 12px rgba(0, 245, 255, .15),
@@ -376,56 +871,57 @@ h1 span {
 .card::after {
     background: linear-gradient(
         90deg,
-        var(--cyan),
-        var(--magenta)
+        var(--color-accent),
+        var(--color-accent-secondary)
     );
 
-    box-shadow: 0 0 10px var(--cyan);
+    box-shadow: 0 0 10px var(--color-accent);
 }
 
 .card-label {
-    color: var(--muted);
-    font-weight: 500;
+    color: var(--color-text-muted);
 }
 
 .value {
-    color: var(--cyan);
-    font-family: var(--mono);
-    font-weight: 400;
+    color: var(--color-accent);
+
+    font-size: var(--font-size-card-value);
+    font-weight: var(--font-weight-regular);
 
     text-shadow: 0 0 10px rgba(0, 245, 255, .25);
 }
 
 .unit {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 .highlight {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .cyan {
-    color: var(--cyan);
+    color: var(--color-status-info);
     text-shadow: 0 0 8px rgba(0, 245, 255, .4);
 }
 
 .yellow {
-    color: var(--yellow);
+    color: var(--color-status-warning);
     text-shadow: 0 0 8px rgba(245, 230, 66, .3);
 }
 
-/* =========================================
+
+/* ---------------------------------
    DIAGNOSTICS
-========================================= */
+--------------------------------- */
 
 .diagnostics-panel {
     background: linear-gradient(
         145deg,
-        var(--panel2),
-        var(--panel)
+        var(--color-surface-secondary),
+        var(--color-surface)
     );
 
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
@@ -433,61 +929,48 @@ h1 span {
 }
 
 .diagnostic-header {
-    color: var(--cyan);
-    font-family: var(--tech);
-    font-weight: 500;
+    color: var(--color-accent);
+
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
 }
 
 .diagnostic-row {
-    border-top: 1px solid rgba(0, 245, 255, .12);
+    border-top: var(--border-width) solid rgba(0, 245, 255, .12);
 }
 
 .diagnostic-status b {
-    color: var(--muted);
-    font-weight: 500;
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
 }
 
 .diagnostic-status b.active-text {
-    color: var(--green);
+    color: var(--color-status-success);
     text-shadow: 0 0 7px rgba(57, 255, 110, .4);
 }
 
-.indicator {
-    background: #26364a;
-    border: 1px solid rgba(0, 245, 255, .15);
-    box-shadow: none;
-}
-
-.indicator.active {
-    background: var(--green);
-    border-color: var(--green);
-
-    box-shadow:
-        0 0 5px var(--green),
-        0 0 12px rgba(57, 255, 110, .5);
-
-    animation: indicator-pulse 2s infinite ease-in-out;
-}
-
 .diagnostic-separator {
-    border-top: 1px solid var(--border);
-    color: var(--cyan);
+    border-top: var(--border-width) solid var(--color-border);
+    color: var(--color-accent);
 }
 
-/* =========================================
+
+/* ---------------------------------
    DIRECTIONAL BOOSTERS
-========================================= */
+--------------------------------- */
 
 .booster {
-    background: var(--panel2);
-    border: 1px solid rgba(0, 245, 255, .15);
+    background: var(--color-surface-secondary);
 
-    transition: all var(--transition);
+    border: var(--border-width) solid rgba(0, 245, 255, .15);
+
+    transition: all var(--transition-fast);
 }
 
 .booster.pulse {
     background: rgba(0, 245, 255, .07);
-    border-color: var(--cyan);
+
+    border-color: var(--color-accent);
 
     box-shadow:
         inset 0 0 15px rgba(0, 245, 255, .08),
@@ -495,80 +978,91 @@ h1 span {
 }
 
 .booster.pulse span {
-    color: var(--cyan);
+    color: var(--color-accent);
     text-shadow: 0 0 8px rgba(0, 245, 255, .4);
 }
 
 .booster.pulse .indicator {
-    background: var(--cyan);
-    border-color: var(--cyan);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
 
-    box-shadow: 0 0 10px var(--cyan);
+    box-shadow: 0 0 10px var(--color-accent);
 }
 
-/* =========================================
+
+/* ---------------------------------
    MONITOR
-========================================= */
+--------------------------------- */
 
 .monitor-panel {
     background: linear-gradient(
         145deg,
-        var(--panel2),
-        var(--panel)
+        var(--color-surface-secondary),
+        var(--color-surface)
     );
 
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
         inset 0 0 15px rgba(0, 245, 255, .025);
 }
 
-.monitor-title,
-.event-header {
-    color: var(--cyan);
-    border-bottom: 1px solid var(--border);
+.monitor-title {
+    color: var(--color-accent);
 
-    font-family: var(--tech);
-    font-weight: 500;
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
 }
 
 .monitor-item {
-    border-bottom: 1px solid rgba(0, 245, 255, .10);
+    border-bottom: var(--border-width) solid rgba(0, 245, 255, .10);
 }
 
 .monitor-item span {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 .monitor-item strong {
-    color: var(--text-secondary);
-    font-family: var(--mono);
-    font-weight: 400;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-regular);
 }
 
-/* =========================================
+
+/* ---------------------------------
    EVENT LOG
-========================================= */
+--------------------------------- */
 
 .event-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: var(--color-surface);
+
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
         inset 0 0 15px rgba(0, 245, 255, .025);
 }
 
+.event-header {
+    color: var(--color-accent);
+
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
+}
+
 .event-header span:last-child {
-    color: var(--green);
+    color: var(--color-status-success);
     text-shadow: 0 0 8px rgba(57, 255, 110, .4);
 }
 
 .event-entry {
-    border-bottom: 1px solid rgba(0, 245, 255, .08);
+    border-bottom: var(--border-width) solid rgba(0, 245, 255, .08);
 
-    transition: background-color var(--transition);
+    transition: background-color var(--transition-fast);
 }
 
 .event-entry:hover {
@@ -576,133 +1070,143 @@ h1 span {
 }
 
 .event-time {
-    color: var(--muted);
-    font-family: var(--mono);
+    color: var(--color-text-muted);
+    font-family: var(--font-monospace);
 }
 
 .event-entry span:last-child {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
-/* FLIGHT PHASE */
+
+/* EVENT — FLIGHT PHASE */
 
 .event-entry.phase-event {
-    border-top: 1px solid var(--border);
-    border-left-color: var(--cyan);
+    border-top: var(--border-width) solid var(--color-border);
+    border-left-color: var(--color-accent);
 }
 
 .event-entry.phase-event .event-time,
 .event-entry.phase-event span:last-child {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
-/* ACTIVATION */
+
+/* EVENT — ACTIVATION */
 
 .event-entry.activation {
-    border-left-color: var(--green);
+    border-left-color: var(--color-status-success);
 }
 
 .event-entry.activation span:last-child {
-    color: var(--green);
+    color: var(--color-status-success);
 }
 
-/* DEACTIVATION */
+
+/* EVENT — DEACTIVATION */
 
 .event-entry.deactivation {
-    border-left-color: var(--muted);
+    border-left-color: var(--color-text-muted);
 }
 
 .event-entry.deactivation span:last-child {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
-/* ERRORS */
+
+/* EVENT — ERRORS */
 
 .event-entry.error {
-    border-left-color: var(--red);
+    border-left-color: var(--color-status-error);
     background: rgba(255, 45, 120, .07);
 }
 
 .event-entry.error span:last-child {
-    color: var(--red);
+    color: var(--color-status-error);
     text-shadow: 0 0 7px rgba(255, 45, 120, .35);
 }
 
-/* NAVIGATION */
+
+/* EVENT — NAVIGATION */
 
 .event-entry.navigation-event {
-    border-left-color: var(--cyan);
+    border-left-color: var(--color-status-info);
 }
 
 .event-entry.navigation-event span:last-child {
-    color: var(--cyan);
+    color: var(--color-status-info);
 }
 
-/* WARNINGS */
+
+/* EVENT — WARNINGS */
 
 .event-entry.warning {
-    border-left-color: var(--yellow);
+    border-left-color: var(--color-status-warning);
 }
 
 .event-entry.warning span:last-child {
-    color: var(--yellow);
+    color: var(--color-status-warning);
 }
 
-/* NORMAL EVENTS */
+
+/* EVENT — NORMAL */
 
 .event-entry.normal {
-    border-left-color: var(--border);
+    border-left-color: var(--color-border);
 }
 
 .event-entry.normal span:last-child {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
-/* =========================================
+
+/* ---------------------------------
    SYSTEM INFO
-========================================= */
+--------------------------------- */
 
 .system-info > div {
-    background: var(--panel2);
-    border: 1px solid rgba(0, 245, 255, .13);
+    background: var(--color-surface-secondary);
+
+    border: var(--border-width) solid rgba(0, 245, 255, .13);
 
     box-shadow:
         inset 0 0 12px rgba(0, 245, 255, .025);
 }
 
 .system-info span {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 .system-info strong {
-    color: var(--cyan);
-    font-family: var(--mono);
-    font-weight: 400;
+    color: var(--color-accent);
+    font-weight: var(--font-weight-regular);
 }
 
-/* =========================================
-   FLIGHT DATA RECORDER BUTTON
-========================================= */
+
+/* ---------------------------------
+   FLIGHT DATA RECORDER
+--------------------------------- */
 
 .recorder-dot {
-    background: var(--green);
+    background: var(--color-status-success);
 
     box-shadow:
-        0 0 6px var(--green),
+        0 0 6px var(--color-status-success),
         0 0 12px rgba(57, 255, 110, .35);
 }
 
 .recorder-btn.stop .recorder-dot {
-    background: var(--red);
+    background: var(--color-status-error);
 
     box-shadow:
-        0 0 6px var(--red),
+        0 0 6px var(--color-status-error),
         0 0 12px rgba(255, 45, 120, .35);
 }
 
-/* =========================================
+
+/* ---------------------------------
    TELEMETRY GRAPHS
-========================================= */
+--------------------------------- */
 
 .telemetry-chart-panel {
     background: linear-gradient(
@@ -711,7 +1215,7 @@ h1 span {
         #080d1a
     );
 
-    border: 1px solid var(--border);
+    border: var(--border-width) solid var(--color-border);
 
     box-shadow:
         var(--panel-shadow),
@@ -719,253 +1223,180 @@ h1 span {
 }
 
 .telemetry-chart-panel::after {
-    background: var(--cyan);
-    box-shadow: 0 0 10px var(--cyan);
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
 }
 
 .telemetry-chart-header {
-    color: var(--cyan);
-    border-bottom: 1px solid var(--border);
+    color: var(--color-accent);
 
-    font-family: var(--tech);
-    font-weight: 500;
+    border-bottom: var(--border-width) solid var(--color-border);
+
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
 }
 
 .telemetry-chart-header span:last-child {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
+
+
+/* TELEMETRY READOUTS */
 
 .telemetry-readouts span,
 .telemetry-readouts small {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 .telemetry-readouts strong {
-    color: var(--cyan);
-    font-family: var(--mono);
-    font-weight: 400;
+    color: var(--color-chart-primary);
+
+    font-weight: var(--font-weight-regular);
 
     text-shadow: 0 0 8px rgba(0, 245, 255, .25);
 }
 
 .telemetry-readouts > div:nth-child(2) strong {
-    color: var(--green);
+    color: var(--color-chart-target);
     text-shadow: 0 0 8px rgba(57, 255, 110, .3);
 }
 
 .telemetry-readouts > div:nth-child(3) strong {
-    color: var(--yellow);
+    color: var(--color-chart-warning);
     text-shadow: 0 0 8px rgba(245, 230, 66, .25);
 }
 
+
+/* TELEMETRY LEGEND */
+
 .legend-alt {
-    color: var(--cyan);
+    color: var(--color-chart-primary);
 }
 
 .legend-target {
-    color: var(--green);
+    color: var(--color-chart-target);
 }
 
 .legend-error {
-    color: var(--red);
+    color: var(--color-chart-error);
 }
 
-/* =========================================
-   INPUTS AND CONTROLS
-========================================= */
 
-input,
-select,
-textarea {
-    border: 1px solid rgba(0, 245, 255, .25);
-    border-radius: 0;
-
-    background: #080d1a;
-    color: var(--cyan);
-
-    font-family: var(--mono);
-    font-weight: 400;
-
-    box-shadow: inset 0 0 10px rgba(0, 245, 255, .025);
-
-    transition:
-        border-color var(--transition),
-        box-shadow var(--transition),
-        background-color var(--transition);
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-
-    border-color: var(--cyan);
-
-    background: #0c1424;
-
-    box-shadow:
-        0 0 0 1px rgba(0, 245, 255, .2),
-        0 0 12px rgba(0, 245, 255, .15);
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: #52677e;
-}
-
-/* =========================================
-   GLOBAL BUTTON SYSTEM
-========================================= */
-
-button,
-.button {
-    position: relative;
-    z-index: 1;
-    isolation: isolate;
-    overflow: hidden;
-
-    border: 1px solid var(--cyan);
-    border-radius: 0;
-
-    background: rgba(0, 245, 255, .08);
-    color: var(--cyan);
-
-    font-family: var(--tech);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: .08rem;
-    text-transform: uppercase;
-
-    cursor: pointer;
-
-    box-shadow:
-        inset 0 0 12px rgba(0, 245, 255, .04),
-        0 0 5px rgba(0, 245, 255, .08);
-
-    transition:
-        color .2s ease,
-        background-color .2s ease,
-        box-shadow .2s ease,
-        border-color .2s ease;
-}
-
-/* Horizontal sweep */
-
-button::after,
-.button::after {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 0;
-
-    background: var(--cyan);
-    z-index: -1;
-
-    transition: width .2s ease-out;
-}
-
-/* Hover */
-
-button:not(:disabled):hover,
-.button:hover {
-    background: transparent;
-    color: #050810;
-
-    border-color: var(--cyan);
-
-    box-shadow:
-        0 0 8px rgba(0, 245, 255, .4),
-        0 0 18px rgba(0, 245, 255, .15);
-}
-
-button:not(:disabled):hover::after,
-.button:hover::after {
-    width: 100%;
-}
-
-/* Active */
-
-button:not(:disabled):active,
-.button:active {
-    color: #050810;
-
-    box-shadow:
-        0 0 15px rgba(0, 245, 255, .4);
-}
-
-/* Disabled */
-
-button:disabled,
-.button:disabled {
-    opacity: .4;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-/* =========================================
-   SCROLLBAR
-========================================= */
+/* =====================================================
+   06. SCROLLBAR
+===================================================== */
 
 .event-list::-webkit-scrollbar {
     width: 5px;
 }
 
 .event-list::-webkit-scrollbar-track {
-    background: #080d1a;
+    background: var(--color-surface);
 }
 
 .event-list::-webkit-scrollbar-thumb {
-    background: var(--cyan);
+    background: var(--color-accent);
 
     box-shadow: 0 0 6px rgba(0, 245, 255, .5);
 }
 
-/* =========================================
-   FOOTER
-========================================= */
+
+/* =====================================================
+   07. FOOTER
+===================================================== */
 
 footer {
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-weight: 400;
+    border-top: var(--border-width) solid var(--color-border);
+
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-regular);
 }
 
-/* =========================================
-   ANIMATIONS
-========================================= */
+
+/* =====================================================
+   08. SYSTEM STATES
+===================================================== */
+
+
+/* ---------------------------------
+   SUCCESS
+--------------------------------- */
+
+.state-pill.running,
+.diagnostic-status b.active-text {
+    color: var(--color-status-success);
+}
+
+
+/* ---------------------------------
+   INFO
+--------------------------------- */
+
+.state-pill.completed {
+    color: var(--color-status-info);
+}
+
+
+/* ---------------------------------
+   WARNING / IDLE
+--------------------------------- */
+
+.state-pill.idle {
+    color: var(--color-status-warning);
+}
+
+
+/* =====================================================
+   09. ANIMATIONS
+===================================================== */
 
 @keyframes indicator-pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
-        box-shadow: 0 0 6px var(--green);
+        box-shadow: 0 0 6px var(--color-status-success);
     }
 
     50% {
         opacity: .55;
-        box-shadow: 0 0 2px var(--green);
+        box-shadow: 0 0 2px var(--color-status-success);
     }
+
 }
 
+
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
 
     50% {
         opacity: .45;
     }
+
 }
 
-/* =========================================
-   ACCESSIBILITY
-========================================= */
+
+/* =====================================================
+   10. ACCESSIBILITY
+===================================================== */
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
+
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
+
         transition-duration: .01ms !important;
+
+        scroll-behavior: auto !important;
+
     }
+
 }

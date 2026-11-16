@@ -1,733 +1,783 @@
 
-/* =========================================
+/* =====================================================
    MILITARY TACTICAL OS
-   Full theme adaptation
-========================================= */
+   PROJECT: GHOST PROTOCOL
+   CLASSIFICATION: TOP SECRET
+   DESIGN SYSTEM & FULL THEME
+===================================================== */
+
+
+/* =====================================================
+   01. DESIGN TOKENS
+===================================================== */
+
+
+/* ---------------------------------
+   COLORS — BACKGROUNDS
+--------------------------------- */
 
 :root {
-    /* BACKGROUNDS */
 
-    --bg: #111811;
-    --panel: #1a2319;
-    --panel2: #252e20;
-    --paper-light: #303a29;
-    --paper-shadow: #0a100b;
-    --border: rgba(169, 183, 130, .22);
+    --color-background: #070b10;
+    --color-background-grid: rgba(104, 180, 164, .075);
 
-    /* PRIMARY COLORS */
+    --color-surface: #101820;
+    --color-surface-secondary: #16232b;
+    --color-surface-hover: #20343b;
+    --color-surface-inverted: #e4eee8;
 
-    --gold: #c2b477;
-    --gold-light: #e0d5a5;
-    --ivory: #d1d5bc;
-    --muted: #89917c;
+    --color-background-deep: #05080d;
+    --color-surface-glass: rgba(16, 28, 35, .84);
+    --color-surface-metal: #19262c;
 
-    /* ORIGINAL THEME COLORS */
 
-    --text-primary: #c2b477;
-    --text-secondary: #d1d5bc;
-    --text-shadow: rgba(169, 183, 130, .22);
+/* ---------------------------------
+   COLORS — TEXT
+--------------------------------- */
 
-    /* BACKGROUND GRID */
+    --color-text-primary: #d5e9df;
+    --color-text-secondary: #a7beb5;
+    --color-text-muted: #637e79;
+    --color-text-inverted: #07100e;
 
-    --main-bg-color: #111811;
-    --bg-grid-color: rgba(169, 183, 130, .065);
-    --bg-grid-2-color: rgba(169, 183, 130, .01);
 
-    /* STATUS COLORS */
+/* ---------------------------------
+   COLORS — ACCENTS
+--------------------------------- */
 
-    --green: #a8c879;
-    --cyan: #91a9a0;
-    --yellow: #d5b75c;
-    --red: #c15a49;
+    --color-accent: #65e6c1;
+    --color-accent-hover: #a1ffe3;
+    --color-accent-muted: #326d61;
 
-    /* ADDITIONAL MILITARY COLORS */
+    --color-accent-khaki: #e3b66c;
+    --color-accent-olive: #4b8170;
+    --color-accent-phosphor: #a5ffe0;
+    --color-accent-steel: #829ca8;
 
-    --olive: #65734c;
-    --khaki: #b5a36a;
-    --phosphor: #c5d0a0;
-    --steel: #788b83;
+    --color-accent-neon: #65e6c1;
+    --color-accent-electric: #42ffc5;
+    --color-accent-blue: #62b9df;
 
-    /* TYPOGRAPHY */
 
-    --mono: 'IBM Plex Mono', monospace;
-    --display: 'Rajdhani', Arial, sans-serif;
+/* ---------------------------------
+   COLORS — BORDERS & SHADOWS
+--------------------------------- */
 
-    /* GRAPHS */
+    --color-border: rgba(117, 188, 171, .19);
+    --color-border-strong: rgba(101, 230, 193, .55);
+    --color-border-subtle: rgba(117, 188, 171, .09);
 
-    --graph-altitude: #c2b477;
-    --graph-target: #a8c879;
-    --graph-alt-error: #c15a49;
-    --graph-vs-error: #d5b75c;
+    --color-shadow: rgba(0, 0, 0, .7);
 
-    /* ERROR READOUTS */
+    --color-shadow-soft: rgba(0, 0, 0, .35);
+    --color-shadow-inset: rgba(101, 230, 193, .035);
 
-    --alt-error-color: #d5b75c;
-    --vs-error-color: #c15a49;
+    --color-border-glow: rgba(101, 230, 193, .28);
 
-    /* EFFECTS */
 
-    --neon-glow: 0 0 5px rgba(168, 200, 121, .12);
-    --neon-glow-strong: 0 0 10px rgba(168, 200, 121, .2);
-    --panel-shadow: 3px 3px 0 rgba(0, 0, 0, .35);
+/* ---------------------------------
+   COLORS — SYSTEM STATUS
+--------------------------------- */
 
-    /* MOTION */
+    --color-status-success: #65e6a0;
+    --color-status-info: #69c5df;
+    --color-status-warning: #edbc63;
+    --color-status-error: #ff625f;
+    --color-status-idle: #71847f;
 
-    --transition: .2s ease;
+
+/* ---------------------------------
+   COLORS — TELEMETRY
+--------------------------------- */
+
+    --color-chart-primary: #65e6c1;
+    --color-chart-target: #65e6a0;
+    --color-chart-warning: #edbc63;
+    --color-chart-error: #ff625f;
+
+    --color-chart-altitude: var(--color-chart-primary);
+    --color-chart-vs-error: var(--color-chart-warning);
+
+
+/* ---------------------------------
+   COLORS — ORIGINAL THEME PALETTE
+--------------------------------- */
+
+    --color-gold: #65e6c1;
+    --color-gold-light: #c2ffea;
+    --color-ivory: #e4eee8;
+    --color-muted: #637e79;
+
+    --color-green: #65e6a0;
+    --color-cyan: #69c5df;
+    --color-yellow: #edbc63;
+    --color-red: #ff625f;
+
+    --color-olive: #4b8170;
+    --color-khaki: #e3b66c;
+    --color-phosphor: #a5ffe0;
+    --color-steel: #829ca8;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — FONTS
+--------------------------------- */
+
+    --font-primary: 'Rajdhani', 'Arial Narrow', sans-serif;
+    --font-monospace: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+
+    --font-display: var(--font-primary);
+    --font-data: var(--font-monospace);
+
+
+/* ---------------------------------
+   TYPOGRAPHY — GLOBAL SIZES
+--------------------------------- */
+
+    --font-size-xs: 9px;
+    --font-size-sm: 10px;
+    --font-size-base: 12px;
+    --font-size-md: 14px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — HEADINGS
+--------------------------------- */
+
+    --font-size-h1: 42px;
+    --font-size-h2: 25px;
+    --font-size-h3: 18px;
+    --font-size-h4: 14px;
+    --font-size-h5: 12px;
+    --font-size-h6: 10px;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — COMPONENTS
+--------------------------------- */
+
+    /* HEADER */
+
+    --font-size-header-title: 42px;
+    --font-size-header-subtitle: 12px;
+
+    /* SECTION HEADERS */
+
+    --font-size-section-header: 10px;
+
+    /* MISSION BAR */
+
+    --font-size-mission-label: 9px;
+    --font-size-mission-value: 21px;
+    --font-size-mission-data: 15px;
+
+    /* METRIC CARDS */
+
+    --font-size-card-label: 10px;
+    --font-size-card-value: 28px;
+    --font-size-card-unit: 10px;
+
+    /* DIAGNOSTICS */
+
+    --font-size-diagnostic-header: 15px;
+    --font-size-diagnostic-label: 11px;
+    --font-size-diagnostic-status: 11px;
+
+    /* BOOSTERS */
+
+    --font-size-booster-label: 12px;
+
+    /* MONITOR */
+
+    --font-size-monitor-title: 14px;
+    --font-size-monitor-label: 11px;
+    --font-size-monitor-value: 13px;
+
+    /* EVENT LOG */
+
+    --font-size-event-header: 14px;
+    --font-size-event-time: 10px;
+    --font-size-event-entry: 12px;
+
+    /* SYSTEM INFO */
+
+    --font-size-system-label: 10px;
+    --font-size-system-value: 13px;
+
+    /* TELEMETRY */
+
+    --font-size-telemetry-title: 14px;
+    --font-size-telemetry-label: 10px;
+    --font-size-telemetry-value: 13px;
+
+    /* BUTTONS */
+
+    --font-size-button: 10px;
+
+    /* FOOTER */
+
+    --font-size-footer: 10px;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — WEIGHTS
+--------------------------------- */
+
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — LETTER SPACING
+--------------------------------- */
+
+    --letter-spacing-tight: -.02em;
+    --letter-spacing-normal: .045em;
+    --letter-spacing-wide: .12em;
+    --letter-spacing-wider: .2em;
+    --letter-spacing-heading: .16em;
+
+    --letter-spacing-section: .2em;
+    --letter-spacing-button: .14em;
+
+
+/* ---------------------------------
+   TYPOGRAPHY — TRANSFORMS
+--------------------------------- */
+
+    --text-transform-heading: uppercase;
+    --text-transform-label: uppercase;
+    --text-transform-button: uppercase;
+
+
+/* ---------------------------------
+   BORDERS
+--------------------------------- */
+
+    --border-width: 1px;
+    --border-width-accent: 3px;
+    --border-width-section: 3px;
+
+    --border-radius: 3px;
+    --border-radius-large: 7px;
+
+    --border-cut: 12px;
+
+
+/* ---------------------------------
+   SHADOWS
+--------------------------------- */
+
+    --shadow-sm:
+        0 2px 5px rgba(0, 0, 0, .3);
+
+    --shadow-md:
+        0 5px 15px rgba(0, 0, 0, .32),
+        0 0 12px rgba(101, 230, 193, .035);
+
+    --shadow-lg:
+        0 12px 30px rgba(0, 0, 0, .42),
+        0 0 20px rgba(101, 230, 193, .04);
+
+    --shadow-panel:
+        0 12px 35px rgba(0, 0, 0, .4),
+        inset 0 1px rgba(255, 255, 255, .035),
+        inset 0 0 30px rgba(101, 230, 193, .025);
+
+    --shadow-card:
+        0 5px 15px rgba(0, 0, 0, .28),
+        inset 0 1px rgba(255, 255, 255, .025);
+
+    --shadow-card-hover:
+        0 12px 25px rgba(0, 0, 0, .42),
+        0 0 20px rgba(101, 230, 193, .12),
+        inset 0 1px rgba(101, 230, 193, .13);
+
+    --shadow-input:
+        inset 0 3px 8px rgba(0, 0, 0, .4);
+
+    --shadow-glow:
+        0 0 8px rgba(101, 230, 193, .35);
+
+    --shadow-glow-strong:
+        0 0 8px rgba(101, 230, 193, .55),
+        0 0 25px rgba(101, 230, 193, .2),
+        0 0 50px rgba(101, 230, 193, .08);
+
+    --shadow-amber:
+        0 0 12px rgba(237, 188, 99, .3);
+
+    --shadow-red:
+        0 0 12px rgba(255, 98, 95, .3);
+
+
+/* ---------------------------------
+   SPACING
+--------------------------------- */
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+
+/* ---------------------------------
+   MOTION
+--------------------------------- */
+
+    --transition-fast: .2s ease;
+    --transition-normal: .35s cubic-bezier(.2, .8, .2, 1);
+    --transition-button: .3s cubic-bezier(.2, .8, .2, 1);
+
+    --animation-indicator: 2s infinite ease-in-out;
+    --animation-scan: 7s linear infinite;
+    --animation-glow: 3s ease-in-out infinite;
+
+
+/* ---------------------------------
+   LAYOUT
+--------------------------------- */
+
+    --grid-size: 32px;
+
+
+/* ---------------------------------
+   ORIGINAL THEME ALIASES
+--------------------------------- */
+
+    --bg: var(--color-background);
+    --panel: var(--color-surface);
+    --panel2: var(--color-surface-secondary);
+
+    --paper-light: #20343b;
+    --paper-shadow: #05080d;
+
+    --border: var(--color-border);
+
+    --gold: var(--color-gold);
+    --gold-light: var(--color-gold-light);
+    --ivory: var(--color-ivory);
+    --muted: var(--color-muted);
+
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-shadow: var(--color-border);
+
+    --main-bg-color: var(--color-background);
+
+    --bg-grid-color: rgba(104, 180, 164, .075);
+    --bg-grid-2-color: rgba(104, 180, 164, .012);
+
+    --green: var(--color-green);
+    --cyan: var(--color-cyan);
+    --yellow: var(--color-yellow);
+    --red: var(--color-red);
+
+    --olive: var(--color-olive);
+    --khaki: var(--color-khaki);
+    --phosphor: var(--color-phosphor);
+    --steel: var(--color-steel);
+
+    --mono: var(--font-monospace);
+    --display: var(--font-primary);
+
+    --graph-altitude: #65e6c1;
+    --graph-target: #65e6a0;
+    --graph-alt-error: #ff625f;
+    --graph-vs-error: #edbc63;
+
+    --alt-error-color: #edbc63;
+    --vs-error-color: #ff625f;
+
+    --neon-glow: var(--shadow-glow);
+    --neon-glow-strong: var(--shadow-glow-strong);
+
+    --panel-shadow: 0 12px 35px rgba(0, 0, 0, .4);
+
+    --transition: var(--transition-fast);
+
 }
 
-/* =========================================
-   GLOBAL
-========================================= */
+
+/* =====================================================
+   02. TYPOGRAPHY SYSTEM
+===================================================== */
+
+
+/* ---------------------------------
+   GLOBAL TEXT
+--------------------------------- */
+
+body {
+    color: var(--color-text-secondary);
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-normal);
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+
+/* ---------------------------------
+   HEADINGS
+--------------------------------- */
+
+h1 {
+    color: var(--color-gold-light);
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-bold);
+
+    text-shadow:
+        0 0 18px rgba(101, 230, 193, .16),
+        0 2px 0 rgba(0, 0, 0, .7);
+
+    letter-spacing: var(--letter-spacing-heading);
+    text-transform: var(--text-transform-heading);
+}
+
+h1 span {
+    color: var(--color-accent);
+}
+
+
+/* ---------------------------------
+   LABELS
+--------------------------------- */
+
+.eyebrow,
+.subtitle {
+    color: var(--color-text-muted);
+    letter-spacing: .18em;
+}
+
+.micro-label {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: .16em;
+}
+
+.card-label {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: .14em;
+}
+
+
+/* ---------------------------------
+   DATA TYPOGRAPHY
+--------------------------------- */
+
+.value,
+.mission-stage strong,
+.mission-data strong,
+.monitor-item strong,
+.event-time,
+.telemetry-readouts strong {
+    font-family: var(--font-monospace);
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =====================================================
+   03. GLOBAL STYLES
+===================================================== */
+
+
+/* ---------------------------------
+   DOCUMENT
+--------------------------------- */
 
 html {
-    background: var(--bg);
+    background: var(--color-background);
+    scroll-behavior: smooth;
 }
 
 body {
+    position: relative;
+    isolation: isolate;
+
     background-color: var(--main-bg-color);
 
     background-image:
         linear-gradient(
-            to right,
+            90deg,
             var(--bg-grid-color) 1px,
-            var(--bg-grid-2-color) 1px
+            transparent 1px
         ),
         linear-gradient(
-            to bottom,
+            0deg,
             var(--bg-grid-color) 1px,
-            var(--bg-grid-2-color) 1px
-        );
-
-    background-size: 24px 24px;
-
-    color: var(--text-secondary);
-    font-family: var(--display);
-    font-weight: 500;
-    letter-spacing: .035rem;
-}
-
-body::before {
-    background:
+            transparent 1px
+        ),
         radial-gradient(
             ellipse at 50% 0%,
-            rgba(169, 183, 130, .045),
-            transparent 70%
+            rgba(57, 132, 119, .2),
+            transparent 55%
+        ),
+        radial-gradient(
+            ellipse at 100% 100%,
+            rgba(40, 99, 116, .11),
+            transparent 45%
+        ),
+        linear-gradient(
+            140deg,
+            #0b141b,
+            #070b10 55%,
+            #080f13
+        );
+
+    background-size:
+        var(--grid-size) var(--grid-size),
+        var(--grid-size) var(--grid-size),
+        100% 100%,
+        100% 100%,
+        100% 100%;
+
+    background-attachment: fixed;
+}
+
+
+/* ---------------------------------
+   ATMOSPHERIC BACKGROUND
+--------------------------------- */
+
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 9998;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, .012) 0,
+            rgba(255, 255, 255, .012) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    pointer-events: none;
+    opacity: .2;
+}
+
+body::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 9997;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 35%,
+            rgba(0, 0, 0, .45) 100%
         );
 
     pointer-events: none;
 }
 
+
+/* ---------------------------------
+   TEXT SELECTION
+--------------------------------- */
+
 ::selection {
-    background-color: var(--gold);
-    color: var(--bg);
+    background: var(--color-accent);
+    color: #06110e;
+    text-shadow: none;
 }
 
-input,
-select,
-textarea {
-    font-family: inherit;
-    letter-spacing: inherit;
-}
 
-/* =========================================
-   SECTION HEADER — REUSABLE
-========================================= */
+/* =====================================================
+   04. REUSABLE COMPONENTS
+===================================================== */
+
+
+/* ---------------------------------
+   SECTION HEADERS
+--------------------------------- */
 
 .section-header {
-    background: #303a29;
-    color: var(--gold-light);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
 
-    border-left: 4px solid var(--olive);
+    background:
+        linear-gradient(
+            100deg,
+            rgba(101, 230, 193, .12),
+            rgba(101, 230, 193, .015) 55%,
+            transparent
+        ),
+        linear-gradient(
+            180deg,
+            #1a2a31,
+            #111c23
+        );
 
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    color: var(--color-gold-light);
+
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+
+    border-radius: 2px;
+
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-section-header);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-section);
+    text-transform: var(--text-transform-heading);
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .04),
+        0 4px 12px rgba(0, 0, 0, .2);
+}
+
+.section-header::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent 25%,
+            rgba(101, 230, 193, .08) 50%,
+            transparent 75%
+        );
+
+    transform: translateX(-100%);
+    transition: transform .8s ease;
+}
+
+.section-header:hover::before {
+    transform: translateX(100%);
+}
+
+.section-header::after {
+    content: "◆";
+
+    position: absolute;
+    right: 12px;
+    top: 50%;
+
+    color: var(--color-accent);
+    font-size: 7px;
+
+    text-shadow: var(--shadow-glow);
+
+    transform: translateY(-50%);
 }
 
 .module-header > span {
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
-/* =========================================
-   HEADER
-========================================= */
 
-header {
-    position: relative;
-
-    background: linear-gradient(
-        135deg,
-        #252e20,
-        #1a2319
-    );
-
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--khaki);
-
-    box-shadow:
-        3px 3px 0 var(--paper-shadow),
-        inset 0 0 20px rgba(169, 183, 130, .025);
-}
-
-.eyebrow,
-.subtitle {
-    color: var(--muted);
-}
-
-h1 {
-    color: var(--gold-light);
-    font-family: var(--display);
-    font-weight: 600;
-
-    text-shadow: 2px 2px 0 #111811;
-
-    letter-spacing: .4rem;
-    text-transform: uppercase;
-}
-
-h1 span {
-    color: var(--gold);
-}
-
-.connection {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.connection strong {
-    color: var(--green);
-}
-
-.connection small {
-    color: var(--muted);
-}
-
-/* =========================================
-   MISSION BAR
-========================================= */
-
-.mission-bar {
-    background: #252e20;
-
-    border: 1px solid var(--border);
-
-    box-shadow: 3px 3px 0 var(--paper-shadow);
-}
-
-.micro-label {
-    color: var(--muted);
-    font-weight: 500;
-}
-
-.mission-stage strong {
-    color: var(--gold-light);
-    font-weight: 600;
-}
-
-.state-pill.running {
-    color: var(--green) !important;
-}
-
-.state-pill.completed {
-    color: var(--cyan) !important;
-}
-
-.state-pill.idle {
-    color: var(--yellow) !important;
-}
-
-/* MISSION INFORMATION */
-
-.mission-stage {
-    background: #303a29;
-    border-left: 3px solid var(--khaki);
-}
-
-.mission-stage .micro-label {
-    color: var(--muted);
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-}
-
-.mission-stage strong {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-
-/* DATA CELLS */
-
-.mission-data > div {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 1px 1px 0 var(--paper-shadow);
-}
-
-.mission-data .micro-label {
-    color: var(--muted);
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.mission-data strong {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
-    overflow-wrap: anywhere;
-}
-
-.mission-data .state-pill {
-    color: var(--green);
-    font-size: 11px;
-}
-
-/* =========================================
-   RECORDER PANEL
-========================================= */
-
-.recorder-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 3px 3px 0 var(--paper-shadow);
-}
-
-/* =========================================
-   METRIC CARDS
-========================================= */
-
-.card {
-    position: relative;
-
-    background: linear-gradient(
-        145deg,
-        #252e20,
-        #1a2319
-    );
-
-    border: 1px solid var(--border);
-
-    box-shadow:
-        2px 2px 0 var(--paper-shadow),
-        inset 0 0 15px rgba(169, 183, 130, .015);
-
-    transition:
-        background-color var(--transition),
-        border-color var(--transition),
-        box-shadow var(--transition),
-        transform var(--transition);
-}
-
-.card:hover {
-    background: #303a29;
-    border-color: var(--khaki);
-
-    box-shadow:
-        3px 3px 0 var(--paper-shadow),
-        inset 0 0 15px rgba(169, 183, 130, .04);
-
-    transform: translateY(-1px);
-}
-
-.card::after {
-    background: var(--khaki);
-}
-
-.card-label {
-    color: var(--muted);
-    font-weight: 500;
-}
-
-.value {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-.unit {
-    color: var(--muted);
-}
-
-.highlight {
-    color: var(--gold);
-}
-
-.cyan {
-    color: var(--cyan);
-}
-
-.yellow {
-    color: var(--yellow);
-}
-
-/* =========================================
-   DIAGNOSTICS
-========================================= */
-
-.diagnostics-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.diagnostic-header {
-    color: var(--gold);
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-.diagnostic-row {
-    border-top: 1px solid var(--border);
-}
-
-.diagnostic-status b {
-    color: var(--muted);
-    font-weight: 500;
-}
-
-.diagnostic-status b.active-text {
-    color: var(--green);
-}
+/* ---------------------------------
+   INDICATORS
+--------------------------------- */
 
 .indicator {
-    background: #414b38;
-    border: 1px solid #65704f;
-    box-shadow: none;
+    position: relative;
+
+    background: #293a3b;
+    border: 1px solid #47645d;
+    border-radius: 50%;
+
+    box-shadow:
+        inset 0 0 5px rgba(0, 0, 0, .8),
+        0 0 2px rgba(0, 0, 0, .6);
+
+    transition: all var(--transition-normal);
 }
 
 .indicator.active {
-    background: var(--green);
-    border-color: var(--green);
+    background: var(--color-status-success);
+    border-color: #b0ffd0;
 
     box-shadow:
-        0 0 4px rgba(168, 200, 121, .3);
+        0 0 5px var(--color-status-success),
+        0 0 14px rgba(101, 230, 160, .6),
+        0 0 25px rgba(101, 230, 160, .18);
 
-    animation: indicator-pulse 2s infinite ease-in-out;
+    animation: indicator-pulse var(--animation-indicator);
 }
 
-.diagnostic-separator {
-    border-top: 1px solid var(--border);
-    color: var(--gold);
-}
 
-/* =========================================
-   DIRECTIONAL BOOSTERS
-========================================= */
-
-.booster {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-
-    transition: all var(--transition);
-}
-
-.booster.pulse {
-    background: #303a29;
-    border-color: var(--khaki);
-
-    box-shadow:
-        inset 0 0 0 1px rgba(181, 163, 106, .12);
-}
-
-.booster.pulse span {
-    color: var(--gold-light);
-}
-
-.booster.pulse .indicator {
-    background: var(--green);
-    border-color: var(--green);
-
-    box-shadow: 0 0 5px rgba(168, 200, 121, .3);
-}
-
-/* =========================================
-   MONITOR
-========================================= */
-
-.monitor-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.monitor-title,
-.event-header {
-    color: var(--gold);
-    border-bottom: 1px solid var(--border);
-
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-.monitor-item {
-    border-bottom: 1px solid rgba(169, 183, 130, .12);
-}
-
-.monitor-item span {
-    color: var(--muted);
-}
-
-.monitor-item strong {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-/* =========================================
-   EVENT LOG
-========================================= */
-
-.event-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.event-header span:last-child {
-    color: var(--green);
-}
-
-.event-entry {
-    border-bottom: 1px solid rgba(169, 183, 130, .10);
-
-    transition: background-color var(--transition);
-}
-
-.event-entry:hover {
-    background: rgba(169, 183, 130, .045);
-}
-
-.event-time {
-    color: var(--muted);
-    font-family: var(--mono);
-}
-
-.event-entry span:last-child {
-    color: var(--text-secondary);
-}
-
-/* FLIGHT PHASE */
-
-.event-entry.phase-event {
-    border-top: 1px solid var(--border);
-    border-left-color: var(--khaki);
-}
-
-.event-entry.phase-event .event-time,
-.event-entry.phase-event span:last-child {
-    color: var(--gold);
-}
-
-/* ACTIVATION */
-
-.event-entry.activation {
-    border-left-color: var(--green);
-}
-
-.event-entry.activation span:last-child {
-    color: var(--green);
-}
-
-/* DEACTIVATION */
-
-.event-entry.deactivation {
-    border-left-color: var(--muted);
-}
-
-.event-entry.deactivation span:last-child {
-    color: var(--muted);
-}
-
-/* ERRORS */
-
-.event-entry.error {
-    border-left-color: var(--red);
-    background: rgba(193, 90, 73, .09);
-}
-
-.event-entry.error span:last-child {
-    color: var(--red);
-}
-
-/* NAVIGATION */
-
-.event-entry.navigation-event {
-    border-left-color: var(--cyan);
-}
-
-.event-entry.navigation-event span:last-child {
-    color: var(--cyan);
-}
-
-/* WARNINGS */
-
-.event-entry.warning {
-    border-left-color: var(--yellow);
-}
-
-.event-entry.warning span:last-child {
-    color: var(--yellow);
-}
-
-/* NORMAL EVENTS */
-
-.event-entry.normal {
-    border-left-color: var(--border);
-}
-
-.event-entry.normal span:last-child {
-    color: var(--muted);
-}
-
-/* =========================================
-   SYSTEM INFO
-========================================= */
-
-.system-info > div {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.system-info span {
-    color: var(--muted);
-}
-
-.system-info strong {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-/* =========================================
-   FLIGHT DATA RECORDER BUTTON
-========================================= */
-
-.recorder-dot {
-    background: var(--green);
-}
-
-.recorder-btn.stop .recorder-dot {
-    background: var(--red);
-}
-
-/* =========================================
-   TELEMETRY GRAPHS
-========================================= */
-
-.telemetry-chart-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.telemetry-chart-panel::after {
-    background: var(--khaki);
-}
-
-.telemetry-chart-header {
-    color: var(--gold);
-    border-bottom: 1px solid var(--border);
-
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-.telemetry-chart-header span:last-child {
-    color: var(--muted);
-}
-
-.telemetry-readouts span,
-.telemetry-readouts small {
-    color: var(--muted);
-}
-
-.telemetry-readouts strong {
-    color: var(--gold-light);
-    font-family: var(--mono);
-    font-weight: 500;
-}
-
-.telemetry-readouts > div:nth-child(2) strong {
-    color: var(--green);
-}
-
-.telemetry-readouts > div:nth-child(3) strong {
-    color: var(--yellow);
-}
-
-.legend-alt {
-    color: var(--gold);
-}
-
-.legend-target {
-    color: var(--green);
-}
-
-.legend-error {
-    color: var(--red);
-}
-
-/* =========================================
-   INPUTS AND CONTROLS
-========================================= */
+/* ---------------------------------
+   INPUTS
+--------------------------------- */
 
 input,
 select,
 textarea {
-    border: 1px solid var(--border);
-    border-radius: 0;
+    border: 1px solid rgba(101, 230, 193, .24);
+    border-radius: 3px;
 
-    background: #161e15;
-    color: var(--gold-light);
+    background:
+        linear-gradient(
+            120deg,
+            rgba(101, 230, 193, .04),
+            transparent
+        ),
+        #090f15;
 
-    font-family: var(--mono);
-    font-weight: 400;
+    color: var(--color-gold-light);
 
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, .2);
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: inherit;
+
+    box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, .4),
+        0 1px rgba(255, 255, 255, .02);
 
     transition:
-        border-color var(--transition),
-        box-shadow var(--transition),
-        background-color var(--transition);
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #58716d;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-    outline: 1px solid var(--khaki);
-    outline-offset: 2px;
+    outline: none;
 
-    border-color: var(--khaki);
+    border-color: var(--color-accent);
+
+    background: #0d191c;
 
     box-shadow:
-        0 0 0 2px rgba(181, 163, 106, .12);
+        0 0 0 2px rgba(101, 230, 193, .08),
+        0 0 15px rgba(101, 230, 193, .12),
+        inset 0 0 12px rgba(101, 230, 193, .04);
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: #727c68;
-}
 
-/* =========================================
-   GLOBAL BUTTON SYSTEM
-========================================= */
+/* ---------------------------------
+   BUTTON SYSTEM
+--------------------------------- */
 
 button,
 .button {
@@ -736,122 +786,1089 @@ button,
     isolation: isolate;
     overflow: hidden;
 
-    border: 1px solid #65734c;
-    border-radius: 0;
+    border: 1px solid rgba(101, 230, 193, .4);
+    border-radius: 3px;
 
-    background: #303a29;
-    color: var(--gold-light);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(101, 230, 193, .13),
+            rgba(101, 230, 193, .025) 65%
+        ),
+        #14242a;
 
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .05rem;
-    text-transform: uppercase;
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-button);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-button);
+    text-transform: var(--text-transform-button);
 
     cursor: pointer;
 
     box-shadow:
-        2px 2px 0 var(--paper-shadow);
+        inset 0 1px rgba(255, 255, 255, .06),
+        0 3px 8px rgba(0, 0, 0, .35);
 
     transition:
-        color .2s ease,
-        background-color .2s ease,
-        box-shadow .2s ease,
-        border-color .2s ease;
+        color var(--transition-fast),
+        background var(--transition-normal),
+        box-shadow var(--transition-normal),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
-/* Horizontal sweep */
+
+/* BUTTON SWEEP */
 
 button::after,
 .button::after {
     content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 0;
 
-    background: var(--khaki);
+    position: absolute;
+    inset: 0;
+
     z-index: -1;
 
-    transition: width .2s ease-out;
+    background:
+        linear-gradient(
+            105deg,
+            transparent 15%,
+            rgba(165, 255, 224, .95) 50%,
+            transparent 85%
+        );
+
+    transform: translateX(-120%);
+    transition: transform .55s cubic-bezier(.2, .8, .2, 1);
 }
 
-/* Hover */
+
+/* BUTTON HOVER */
 
 button:not(:disabled):hover,
 .button:hover {
-    background: transparent;
-    color: #111811;
+    background: #1d3839;
 
-    border-color: var(--khaki);
+    color: #e4fff5;
+
+    border-color: var(--color-accent);
 
     box-shadow:
-        2px 2px 0 var(--paper-shadow),
-        0 0 8px rgba(181, 163, 106, .12);
+        0 0 0 1px rgba(101, 230, 193, .12),
+        0 0 15px rgba(101, 230, 193, .16),
+        inset 0 0 15px rgba(101, 230, 193, .06);
+
+    transform: translateY(-2px);
 }
 
 button:not(:disabled):hover::after,
 .button:hover::after {
-    width: 100%;
+    transform: translateX(120%);
 }
 
-/* Active */
+
+/* BUTTON ACTIVE */
 
 button:not(:disabled):active,
 .button:active {
-    color: #111811;
-    box-shadow: none;
+    color: var(--color-accent);
+
+    transform: translateY(0);
+
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, .5);
 }
 
-/* Disabled */
+
+/* BUTTON DISABLED */
 
 button:disabled,
 .button:disabled {
-    opacity: .45;
+    opacity: .35;
     cursor: not-allowed;
     pointer-events: none;
 }
 
-/* =========================================
-   SCROLLBAR
-========================================= */
+
+/* =====================================================
+   05. APPLICATION LAYOUT
+===================================================== */
+
+
+/* ---------------------------------
+   HEADER
+--------------------------------- */
+
+header {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            ellipse at 85% 0%,
+            rgba(101, 230, 193, .13),
+            transparent 45%
+        ),
+        linear-gradient(
+            120deg,
+            rgba(101, 230, 193, .06),
+            transparent 50%
+        ),
+        linear-gradient(
+            135deg,
+            #1a2a34,
+            #101820 70%
+        );
+
+    border: 1px solid rgba(101, 230, 193, .23);
+    border-left: 4px solid var(--color-accent);
+
+    border-radius: 4px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, .4),
+        inset 0 1px rgba(255, 255, 255, .06),
+        inset 0 -1px rgba(101, 230, 193, .08);
+}
+
+header::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent 45%,
+            rgba(101, 230, 193, .035) 50%,
+            transparent 55%
+        );
+
+    animation: header-sweep 9s ease-in-out infinite;
+}
+
+header::after {
+    content: "GHOST PROTOCOL  //  CLASSIFIED";
+
+    position: absolute;
+    right: 14px;
+    bottom: 9px;
+
+    color: rgba(101, 230, 193, .35);
+
+    font-family: var(--font-monospace);
+    font-size: 8px;
+    letter-spacing: 2px;
+
+    pointer-events: none;
+}
+
+h1 {
+    position: relative;
+}
+
+h1 span {
+    color: var(--color-accent);
+
+    text-shadow:
+        0 0 8px rgba(101, 230, 193, .5),
+        0 0 22px rgba(101, 230, 193, .2);
+}
+
+.connection {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .07),
+            transparent
+        ),
+        rgba(7, 16, 21, .8);
+
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .04),
+        0 4px 12px rgba(0, 0, 0, .25);
+}
+
+.connection strong {
+    color: var(--color-status-success);
+
+    text-shadow:
+        0 0 8px rgba(101, 230, 160, .5);
+
+    animation: neon-breathing 3s ease-in-out infinite;
+}
+
+.connection small {
+    color: var(--color-text-muted);
+}
+
+
+/* ---------------------------------
+   MISSION BAR
+--------------------------------- */
+
+.mission-bar {
+    position: relative;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(101, 230, 193, .05),
+            transparent 65%
+        ),
+        #101b23;
+
+    border: 1px solid rgba(101, 230, 193, .24);
+    border-radius: 4px;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, .3),
+        inset 0 1px rgba(255, 255, 255, .04);
+}
+
+
+/* MISSION STAGE */
+
+.mission-stage {
+    position: relative;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(227, 182, 108, .12),
+            transparent 80%
+        ),
+        #1c2a30;
+
+    border-left: 3px solid var(--color-accent-khaki);
+
+    box-shadow:
+        inset 0 0 20px rgba(227, 182, 108, .035);
+}
+
+.mission-stage::after {
+    content: "";
+
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    width: 6px;
+    height: 6px;
+
+    border: 1px solid var(--color-accent-khaki);
+
+    transform: rotate(45deg);
+
+    box-shadow: var(--shadow-amber);
+}
+
+.mission-stage .micro-label {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-mission-label);
+    letter-spacing: var(--letter-spacing-wider);
+    font-weight: var(--font-weight-semibold);
+}
+
+.mission-stage strong {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-mission-value);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wide);
+
+    text-shadow: 0 0 12px rgba(101, 230, 193, .15);
+}
+
+
+/* MISSION DATA */
+
+.mission-data > div {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .045),
+            transparent
+        ),
+        #111e24;
+
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .025),
+        0 3px 8px rgba(0, 0, 0, .2);
+
+    transition:
+        background var(--transition-normal),
+        border-color var(--transition-normal),
+        transform var(--transition-fast);
+}
+
+.mission-data > div:hover {
+    background: #1c3033;
+    border-color: var(--color-border-strong);
+
+    transform: translateY(-2px);
+}
+
+.mission-data .micro-label {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-mission-label);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: var(--text-transform-label);
+}
+
+.mission-data strong {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-mission-data);
+    font-weight: var(--font-weight-medium);
+
+    overflow-wrap: anywhere;
+}
+
+.mission-data .state-pill {
+    color: var(--color-status-success);
+    font-size: 11px;
+}
+
+
+/* ---------------------------------
+   RECORDER PANEL
+--------------------------------- */
+
+.recorder-panel {
+    position: relative;
+
+    background:
+        radial-gradient(
+            ellipse at 0% 0%,
+            rgba(101, 230, 193, .07),
+            transparent 60%
+        ),
+        #101a21;
+
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+
+    box-shadow: var(--shadow-panel);
+}
+
+
+/* ---------------------------------
+   METRIC CARDS
+--------------------------------- */
+
+.card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .09),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            #1b2a31,
+            #111b22
+        );
+
+    border: 1px solid rgba(117, 188, 171, .2);
+    border-radius: 5px;
+
+    box-shadow: var(--shadow-card);
+
+    transition:
+        background var(--transition-normal),
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+}
+
+.card::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            125deg,
+            transparent 25%,
+            rgba(101, 230, 193, .07) 50%,
+            transparent 75%
+        );
+
+    transform: translateX(-100%);
+    transition: transform .7s ease;
+}
+
+.card:hover {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .14),
+            transparent 70%
+        ),
+        #1b3034;
+
+    border-color: rgba(101, 230, 193, .6);
+
+    box-shadow: var(--shadow-card-hover);
+
+    transform: translateY(-4px);
+}
+
+.card:hover::before {
+    transform: translateX(100%);
+}
+
+.card::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 45px;
+    height: 2px;
+
+    background: var(--color-accent);
+
+    box-shadow:
+        0 0 8px var(--color-accent),
+        0 0 18px rgba(101, 230, 193, .5);
+
+    transition: width .4s ease;
+}
+
+.card:hover::after {
+    width: 100%;
+}
+
+.card-label {
+    color: var(--color-text-muted);
+}
+
+.value {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+
+    text-shadow:
+        0 0 12px rgba(101, 230, 193, .2);
+}
+
+.unit {
+    color: var(--color-text-muted);
+}
+
+.highlight {
+    color: var(--color-accent);
+}
+
+.cyan {
+    color: var(--color-status-info);
+}
+
+.yellow {
+    color: var(--color-status-warning);
+}
+
+
+/* ---------------------------------
+   DIAGNOSTICS
+--------------------------------- */
+
+.diagnostics-panel {
+    background:
+        linear-gradient(
+            140deg,
+            rgba(101, 230, 193, .035),
+            transparent 65%
+        ),
+        #101a21;
+
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+
+    box-shadow: var(--shadow-panel);
+}
+
+.diagnostic-header {
+    color: var(--color-accent);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+
+    text-shadow: 0 0 8px rgba(101, 230, 193, .2);
+}
+
+.diagnostic-row {
+    border-top: 1px solid var(--color-border-subtle);
+
+    transition: background var(--transition-fast);
+}
+
+.diagnostic-row:hover {
+    background: rgba(101, 230, 193, .035);
+}
+
+.diagnostic-status b {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+.diagnostic-status b.active-text {
+    color: var(--color-status-success);
+
+    text-shadow: 0 0 10px rgba(101, 230, 160, .35);
+}
+
+.diagnostic-separator {
+    border-top: 1px solid var(--color-border);
+    color: var(--color-accent);
+}
+
+
+/* ---------------------------------
+   DIRECTIONAL BOOSTERS
+--------------------------------- */
+
+.booster {
+    position: relative;
+
+    background:
+        linear-gradient(
+            140deg,
+            rgba(101, 230, 193, .05),
+            transparent
+        ),
+        #17252c;
+
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+
+    transition: all var(--transition-normal);
+}
+
+.booster:hover {
+    border-color: var(--color-border-strong);
+    background: #20343a;
+
+    transform: translateY(-2px);
+}
+
+.booster.pulse {
+    background:
+        linear-gradient(
+            120deg,
+            rgba(101, 230, 193, .16),
+            transparent 80%
+        ),
+        #203438;
+
+    border-color: var(--color-accent);
+
+    box-shadow:
+        0 0 12px rgba(101, 230, 193, .12),
+        inset 0 0 20px rgba(101, 230, 193, .06);
+}
+
+.booster.pulse span {
+    color: var(--color-gold-light);
+}
+
+.booster.pulse .indicator {
+    background: var(--color-status-success);
+    border-color: var(--color-status-success);
+
+    box-shadow: var(--shadow-glow-strong);
+}
+
+
+/* ---------------------------------
+   MONITOR
+--------------------------------- */
+
+.monitor-panel {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .035),
+            transparent 60%
+        ),
+        #101a21;
+
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+
+    box-shadow: var(--shadow-panel);
+}
+
+.monitor-title {
+    color: var(--color-accent);
+
+    border-bottom: 1px solid var(--color-border);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+
+    text-shadow: 0 0 8px rgba(101, 230, 193, .15);
+}
+
+.monitor-item {
+    border-bottom: 1px solid var(--color-border-subtle);
+
+    transition: background var(--transition-fast);
+}
+
+.monitor-item:hover {
+    background: rgba(101, 230, 193, .035);
+}
+
+.monitor-item span {
+    color: var(--color-text-muted);
+}
+
+.monitor-item strong {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+}
+
+
+/* ---------------------------------
+   EVENT LOG
+--------------------------------- */
+
+.event-panel {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(101, 230, 193, .035),
+            transparent 60%
+        ),
+        #0e171e;
+
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+
+    box-shadow: var(--shadow-panel);
+}
+
+.event-header {
+    color: var(--color-accent);
+
+    border-bottom: 1px solid var(--color-border);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+}
+
+.event-header span:last-child {
+    color: var(--color-status-success);
+}
+
+.event-entry {
+    position: relative;
+
+    border-bottom: 1px solid rgba(117, 188, 171, .09);
+
+    transition:
+        background var(--transition-fast),
+        padding-left var(--transition-fast);
+}
+
+.event-entry:hover {
+    background: rgba(101, 230, 193, .045);
+    padding-left: 5px;
+}
+
+.event-time {
+    color: var(--color-text-muted);
+    font-family: var(--font-monospace);
+}
+
+.event-entry span:last-child {
+    color: var(--color-text-secondary);
+}
+
+
+/* EVENT — FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: 1px solid var(--color-border);
+    border-left-color: var(--color-accent-khaki);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--color-accent);
+}
+
+
+/* EVENT — ACTIVATION */
+
+.event-entry.activation {
+    border-left-color: var(--color-status-success);
+}
+
+.event-entry.activation span:last-child {
+    color: var(--color-status-success);
+}
+
+
+/* EVENT — DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--color-text-muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--color-text-muted);
+}
+
+
+/* EVENT — ERROR */
+
+.event-entry.error {
+    border-left-color: var(--color-status-error);
+    background: rgba(255, 98, 95, .075);
+}
+
+.event-entry.error span:last-child {
+    color: var(--color-status-error);
+}
+
+
+/* EVENT — NAVIGATION */
+
+.event-entry.navigation-event {
+    border-left-color: var(--color-status-info);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--color-status-info);
+}
+
+
+/* EVENT — WARNING */
+
+.event-entry.warning {
+    border-left-color: var(--color-status-warning);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--color-status-warning);
+}
+
+
+/* EVENT — NORMAL */
+
+.event-entry.normal {
+    border-left-color: var(--color-border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--color-text-muted);
+}
+
+
+/* ---------------------------------
+   SYSTEM INFO
+--------------------------------- */
+
+.system-info > div {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(101, 230, 193, .08),
+            transparent
+        ),
+        #17252c;
+
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .025),
+        0 4px 10px rgba(0, 0, 0, .25);
+
+    transition: all var(--transition-normal);
+}
+
+.system-info > div:hover {
+    border-color: var(--color-border-strong);
+    background-color: #1c3034;
+}
+
+.system-info span {
+    color: var(--color-text-muted);
+}
+
+.system-info strong {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+}
+
+
+/* ---------------------------------
+   FLIGHT DATA RECORDER
+--------------------------------- */
+
+.recorder-dot {
+    background: var(--color-status-success);
+
+    box-shadow:
+        0 0 6px var(--color-status-success),
+        0 0 14px rgba(101, 230, 160, .35);
+}
+
+.recorder-btn.stop .recorder-dot {
+    background: var(--color-status-error);
+
+    box-shadow:
+        0 0 6px var(--color-status-error),
+        0 0 14px rgba(255, 98, 95, .35);
+}
+
+
+/* ---------------------------------
+   TELEMETRY GRAPHS
+--------------------------------- */
+
+.telemetry-chart-panel {
+    position: relative;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(101, 230, 193, .05),
+            transparent 60%
+        ),
+        #0e191f;
+
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+
+    box-shadow: var(--shadow-panel);
+}
+
+.telemetry-chart-panel::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 55px;
+    height: 2px;
+
+    background: var(--color-accent);
+
+    box-shadow: var(--shadow-glow);
+}
+
+.telemetry-chart-header {
+    color: var(--color-accent);
+
+    border-bottom: 1px solid var(--color-border);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+}
+
+.telemetry-chart-header span:last-child {
+    color: var(--color-text-muted);
+}
+
+
+/* TELEMETRY READOUTS */
+
+.telemetry-readouts span,
+.telemetry-readouts small {
+    color: var(--color-text-muted);
+}
+
+.telemetry-readouts strong {
+    color: var(--color-gold-light);
+
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-medium);
+
+    text-shadow: 0 0 8px rgba(101, 230, 193, .15);
+}
+
+.telemetry-readouts > div:nth-child(2) strong {
+    color: var(--color-chart-target);
+}
+
+.telemetry-readouts > div:nth-child(3) strong {
+    color: var(--color-chart-warning);
+}
+
+
+/* TELEMETRY LEGEND */
+
+.legend-alt {
+    color: var(--color-chart-primary);
+}
+
+.legend-target {
+    color: var(--color-chart-target);
+}
+
+.legend-error {
+    color: var(--color-chart-error);
+}
+
+
+/* =====================================================
+   06. SCROLLBAR
+===================================================== */
+
+.event-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent-muted) #091117;
+}
 
 .event-list::-webkit-scrollbar {
     width: 5px;
 }
 
 .event-list::-webkit-scrollbar-track {
-    background: var(--panel);
+    background: #091117;
 }
 
 .event-list::-webkit-scrollbar-thumb {
-    background: var(--olive);
+    background: linear-gradient(
+        180deg,
+        var(--color-accent),
+        var(--color-accent-muted)
+    );
+
+    border-radius: 5px;
 }
 
-/* =========================================
-   FOOTER
-========================================= */
+
+/* =====================================================
+   07. FOOTER
+===================================================== */
 
 footer {
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-weight: 400;
+    border-top: 1px solid var(--color-border);
+
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-regular);
+
+    letter-spacing: .16em;
 }
 
-/* =========================================
-   ANIMATIONS
-========================================= */
+
+/* =====================================================
+   08. SYSTEM STATES
+===================================================== */
+
+
+/* ---------------------------------
+   SUCCESS
+--------------------------------- */
+
+.state-pill.running,
+.diagnostic-status b.active-text {
+    color: var(--color-status-success);
+
+    text-shadow: 0 0 9px rgba(101, 230, 160, .3);
+}
+
+
+/* ---------------------------------
+   INFO
+--------------------------------- */
+
+.state-pill.completed {
+    color: var(--color-status-info);
+}
+
+
+/* ---------------------------------
+   WARNING / IDLE
+--------------------------------- */
+
+.state-pill.idle {
+    color: var(--color-status-warning);
+}
+
+
+/* ---------------------------------
+   ERROR
+--------------------------------- */
+
+.state-pill.error {
+    color: var(--color-status-error);
+    text-shadow: 0 0 10px rgba(255, 98, 95, .3);
+}
+
+
+/* =====================================================
+   09. ANIMATIONS
+===================================================== */
+
+
+/* ---------------------------------
+   INDICATOR PULSE
+--------------------------------- */
 
 @keyframes indicator-pulse {
+
     0%, 100% {
         opacity: 1;
+
+        box-shadow:
+            0 0 6px rgba(101, 230, 160, .6),
+            0 0 14px rgba(101, 230, 160, .2);
     }
 
     50% {
-        opacity: .55;
+        opacity: .45;
+
+        box-shadow:
+            0 0 2px rgba(101, 230, 160, .1);
     }
+
 }
 
+
+/* ---------------------------------
+   GENERAL PULSE
+--------------------------------- */
+
 @keyframes pulse {
+
     0%, 100% {
         opacity: 1;
     }
@@ -859,18 +1876,475 @@ footer {
     50% {
         opacity: .45;
     }
+
 }
 
-/* =========================================
-   ACCESSIBILITY
-========================================= */
+
+/* ---------------------------------
+   HEADER SWEEP
+--------------------------------- */
+
+@keyframes header-sweep {
+
+    0%, 65% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    75% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+}
+
+
+/* ---------------------------------
+   NEON BREATHING
+--------------------------------- */
+
+@keyframes neon-breathing {
+
+    0%, 100% {
+        opacity: .75;
+        filter: brightness(1);
+    }
+
+    50% {
+        opacity: 1;
+        filter: brightness(1.4);
+    }
+
+}
+
+
+/* ---------------------------------
+   DATA FLICKER
+--------------------------------- */
+
+@keyframes data-flicker {
+
+    0%, 92%, 100% {
+        opacity: 1;
+    }
+
+    94% {
+        opacity: .65;
+    }
+
+    96% {
+        opacity: .9;
+    }
+
+}
+
+
+/* ---------------------------------
+   BOOT SEQUENCE
+--------------------------------- */
+
+@keyframes boot-sequence {
+
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+        filter: blur(3px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+
+}
+
+
+/* ---------------------------------
+   SCANNING LINE
+--------------------------------- */
+
+@keyframes scan-line {
+
+    0% {
+        top: -2px;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: .5;
+    }
+
+    90% {
+        opacity: .35;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+
+}
+
+
+/* ---------------------------------
+   RADAR ROTATION
+--------------------------------- */
+
+@keyframes radar-rotation {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ---------------------------------
+   FLOATING GLOW
+--------------------------------- */
+
+@keyframes floating-glow {
+
+    0%, 100% {
+        opacity: .45;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+
+}
+
+
+/* ---------------------------------
+   ALERT FLASH
+--------------------------------- */
+
+@keyframes alert-flash {
+
+    0%, 100% {
+        box-shadow: inset 0 0 0 transparent;
+    }
+
+    50% {
+        box-shadow: inset 0 0 25px rgba(255, 98, 95, .13);
+    }
+
+}
+
+
+/* =====================================================
+   10. ACCESSIBILITY
+===================================================== */
+
+
+/* ---------------------------------
+   KEYBOARD FOCUS
+--------------------------------- */
+
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
+
+
+/* ---------------------------------
+   REDUCED MOTION
+--------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
+
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
+
         transition-duration: .01ms !important;
+
+        scroll-behavior: auto !important;
+
     }
+
 }
+
+
+/* =====================================================
+   11. ADVANCED TACTICAL EFFECTS
+   OPTIONAL ENHANCEMENTS
+===================================================== */
+
+
+/* ---------------------------------
+   PANEL CORNER BRACKETS
+   Add class: tactical-frame
+--------------------------------- */
+
+.tactical-frame {
+    position: relative;
+    isolation: isolate;
+}
+
+.tactical-frame::before,
+.tactical-frame::after {
+    content: "";
+
+    position: absolute;
+
+    width: 16px;
+    height: 16px;
+
+    pointer-events: none;
+    z-index: 5;
+}
+
+.tactical-frame::before {
+    top: -1px;
+    left: -1px;
+
+    border-top: 2px solid var(--color-accent);
+    border-left: 2px solid var(--color-accent);
+
+    filter: drop-shadow(0 0 4px var(--color-accent));
+}
+
+.tactical-frame::after {
+    right: -1px;
+    bottom: -1px;
+
+    border-right: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+
+    filter: drop-shadow(0 0 4px var(--color-accent));
+}
+
+
+/* ---------------------------------
+   ACTIVE SCANNER
+   Add class: tactical-scanner
+--------------------------------- */
+
+.tactical-scanner {
+    position: relative;
+    overflow: hidden;
+}
+
+.tactical-scanner::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--color-accent),
+            transparent
+        );
+
+    box-shadow:
+        0 0 12px var(--color-accent),
+        0 0 25px rgba(101, 230, 193, .35);
+
+    animation: scan-line 5s linear infinite;
+
+    pointer-events: none;
+}
+
+
+/* ---------------------------------
+   RADAR DISPLAY
+   Add class: radar-display
+--------------------------------- */
+
+.radar-display {
+    position: relative;
+    overflow: hidden;
+
+    background:
+        repeating-radial-gradient(
+            circle at center,
+            transparent 0,
+            transparent 34px,
+            rgba(101, 230, 193, .15) 35px,
+            transparent 36px
+        ),
+        linear-gradient(
+            90deg,
+            transparent 49.8%,
+            rgba(101, 230, 193, .12) 50%,
+            transparent 50.2%
+        ),
+        linear-gradient(
+            0deg,
+            transparent 49.8%,
+            rgba(101, 230, 193, .12) 50%,
+            transparent 50.2%
+        ),
+        #0b171b;
+}
+
+.radar-display::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            rgba(101, 230, 193, .18) 35deg,
+            transparent 75deg
+        );
+
+    border-radius: 50%;
+
+    animation: radar-rotation 5s linear infinite;
+
+    pointer-events: none;
+}
+
+
+/* ---------------------------------
+   NEON TEXT
+   Add class: neon-text
+--------------------------------- */
+
+.neon-text {
+    color: var(--color-accent);
+
+    text-shadow:
+        0 0 4px rgba(101, 230, 193, .5),
+        0 0 12px rgba(101, 230, 193, .3),
+        0 0 24px rgba(101, 230, 193, .15);
+}
+
+
+/* ---------------------------------
+   AMBER ALERT
+   Add class: tactical-warning
+--------------------------------- */
+
+.tactical-warning {
+    border-color: rgba(237, 188, 99, .65) !important;
+
+    box-shadow:
+        0 0 12px rgba(237, 188, 99, .12),
+        inset 0 0 15px rgba(237, 188, 99, .045);
+}
+
+
+/* ---------------------------------
+   CRITICAL ALERT
+   Add class: tactical-critical
+--------------------------------- */
+
+.tactical-critical {
+    border-color: var(--color-status-error) !important;
+
+    animation: alert-flash 1.8s ease-in-out infinite;
+}
+
+
+/* ---------------------------------
+   HUD DIVIDER
+   Add class: hud-divider
+--------------------------------- */
+
+.hud-divider {
+    height: 1px;
+
+    border: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--color-accent-muted),
+            var(--color-accent),
+            var(--color-accent-muted),
+            transparent
+        );
+
+    box-shadow: 0 0 8px rgba(101, 230, 193, .2);
+}
+
+
+/* ---------------------------------
+   GLASS PANEL
+   Add class: tactical-glass
+--------------------------------- */
+
+.tactical-glass {
+    background: rgba(14, 26, 32, .72);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(101, 230, 193, .22);
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .045),
+        0 12px 30px rgba(0, 0, 0, .3);
+}
+
+
+/* ---------------------------------
+   DATA BOOT ANIMATION
+   Add class: tactical-boot
+--------------------------------- */
+
+.tactical-boot {
+    animation: boot-sequence .65s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+
+/* ---------------------------------
+   FLOATING STATUS
+   Add class: tactical-live
+--------------------------------- */
+
+.tactical-live {
+    animation: floating-glow 3s ease-in-out infinite;
+}
+
+
+/* ---------------------------------
+   ANGULAR HUD PANEL
+   Add class: tactical-angular
+--------------------------------- */
+
+.tactical-angular {
+    clip-path: polygon(
+        0 0,
+        calc(100% - 14px) 0,
+        100% 14px,
+        100% 100%,
+        14px 100%,
+        0 calc(100% - 14px)
+    );
+}
+
+
+/* =====================================================
+   END OF GHOST PROTOCOL
+   ALL SYSTEMS NOMINAL
+===================================================== */
