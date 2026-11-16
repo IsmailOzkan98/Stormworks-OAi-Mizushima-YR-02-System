@@ -1,3 +1,4 @@
+
 /* =====================================================
    FINAL FANTASY VII
    DESIGN SYSTEM & FULL THEME
@@ -10,9 +11,7 @@
 
 :root {
 
-    /* ---------------------------------
-       COLORS — BACKGROUNDS
-    --------------------------------- */
+    /* COLORS — BACKGROUNDS */
 
     --color-background: #020617;
     --color-background-grid: rgba(48, 135, 225, 0.10);
@@ -22,64 +21,47 @@
     --color-surface-hover: #1766b4;
     --color-surface-inverted: #ffffff;
 
-    --bg: #020617;
-    --panel: #001b55;
-    --panel2: #003b8f;
-    --paper-light: #1766b4;
-    --paper-shadow: #000b32;
+    --color-background-deep: #000b32;
+    --color-surface-paper: #1766b4;
+    --color-surface-card: radial-gradient(
+        ellipse at 20% 0%,
+        #1766b4 0%,
+        #003b8f 45%,
+        #000b32 100%
+    );
 
-    --main-bg-color: #020617;
-    --bg-grid-color: rgba(48, 135, 225, 0.10);
-    --bg-grid-2-color: rgba(20, 226, 190, 0.05);
 
-
-    /* ---------------------------------
-       COLORS — TEXT
-    --------------------------------- */
+    /* COLORS — TEXT */
 
     --color-text-primary: #ffffff;
     --color-text-secondary: #c4d9f1;
     --color-text-muted: #8da9cb;
     --color-text-inverted: #001333;
-
-    --text-primary: #ffffff;
-    --text-secondary: #c4d9f1;
-    --text-shadow: 0 1px 3px #000b32;
-
-    --gold: #c5d5e5;
-    --gold-light: #ffffff;
-    --ivory: #ffffff;
-    --muted: #8da9cb;
+    --color-text-accent-light: #8fd9e0;
+    --color-text-card-label: #a9d9f5;
+    --color-text-event-error: #ff8eae;
+    --color-text-event: #d7eaff;
 
 
-    /* ---------------------------------
-       COLORS — ACCENTS
-    --------------------------------- */
+    /* COLORS — ACCENTS */
 
     --color-accent: #20b2aa;
     --color-accent-hover: #20e27b;
     --color-accent-muted: #a9c6df;
-
-    --green: #20e27b;
-    --cyan: #20b2aa;
-    --yellow: #e7d47a;
-    --red: #d85a87;
+    --color-accent-warning: #e7d47a;
+    --color-accent-error: #d85a87;
 
 
-    /* ---------------------------------
-       COLORS — BORDERS & SHADOWS
-    --------------------------------- */
+    /* COLORS — BORDERS & SHADOWS */
 
     --color-border: rgba(169, 198, 223, 0.35);
     --color-border-strong: #a9c6df;
+    --color-border-subtle: rgba(169, 198, 223, 0.18);
     --color-shadow: #000b32;
+    --color-shadow-dark: rgba(0, 0, 0, 0.5);
 
-    --border: #a9c6df;
 
-
-    /* ---------------------------------
-       COLORS — SYSTEM STATUS
-    --------------------------------- */
+    /* COLORS — SYSTEM STATUS */
 
     --color-status-success: #20e27b;
     --color-status-info: #20b2aa;
@@ -88,79 +70,21 @@
     --color-status-idle: #8da9cb;
 
 
-    /* ---------------------------------
-       COLORS — TELEMETRY
-    --------------------------------- */
+    /* COLORS — TELEMETRY */
 
-    --color-chart-primary: var(--cyan);
+    --color-chart-primary: #20b2aa;
     --color-chart-target: #ffffff;
-    --color-chart-warning: var(--yellow);
-    --color-chart-error: var(--red);
-
-    --graph-altitude: #20b2aa;
-    --graph-target: #ffffff;
-    --graph-alt-error: #d85a87;
-    --graph-vs-error: #e7d47a;
-
-    --alt-error-color: #d85a87;
-    --vs-error-color: #e7d47a;
+    --color-chart-warning: #e7d47a;
+    --color-chart-error: #d85a87;
 
 
-    /* ---------------------------------
-       SEMANTIC COLORS
-    --------------------------------- */
+    /* TYPOGRAPHY — FONTS */
 
-    --bg: #020617;
-    --panel: #001b55;
-    --panel2: #003b8f;
-
-    --card-bg: radial-gradient(
-        ellipse at 20% 0%,
-        #1766b4 0%,
-        #003b8f 45%,
-        #000b32 100%
-    );
-
-    --card-bg-hover: #1766b4;
-
-    --border: #a9c6df;
-    --border-strong: #a9c6df;
-    --border-subtle: rgba(169, 198, 223, 0.18);
-
-    --accent-primary: #20b2aa;
-    --accent-secondary: #20e27b;
-    --accent-tertiary: #e7d47a;
-
-    --text-primary: #ffffff;
-    --text-secondary: #c4d9f1;
-    --text-muted: #8da9cb;
-
-    --status-success: #20e27b;
-    --status-warning: #e7d47a;
-    --status-error: #d85a87;
-    --status-info: #20b2aa;
-    --status-idle: #8da9cb;
-
-    --graph-altitude: #20b2aa;
-    --graph-target: #ffffff;
-    --graph-alt-error: #d85a87;
-    --graph-vs-error: #e7d47a;
+    --font-primary: "Rajdhani", sans-serif;
+    --font-monospace: "Share Tech Mono", monospace;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — FONTS
-    --------------------------------- */
-
-    --mono: "Share Tech Mono", monospace;
-    --display: "Rajdhani", sans-serif;
-
-    --font-primary: var(--display);
-    --font-monospace: var(--mono);
-
-
-    /* ---------------------------------
-       TYPOGRAPHY — GLOBAL SIZES
-    --------------------------------- */
+    /* TYPOGRAPHY — GLOBAL SIZES */
 
     --font-size-xs: 9px;
     --font-size-sm: 10px;
@@ -170,9 +94,7 @@
     --font-size-xl: 24px;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — HEADINGS
-    --------------------------------- */
+    /* TYPOGRAPHY — HEADINGS */
 
     --font-size-h1: 36px;
     --font-size-h2: 22px;
@@ -182,9 +104,7 @@
     --font-size-h6: 10px;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — COMPONENTS
-    --------------------------------- */
+    /* TYPOGRAPHY — COMPONENTS */
 
     /* HEADER */
     --font-size-header-title: 36px;
@@ -230,10 +150,11 @@
     /* FOOTER */
     --font-size-footer: 10px;
 
+    /* ADDITIONAL TYPOGRAPHY */
+    --font-size-section-marker: 7px;
 
-    /* ---------------------------------
-       TYPOGRAPHY — WEIGHTS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — WEIGHTS */
 
     --font-weight-light: 300;
     --font-weight-regular: 400;
@@ -242,9 +163,7 @@
     --font-weight-bold: 700;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — LETTER SPACING
-    --------------------------------- */
+    /* TYPOGRAPHY — LETTER SPACING */
 
     --letter-spacing-tight: 0;
     --letter-spacing-normal: .035rem;
@@ -255,40 +174,41 @@
     --letter-spacing-button: .05rem;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — TRANSFORMS
-    --------------------------------- */
+    /* TYPOGRAPHY — TRANSFORMS */
 
     --text-transform-heading: uppercase;
     --text-transform-label: uppercase;
 
 
-    /* ---------------------------------
-       BORDERS
-    --------------------------------- */
+    /* BORDERS */
 
     --border-width: 1px;
     --border-width-accent: 4px;
     --border-radius: 12px;
+    --border-radius-small: 6px;
+    --border-radius-card: 11px;
+    --border-radius-button: 8px;
+    --border-radius-indicator: 5px;
 
 
-    /* ---------------------------------
-       SHADOWS & GLOW
-    --------------------------------- */
+    /* SHADOWS */
 
-    --shadow-sm: 1px 1px 0 var(--paper-shadow);
-    --shadow-md: 2px 2px 0 var(--paper-shadow);
-    --shadow-lg: 3px 3px 0 var(--paper-shadow);
+    --shadow-sm: 1px 1px 0 var(--color-shadow);
+    --shadow-md: 2px 2px 0 var(--color-shadow);
+    --shadow-lg: 3px 3px 0 var(--color-shadow);
 
-    --neon-glow: 0 0 8px rgba(65, 150, 255, 0.2);
-    --neon-glow-strong: 0 0 14px rgba(60, 150, 255, 0.35);
+    --shadow-neon: 0 0 8px rgba(65, 150, 255, 0.2);
+    --shadow-neon-strong: 0 0 14px rgba(60, 150, 255, 0.35);
+    --shadow-panel: 0 5px 18px rgba(0, 0, 0, 0.5);
 
-    --panel-shadow: 0 5px 18px rgba(0, 0, 0, 0.5);
+    --shadow-input: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+    --shadow-button: inset 0 1px 3px rgba(255, 255, 255, 0.25),
+        0 3px 8px rgba(0, 0, 0, 0.35);
+    --shadow-button-hover: inset 0 1px 4px rgba(255, 255, 255, 0.35),
+        0 0 12px rgba(65, 150, 255, 0.4);
 
 
-    /* ---------------------------------
-       SPACING
-    --------------------------------- */
+    /* SPACING */
 
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -298,11 +218,8 @@
     --spacing-2xl: 32px;
 
 
-    /* ---------------------------------
-       MOTION
-    --------------------------------- */
+    /* MOTION */
 
-    --transition: .25s ease;
     --transition-fast: .2s ease;
     --transition-normal: .3s ease;
     --transition-button-sweep: .25s ease;
@@ -310,9 +227,7 @@
     --animation-indicator: 2s infinite ease-in-out;
 
 
-    /* ---------------------------------
-       LAYOUT
-    --------------------------------- */
+    /* LAYOUT */
 
     --grid-size: 24px;
 
@@ -323,63 +238,112 @@
    02. TYPOGRAPHY SYSTEM
 ===================================================== */
 
-
 /* GLOBAL TEXT */
 
 body {
-    color: var(--text-primary);
+    color: var(--color-text-primary);
     font-family: var(--font-monospace);
-    text-shadow: var(--text-shadow);
+    font-size: var(--font-size-base);
+    text-shadow: 0 1px 3px var(--color-shadow);
 }
 
 
 /* HEADINGS */
 
-h1 {
-    color: var(--gold-light);
-    font-family: var(--display);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-primary);
     font-weight: var(--font-weight-bold);
+    text-transform: var(--text-transform-heading);
+}
+
+h1 {
+    font-size: var(--font-size-h1);
+    color: var(--color-text-primary);
     text-shadow: 0 0 14px rgba(70, 160, 255, 0.55);
+}
+
+h2 {
+    font-size: var(--font-size-h2);
+}
+
+h3 {
+    font-size: var(--font-size-h3);
+}
+
+h4 {
+    font-size: var(--font-size-h4);
+}
+
+h5 {
+    font-size: var(--font-size-h5);
+}
+
+h6 {
+    font-size: var(--font-size-h6);
 }
 
 
 /* LABELS */
 
+.eyebrow,
+.subtitle,
+.micro-label,
+.card-label {
+    text-transform: var(--text-transform-label);
+}
+
 .eyebrow {
-    color: var(--cyan);
-    font-family: var(--mono);
-    letter-spacing: 3px;
+    color: var(--color-accent);
+    font-family: var(--font-monospace);
+    letter-spacing: var(--letter-spacing-heading);
 }
 
 .subtitle {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-header-subtitle);
 }
 
 .micro-label {
-    color: #8fd9e0;
+    color: var(--color-text-accent-light);
+    font-size: var(--font-size-mission-label);
     letter-spacing: var(--letter-spacing-section);
 }
 
 .card-label {
-    color: #a9d9f5;
+    color: var(--color-text-card-label);
+    font-size: var(--font-size-card-label);
     letter-spacing: var(--letter-spacing-section);
 }
 
 
 /* DATA TYPOGRAPHY */
 
+.value,
+.mission-data strong,
+.telemetry-readouts strong {
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-bold);
+}
+
 .value {
-    color: var(--gold-light);
-    font-family: var(--display);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-card-value);
     text-shadow: 0 0 10px rgba(100, 180, 255, 0.45);
 }
 
 .mission-data strong {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-mission-data);
 }
 
 .telemetry-readouts strong {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-telemetry-value);
 }
 
 
@@ -388,15 +352,15 @@ h1 {
 ===================================================== */
 
 html {
-    background: var(--bg);
-    color: var(--text-primary);
+    background: var(--color-background);
+    color: var(--color-text-primary);
 }
 
 body {
     background:
         radial-gradient(ellipse at 25% 15%, #064c9b 0%, transparent 48%),
         radial-gradient(ellipse at 85% 85%, #001b65 0%, transparent 55%),
-        var(--bg);
+        var(--color-background);
 }
 
 body::before {
@@ -422,8 +386,8 @@ body::before {
 }
 
 ::selection {
-    background: var(--cyan);
-    color: #001333;
+    background: var(--color-accent);
+    color: var(--color-text-inverted);
 }
 
 
@@ -431,14 +395,20 @@ body::before {
    04. REUSABLE COMPONENTS
 ===================================================== */
 
+/* PANELS */
 
-/* ---------------------------------
-   SECTION HEADERS
---------------------------------- */
+.panel {
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+}
+
+
+/* SECTION HEADERS */
 
 .section-header {
-    color: var(--gold-light);
-    border-bottom: 1px solid rgba(169, 198, 223, 0.55);
+    color: var(--color-text-primary);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.55);
     padding-bottom: 10px;
     text-shadow: 0 0 8px rgba(80, 170, 255, 0.5);
 }
@@ -449,9 +419,7 @@ body::before {
 }
 
 
-/* ---------------------------------
-   INPUTS
---------------------------------- */
+/* INPUTS */
 
 input,
 select,
@@ -463,22 +431,22 @@ textarea {
             #00143c 85%
         );
 
-    color: var(--gold-light);
-    border: 1px solid #91b9df;
-    border-radius: 6px;
+    color: var(--color-text-primary);
+    border: var(--border-width) solid #91b9df;
+    border-radius: var(--border-radius-small);
 
-    font-family: var(--mono);
+    font-family: var(--font-monospace);
 
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow-input);
 
-    transition: var(--transition);
+    transition: var(--transition-normal);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--cyan);
+    border-color: var(--color-accent);
 
     box-shadow:
         0 0 0 2px rgba(32, 178, 170, 0.15),
@@ -486,9 +454,7 @@ textarea:focus {
 }
 
 
-/* ---------------------------------
-   BUTTON SYSTEM
---------------------------------- */
+/* BUTTON SYSTEM */
 
 button,
 .button {
@@ -504,23 +470,25 @@ button,
         #001b55 100%
     );
 
-    color: var(--gold-light);
+    color: var(--color-text-primary);
 
-    border: 2px solid var(--border);
-    border-radius: 8px;
+    border: 2px solid var(--color-border-strong);
+    border-radius: var(--border-radius-button);
 
-    font-family: var(--mono);
-    text-shadow: 0 1px 3px #001333;
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-sm);
+    text-transform: var(--text-transform-label);
+    letter-spacing: var(--letter-spacing-button);
 
-    box-shadow:
-        inset 0 1px 3px rgba(255, 255, 255, 0.25),
-        0 3px 8px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 3px var(--color-text-inverted);
 
-    transition: var(--transition);
+    box-shadow: var(--shadow-button);
+
+    transition: var(--transition-normal);
 }
 
 
-/* BUTTON DECORATION */
+/* BUTTON SWEEP */
 
 button::before,
 button::after,
@@ -532,7 +500,7 @@ button::after,
 
 /* BUTTON HOVER */
 
-button:hover,
+button:not(:disabled):hover,
 .button:hover {
     background: linear-gradient(
         180deg,
@@ -541,37 +509,47 @@ button:hover,
         #00266e 100%
     );
 
-    border-color: var(--gold-light);
+    border-color: var(--color-text-primary);
 
-    box-shadow:
-        inset 0 1px 4px rgba(255, 255, 255, 0.35),
-        0 0 12px rgba(65, 150, 255, 0.4);
+    box-shadow: var(--shadow-button-hover);
 
     transform: translateY(-1px);
+}
+
+button:not(:disabled):hover::after,
+.button:hover::after {
+    opacity: 1;
 }
 
 
 /* BUTTON ACTIVE */
 
-button:active,
+button:not(:disabled):active,
 .button:active {
     transform: translateY(1px);
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 
-/* ---------------------------------
-   INDICATORS
---------------------------------- */
+/* BUTTON DISABLED */
+
+button:disabled,
+.button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+
+/* INDICATORS */
 
 .indicator {
     background: #294c73;
-    border: 1px solid #7195b9;
-    box-shadow: inset 0 0 4px #001333;
+    border: var(--border-width) solid #7195b9;
+    box-shadow: inset 0 0 4px var(--color-text-inverted);
 }
 
 .indicator.active {
-    background: var(--green);
+    background: var(--color-status-success);
     border-color: #b0ffcf;
     box-shadow: 0 0 8px rgba(32, 226, 123, 0.8);
 }
@@ -581,89 +559,86 @@ button:active,
    05. APPLICATION LAYOUT
 ===================================================== */
 
-
-/* ---------------------------------
-   HEADER
---------------------------------- */
+/* HEADER */
 
 header {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.4);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.4);
+}
+
+header h1 {
+    font-size: var(--font-size-header-title);
 }
 
 h1 span {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .connection {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .connection strong {
-    color: var(--green);
+    color: var(--color-status-success);
+    font-weight: var(--font-weight-bold);
     text-shadow: 0 0 8px rgba(32, 226, 123, 0.5);
 }
 
 .connection small {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
 }
 
 
-/* ---------------------------------
-   MISSION BAR
---------------------------------- */
+/* MISSION BAR */
 
 .mission-bar {
-    background:
-        radial-gradient(
-            ellipse at 20% 0%,
-            #1766b4 0%,
-            #003b8f 45%,
-            #000b32 100%
-        );
+    background: var(--color-surface-card);
 
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
 
     box-shadow:
         inset 0 0 20px rgba(65, 150, 255, 0.25),
-        0 5px 18px rgba(0, 0, 0, 0.5);
+        var(--shadow-panel);
 }
 
 .mission-stage {
-    border-right: 1px solid rgba(169, 198, 223, 0.35);
+    border-right: var(--border-width) solid rgba(169, 198, 223, 0.35);
 }
 
 .mission-stage .micro-label {
-    color: #8fd9e0;
+    color: var(--color-text-accent-light);
 }
 
 .mission-stage strong {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-mission-value);
 }
 
 
 /* MISSION DATA */
 
 .mission-data > div {
-    border-left: 1px solid rgba(169, 198, 223, 0.3);
+    border-left: var(--border-width) solid rgba(169, 198, 223, 0.3);
 }
 
 .mission-data .micro-label {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
+}
+
+.mission-data strong {
+    font-size: var(--font-size-mission-data);
 }
 
 .mission-data .state-pill {
-    font-family: var(--mono);
+    font-family: var(--font-monospace);
 }
 
 
-/* ---------------------------------
-   RECORDER PANEL
---------------------------------- */
+/* RECORDER PANEL */
 
 .recorder-panel {
     background: linear-gradient(145deg, #06418b, #00143f 80%);
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
 
     box-shadow:
@@ -672,28 +647,26 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   METRIC CARDS
---------------------------------- */
+/* METRIC CARDS */
 
 .card {
-    background: var(--card-bg);
+    background: var(--color-surface-card);
     border: 2px solid #91b9df;
-    border-radius: 11px;
+    border-radius: var(--border-radius-card);
 
     box-shadow:
         inset 0 0 15px rgba(110, 180, 255, 0.15),
         0 4px 12px rgba(0, 0, 0, 0.35);
 
-    transition: var(--transition);
+    transition: var(--transition-normal);
 }
 
 .card:hover {
-    border-color: var(--gold-light);
+    border-color: var(--color-text-primary);
 
     box-shadow:
         inset 0 0 18px rgba(110, 180, 255, 0.25),
-        0 0 14px rgba(60, 150, 255, 0.35);
+        var(--shadow-neon-strong);
 
     transform: translateY(-2px);
 }
@@ -712,26 +685,33 @@ h1 span {
     );
 }
 
+.card-label {
+    font-size: var(--font-size-card-label);
+}
+
+.value {
+    font-size: var(--font-size-card-value);
+}
+
 .unit {
-    color: #8fd9e0;
+    color: var(--color-text-accent-light);
+    font-size: var(--font-size-card-unit);
 }
 
 .highlight {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
 }
 
 .cyan {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .yellow {
-    color: var(--yellow);
+    color: var(--color-accent-warning);
 }
 
 
-/* ---------------------------------
-   DIAGNOSTICS
---------------------------------- */
+/* DIAGNOSTICS */
 
 .diagnostics-panel {
     background:
@@ -742,28 +722,31 @@ h1 span {
             #000b32 100%
         );
 
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
 
     box-shadow: inset 0 0 20px rgba(65, 150, 255, 0.2);
 }
 
 .diagnostic-header {
-    color: var(--gold-light);
-    border-bottom: 1px solid rgba(169, 198, 223, 0.4);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-diagnostic-header);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.4);
 }
 
 .diagnostic-row {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.18);
-    color: #d7eaff;
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+    color: var(--color-text-event);
+    font-size: var(--font-size-diagnostic-label);
 }
 
 .diagnostic-status b {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-diagnostic-status);
 }
 
 .diagnostic-status b.active-text {
-    color: var(--green);
+    color: var(--color-status-success);
     text-shadow: 0 0 7px rgba(32, 226, 123, 0.5);
 }
 
@@ -772,84 +755,87 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   DIRECTIONAL BOOSTERS
---------------------------------- */
+/* DIRECTIONAL BOOSTERS */
 
 .booster {
     background: linear-gradient(145deg, #06418b, #00143f);
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: 10px;
 }
 
+.booster span {
+    font-size: var(--font-size-booster-label);
+}
+
 .booster.pulse {
-    border-color: var(--cyan);
+    border-color: var(--color-accent);
     box-shadow: 0 0 12px rgba(32, 178, 170, 0.35);
 }
 
 .booster.pulse span {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .booster.pulse .indicator {
-    background: var(--green);
-    box-shadow: 0 0 10px var(--green);
+    background: var(--color-status-success);
+    box-shadow: 0 0 10px var(--color-status-success);
 }
 
 
-/* ---------------------------------
-   MONITOR
---------------------------------- */
+/* MONITOR */
 
 .monitor-panel {
     background: linear-gradient(145deg, #063b7c, #00143c);
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
     box-shadow: inset 0 0 18px rgba(65, 150, 255, 0.16);
 }
 
 .monitor-title {
-    color: var(--gold-light);
-    border-bottom: 1px solid rgba(169, 198, 223, 0.4);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-monitor-title);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.4);
 }
 
 .monitor-item {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.15);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.15);
 }
 
 .monitor-item span {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-monitor-label);
 }
 
 .monitor-item strong {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-monitor-value);
 }
 
 
-/* ---------------------------------
-   EVENT LOG
---------------------------------- */
+/* EVENT LOG */
 
 .event-panel {
     background: linear-gradient(145deg, #063b7c, #00143c);
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
     box-shadow: inset 0 0 18px rgba(65, 150, 255, 0.16);
 }
 
 .event-header {
-    color: #8fd9e0;
-    border-bottom: 1px solid rgba(169, 198, 223, 0.3);
+    color: var(--color-text-accent-light);
+    font-size: var(--font-size-event-header);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.3);
 }
 
 .event-header span:last-child {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 .event-entry {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.15);
-    color: #d7eaff;
-    transition: var(--transition);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.15);
+    color: var(--color-text-event);
+    font-size: var(--font-size-event-entry);
+    transition: var(--transition-normal);
 }
 
 .event-entry:hover {
@@ -857,131 +843,128 @@ h1 span {
 }
 
 .event-time {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-event-time);
 }
 
 .event-entry span:last-child {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
 }
 
 
 /* EVENT — FLIGHT PHASE */
 
 .event-entry.phase-event {
-    border-left: 2px solid var(--cyan);
+    border-left: 2px solid var(--color-accent);
 }
 
 .event-entry.phase-event .event-time,
 .event-entry.phase-event span:last-child {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 
 /* EVENT — ACTIVATION */
 
 .event-entry.activation {
-    border-left: 2px solid var(--green);
+    border-left: 2px solid var(--color-status-success);
 }
 
 .event-entry.activation span:last-child {
-    color: var(--green);
+    color: var(--color-status-success);
 }
 
 
 /* EVENT — DEACTIVATION */
 
 .event-entry.deactivation {
-    border-left: 2px solid var(--text-muted);
+    border-left: 2px solid var(--color-text-muted);
 }
 
 .event-entry.deactivation span:last-child {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 
 /* EVENT — ERROR */
 
 .event-entry.error {
-    border-left: 2px solid var(--red);
+    border-left: 2px solid var(--color-status-error);
 }
 
 .event-entry.error span:last-child {
-    color: #ff8eae;
+    color: var(--color-text-event-error);
 }
 
 
 /* EVENT — NAVIGATION */
 
 .event-entry.navigation-event {
-    border-left: 2px solid var(--yellow);
+    border-left: 2px solid var(--color-status-warning);
 }
 
 .event-entry.navigation-event span:last-child {
-    color: var(--yellow);
+    color: var(--color-status-warning);
 }
 
 
 /* EVENT — WARNING */
 
 .event-entry.warning {
-    border-left: 2px solid var(--yellow);
+    border-left: 2px solid var(--color-status-warning);
 }
 
 .event-entry.warning span:last-child {
-    color: var(--yellow);
+    color: var(--color-status-warning);
 }
 
 
 /* EVENT — NORMAL */
 
 .event-entry.normal {
-    border-left: 2px solid var(--text-muted);
+    border-left: 2px solid var(--color-text-muted);
 }
 
 .event-entry.normal span:last-child {
-    color: #d7eaff;
+    color: var(--color-text-event);
 }
 
 
-/* ---------------------------------
-   SYSTEM INFO
---------------------------------- */
+/* SYSTEM INFO */
 
 .system-info > div {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.2);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.2);
 }
 
 .system-info span {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-system-label);
 }
 
 .system-info strong {
-    color: var(--gold-light);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-system-value);
 }
 
 
-/* ---------------------------------
-   FLIGHT DATA RECORDER
---------------------------------- */
+/* FLIGHT DATA RECORDER */
 
 .recorder-dot {
-    background: var(--red);
+    background: var(--color-status-error);
     box-shadow: 0 0 8px rgba(216, 90, 135, 0.7);
 }
 
 .recorder-btn.stop .recorder-dot {
-    background: var(--green);
+    background: var(--color-status-success);
     box-shadow: 0 0 8px rgba(32, 226, 123, 0.7);
 }
 
 
-/* ---------------------------------
-   TELEMETRY GRAPHS
---------------------------------- */
+/* TELEMETRY GRAPHS */
 
 .telemetry-chart-panel {
     background: linear-gradient(145deg, #063b7c, #00143c);
-    border: 2px solid var(--border);
+    border: 2px solid var(--color-border-strong);
     border-radius: var(--border-radius);
     box-shadow: inset 0 0 18px rgba(65, 150, 255, 0.16);
 }
@@ -1000,22 +983,29 @@ h1 span {
 }
 
 .telemetry-chart-header {
-    border-bottom: 1px solid rgba(169, 198, 223, 0.35);
+    font-size: var(--font-size-telemetry-title);
+    border-bottom: var(--border-width) solid rgba(169, 198, 223, 0.35);
 }
 
 .telemetry-chart-header span:last-child {
-    color: var(--cyan);
+    color: var(--color-accent);
 }
 
 
 /* TELEMETRY READOUTS */
 
 .telemetry-readouts span {
-    color: var(--text-muted);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-telemetry-label);
 }
 
 .telemetry-readouts small {
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-telemetry-label);
+}
+
+.telemetry-readouts strong {
+    font-size: var(--font-size-telemetry-value);
 }
 
 .telemetry-readouts > div:nth-child(2) strong {
@@ -1055,13 +1045,13 @@ h1 span {
 }
 
 .event-list::-webkit-scrollbar-thumb {
-    background: var(--paper-light);
-    border: 1px solid #91b9df;
-    border-radius: 5px;
+    background: var(--color-surface-paper);
+    border: var(--border-width) solid #91b9df;
+    border-radius: var(--border-radius-indicator);
 }
 
 .event-list::-webkit-scrollbar-thumb:hover {
-    background: var(--cyan);
+    background: var(--color-accent);
 }
 
 
@@ -1070,8 +1060,9 @@ h1 span {
 ===================================================== */
 
 footer {
-    color: var(--text-muted);
-    border-top: 1px solid rgba(169, 198, 223, 0.35);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-footer);
+    border-top: var(--border-width) solid rgba(169, 198, 223, 0.35);
 }
 
 
@@ -1083,11 +1074,11 @@ footer {
 
 .state-pill.running,
 .diagnostic-status b.active-text {
-    color: var(--status-success);
+    color: var(--color-status-success);
 }
 
 .state-pill.running {
-    border-color: var(--green);
+    border-color: var(--color-status-success);
     background: rgba(32, 226, 123, 0.12);
 }
 
@@ -1095,16 +1086,16 @@ footer {
 /* INFO */
 
 .state-pill.completed {
-    color: var(--status-info);
-    border-color: var(--cyan);
+    color: var(--color-status-info);
+    border-color: var(--color-status-info);
     background: rgba(32, 178, 170, 0.12);
 }
 
 
-/* IDLE */
+/* WARNING / IDLE */
 
 .state-pill.idle {
-    color: var(--status-idle);
+    color: var(--color-status-idle);
     border-color: #7898bd;
     background: rgba(120, 152, 189, 0.12);
 }
@@ -1146,6 +1137,11 @@ footer {
 /* =====================================================
    10. ACCESSIBILITY
 ===================================================== */
+
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
 
 @media (prefers-reduced-motion: reduce) {
 

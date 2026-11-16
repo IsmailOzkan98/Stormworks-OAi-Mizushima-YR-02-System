@@ -1,20 +1,18 @@
-
-/* =========================================================
-   OAi MIZUSHIMA — MILITARY TERMINAL
-   DESIGN SYSTEM & FULL THEME
+/* =====================================================
+   OAi MIZUSHIMA
+   MILITARY TERMINAL — NIER STRUCTURE
+   FULL THEME REFACTOR
    Version: 2.0
-========================================================= */
+===================================================== */
 
 
-/* =========================================================
+/* =====================================================
    01. DESIGN TOKENS
-========================================================= */
+===================================================== */
 
 :root {
 
-    /* ---------------------------------
-       COLORS — BACKGROUNDS
-    --------------------------------- */
+    /* COLORS — BACKGROUNDS */
 
     --color-background: #11110f;
     --color-background-grid: rgba(196, 166, 106, .055);
@@ -25,9 +23,7 @@
     --color-surface-inverted: #e8e0c8;
 
 
-    /* ---------------------------------
-       COLORS — TEXT
-    --------------------------------- */
+    /* COLORS — TEXT */
 
     --color-text-primary: #e0c68a;
     --color-text-secondary: #e8e0c8;
@@ -35,27 +31,22 @@
     --color-text-inverted: #11110f;
 
 
-    /* ---------------------------------
-       COLORS — ACCENTS
-    --------------------------------- */
+    /* COLORS — ACCENTS */
 
     --color-accent: #c4a66a;
     --color-accent-hover: #e0c68a;
     --color-accent-muted: #514c3e;
 
 
-    /* ---------------------------------
-       COLORS — BORDERS & SHADOWS
-    --------------------------------- */
+    /* COLORS — BORDERS & SHADOWS */
 
     --color-border: #514c3e;
     --color-border-strong: #655d4b;
+    --color-border-subtle: rgba(81, 76, 62, .45);
     --color-shadow: rgba(0, 0, 0, .25);
 
 
-    /* ---------------------------------
-       COLORS — SYSTEM STATUS
-    --------------------------------- */
+    /* COLORS — SYSTEM STATUS */
 
     --color-status-success: #91a66b;
     --color-status-info: #76aeb0;
@@ -63,9 +54,7 @@
     --color-status-error: #c56b5b;
 
 
-    /* ---------------------------------
-       COLORS — TELEMETRY
-    --------------------------------- */
+    /* COLORS — TELEMETRY */
 
     --color-chart-primary: var(--color-accent);
     --color-chart-target: var(--color-status-info);
@@ -73,17 +62,13 @@
     --color-chart-error: var(--color-status-error);
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — FONTS
-    --------------------------------- */
+    /* TYPOGRAPHY — FONTS */
 
     --font-primary: 'Barlow Condensed', 'Arial Narrow', sans-serif;
     --font-monospace: 'IBM Plex Mono', monospace;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — GLOBAL SIZES
-    --------------------------------- */
+    /* TYPOGRAPHY — GLOBAL SIZES */
 
     --font-size-xs: 9px;
     --font-size-sm: 10px;
@@ -93,9 +78,7 @@
     --font-size-xl: 24px;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — HEADINGS
-    --------------------------------- */
+    /* TYPOGRAPHY — HEADINGS */
 
     --font-size-h1: 36px;
     --font-size-h2: 22px;
@@ -105,11 +88,9 @@
     --font-size-h6: 10px;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — COMPONENTS
-    --------------------------------- */
+    /* TYPOGRAPHY — COMPONENTS */
 
-/* HEADER */
+    /* HEADER */
     --font-size-header-title: 36px;
     --font-size-header-subtitle: 12px;
 
@@ -127,6 +108,9 @@
     --font-size-diagnostic-header: 14px;
     --font-size-diagnostic-label: 11px;
     --font-size-diagnostic-status: 11px;
+
+    /* BUTTONS */
+    --font-size-button: 12px;
 
     /* BOOSTERS */
     --font-size-booster-label: 12px;
@@ -154,9 +138,7 @@
     --font-size-footer: 10px;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — WEIGHTS
-    --------------------------------- */
+    /* TYPOGRAPHY — WEIGHTS */
 
     --font-weight-light: 300;
     --font-weight-regular: 400;
@@ -165,9 +147,7 @@
     --font-weight-bold: 700;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — LETTER SPACING
-    --------------------------------- */
+    /* TYPOGRAPHY — LETTER SPACING */
 
     --letter-spacing-tight: 0;
     --letter-spacing-normal: .04rem;
@@ -178,35 +158,27 @@
     --letter-spacing-heading: .5rem;
 
 
-    /* ---------------------------------
-       TYPOGRAPHY — TRANSFORMS
-    --------------------------------- */
+    /* TYPOGRAPHY — TRANSFORMS */
 
     --text-transform-heading: uppercase;
     --text-transform-label: uppercase;
 
 
-    /* ---------------------------------
-       BORDERS
-    --------------------------------- */
+    /* BORDERS */
 
     --border-width: 1px;
     --border-width-accent: 3px;
     --border-radius: 0;
 
 
-    /* ---------------------------------
-       SHADOWS
-    --------------------------------- */
+    /* SHADOWS */
 
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, .18);
     --shadow-md: 0 3px 12px rgba(0, 0, 0, .2);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, .25);
 
 
-    /* ---------------------------------
-       SPACING
-    --------------------------------- */
+    /* SPACING */
 
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -216,134 +188,25 @@
     --spacing-2xl: 32px;
 
 
-    /* ---------------------------------
-       MOTION
-    --------------------------------- */
+    /* MOTION */
 
     --transition-fast: .2s ease;
     --transition-normal: .3s ease;
-
     --animation-indicator: 2s infinite ease-in-out;
 
 
-    /* ---------------------------------
-       LAYOUT
-    --------------------------------- */
+    /* LAYOUT */
 
     --grid-size: 20px;
 
-
-    /* ---------------------------------
-       THEME COMPATIBILITY VARIABLES
-       Shared semantic standard
-       Do not rename or remove
-    --------------------------------- */
-
-    --bg: var(--color-background);
-    --panel: var(--color-surface);
-    --panel2: var(--color-surface-secondary);
-
-    --card-bg: var(--color-surface);
-    --card-bg-hover: var(--color-surface-hover);
-
-    --border: var(--color-border);
-    --border-strong: var(--color-border-strong);
-    --border-subtle: rgba(81, 76, 62, .45);
-
-    --accent-primary: var(--color-accent);
-    --accent-secondary: var(--color-status-info);
-    --accent-tertiary: var(--color-status-success);
-
-    --text-primary: var(--color-text-primary);
-    --text-secondary: var(--color-text-secondary);
-    --text-muted: var(--color-text-muted);
-
-    --status-success: var(--color-status-success);
-    --status-info: var(--color-status-info);
-    --status-warning: var(--color-status-warning);
-    --status-error: var(--color-status-error);
-    --status-idle: var(--color-status-warning);
-
-    --graph-altitude: var(--color-chart-primary);
-    --graph-target: var(--color-chart-target);
-    --graph-alt-error: var(--color-chart-error);
-    --graph-vs-error: var(--color-chart-error);
-
-
-    /* ---------------------------------
-       ORIGINAL THEME VARIABLES
-       Backwards compatibility
-    --------------------------------- */
-
-    --paper-light: var(--color-surface-secondary);
-    --paper-shadow: var(--color-border);
-
-    --gold: var(--color-accent);
-    --gold-light: var(--color-accent-hover);
-    --ivory: var(--color-text-secondary);
-    --muted: var(--color-text-muted);
-
-    --text-shadow: #514c3e;
-
-    --green: var(--color-status-success);
-    --cyan: var(--color-status-info);
-    --yellow: var(--color-status-warning);
-    --red: var(--color-status-error);
-
-    --main-bg-color: var(--color-background);
-    --bg-grid-color: var(--color-background-grid);
-    --bg-grid-2-color: rgba(196, 166, 106, 0);
-
-    --alt-error-color: var(--color-status-warning);
-    --vs-error-color: var(--color-status-warning);
-
-    --mono: var(--font-monospace);
-    --display: var(--font-primary);
-
-    --transition: var(--transition-fast);
 }
 
 
-/* =========================================================
+/* =====================================================
    02. TYPOGRAPHY SYSTEM
-========================================================= */
+===================================================== */
 
-
-/* ---------------------------------
-   GLOBAL TEXT
---------------------------------- */
-
-body {
-    color: var(--color-text-secondary);
-    font-family: var(--font-primary);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-regular);
-    letter-spacing: var(--letter-spacing-normal);
-}
-
-
-/* ---------------------------------
-   HEADINGS
---------------------------------- */
-
-h1 {
-    color: var(--color-accent-hover);
-    font-family: var(--font-primary);
-    font-size: var(--font-size-header-title);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-heading);
-    text-transform: var(--text-transform-heading);
-    text-shadow: 0 0 12px rgba(196, 166, 106, .15);
-}
-
-h1 span {
-    color: var(--color-accent);
-}
-
-
-/* ---------------------------------
-   LABELS
---------------------------------- */
+/* GLOBAL TEXT */
 
 .eyebrow,
 .subtitle {
@@ -364,9 +227,58 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   DATA TYPOGRAPHY
---------------------------------- */
+/* HEADINGS */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-semibold);
+    text-transform: var(--text-transform-heading);
+}
+
+h1 {
+    color: var(--color-accent-hover);
+    font-size: var(--font-size-header-title);
+    letter-spacing: var(--letter-spacing-heading);
+    text-shadow: 0 0 12px rgba(196, 166, 106, .15);
+}
+
+h2 {
+    font-size: var(--font-size-h2);
+}
+
+h3 {
+    font-size: var(--font-size-h3);
+}
+
+h4 {
+    font-size: var(--font-size-h4);
+}
+
+h5 {
+    font-size: var(--font-size-h5);
+}
+
+h6 {
+    font-size: var(--font-size-h6);
+}
+
+
+/* LABELS */
+
+.eyebrow,
+.subtitle,
+.micro-label,
+.card-label {
+    line-height: inherit;
+}
+
+
+/* DATA TYPOGRAPHY */
 
 .value,
 .mission-data strong,
@@ -375,9 +287,9 @@ h1 span {
 }
 
 
-/* =========================================================
+/* =====================================================
    03. GLOBAL STYLES
-========================================================= */
+===================================================== */
 
 html {
     background: var(--color-background);
@@ -399,6 +311,12 @@ body {
         );
 
     background-size: var(--grid-size) var(--grid-size);
+
+    color: var(--color-text-secondary);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-normal);
 }
 
 body::before {
@@ -411,15 +329,13 @@ body::before {
 }
 
 
-/* =========================================================
+/* =====================================================
    04. REUSABLE COMPONENTS
-========================================================= */
+===================================================== */
 
+/* PANELS */
 
-/* ---------------------------------
-   PANELS
---------------------------------- */
-
+.panel,
 .recorder-panel,
 .diagnostics-panel,
 .monitor-panel,
@@ -430,9 +346,7 @@ body::before {
 }
 
 
-/* ---------------------------------
-   SECTION HEADERS
---------------------------------- */
+/* SECTION HEADERS */
 
 .section-header {
     background: var(--color-surface-secondary);
@@ -452,9 +366,7 @@ body::before {
 }
 
 
-/* ---------------------------------
-   INPUTS
---------------------------------- */
+/* INPUTS */
 
 input,
 select,
@@ -489,9 +401,7 @@ textarea:focus {
 }
 
 
-/* ---------------------------------
-   BUTTON SYSTEM
---------------------------------- */
+/* BUTTON SYSTEM */
 
 button,
 .button {
@@ -579,9 +489,7 @@ button:disabled,
 }
 
 
-/* ---------------------------------
-   INDICATORS
---------------------------------- */
+/* INDICATORS */
 
 .indicator {
     background: var(--color-border);
@@ -589,24 +497,12 @@ button:disabled,
     box-shadow: none;
 }
 
-.indicator.active {
-    background: var(--color-status-success);
-    border-color: var(--color-status-success);
 
-    box-shadow: 0 0 8px rgba(145, 166, 107, .55);
-
-    animation: indicator-pulse var(--animation-indicator);
-}
-
-
-/* =========================================================
+/* =====================================================
    05. APPLICATION LAYOUT
-========================================================= */
+===================================================== */
 
-
-/* ---------------------------------
-   HEADER
---------------------------------- */
+/* HEADER */
 
 header {
     background: linear-gradient(
@@ -621,9 +517,8 @@ header {
     box-shadow: var(--shadow-lg);
 }
 
-.eyebrow,
-.subtitle {
-    color: var(--color-text-muted);
+h1 span {
+    color: var(--color-accent);
 }
 
 .connection {
@@ -643,20 +538,12 @@ header {
 }
 
 
-/* ---------------------------------
-   MISSION BAR
---------------------------------- */
+/* MISSION BAR */
 
 .mission-bar {
     background: var(--color-surface);
     border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-md);
-}
-
-.micro-label {
-    color: var(--color-text-muted);
-    font-family: var(--font-monospace);
-    font-weight: var(--font-weight-regular);
 }
 
 .mission-stage {
@@ -718,35 +605,14 @@ header {
 }
 
 
-/* MISSION STATES */
-
-.state-pill.running {
-    color: var(--color-status-success) !important;
-}
-
-.state-pill.completed {
-    color: var(--color-status-info) !important;
-}
-
-.state-pill.idle {
-    color: var(--color-status-warning) !important;
-}
-
-
-/* ---------------------------------
-   RECORDER PANEL
---------------------------------- */
+/* RECORDER PANEL */
 
 .recorder-panel {
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-md);
 }
 
 
-/* ---------------------------------
-   METRIC CARDS
---------------------------------- */
+/* METRIC CARDS */
 
 .card {
     background: linear-gradient(
@@ -773,13 +639,6 @@ header {
 
 .card::after {
     background: var(--color-accent);
-}
-
-.card-label {
-    color: var(--color-text-muted);
-    font-family: var(--font-monospace);
-    font-size: var(--font-size-card-label);
-    font-weight: var(--font-weight-regular);
 }
 
 .value {
@@ -810,13 +669,9 @@ header {
 }
 
 
-/* ---------------------------------
-   DIAGNOSTICS
---------------------------------- */
+/* DIAGNOSTICS */
 
 .diagnostics-panel {
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-sm);
 }
 
@@ -838,19 +693,13 @@ header {
     font-weight: var(--font-weight-regular);
 }
 
-.diagnostic-status b.active-text {
-    color: var(--color-status-success);
-}
-
 .diagnostic-separator {
     border-top: var(--border-width) solid var(--color-border);
     color: var(--color-accent);
 }
 
 
-/* ---------------------------------
-   DIRECTIONAL BOOSTERS
---------------------------------- */
+/* DIRECTIONAL BOOSTERS */
 
 .booster {
     background: var(--color-surface-secondary);
@@ -863,32 +712,10 @@ header {
     font-size: var(--font-size-booster-label);
 }
 
-.booster.pulse {
-    background: var(--color-surface-hover);
-    border-color: var(--color-accent);
 
-    box-shadow: inset 0 0 12px rgba(196, 166, 106, .08);
-}
-
-.booster.pulse span {
-    color: var(--color-accent-hover);
-}
-
-.booster.pulse .indicator {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-
-    box-shadow: 0 0 8px rgba(196, 166, 106, .45);
-}
-
-
-/* ---------------------------------
-   MONITOR
---------------------------------- */
+/* MONITOR */
 
 .monitor-panel {
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-sm);
 }
 
@@ -920,13 +747,9 @@ header {
 }
 
 
-/* ---------------------------------
-   EVENT LOG
---------------------------------- */
+/* EVENT LOG */
 
 .event-panel {
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-sm);
 }
 
@@ -940,24 +763,16 @@ header {
     font-weight: var(--font-weight-medium);
 }
 
-.event-header span:last-child {
-    color: var(--color-status-success);
-}
-
-.event-entry {
-    border-bottom: var(--border-width) solid var(--border-subtle);
-
-    transition: background-color var(--transition-fast);
-}
-
-.event-entry:hover {
-    background: rgba(196, 166, 106, .07);
-}
-
 .event-time {
     color: var(--color-text-muted);
     font-family: var(--font-monospace);
     font-size: var(--font-size-event-time);
+}
+
+.event-entry {
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
+
+    transition: background-color var(--transition-fast);
 }
 
 .event-entry span:last-child {
@@ -966,89 +781,7 @@ header {
 }
 
 
-/* EVENT — FLIGHT PHASE */
-
-.event-entry.phase-event {
-    border-top: var(--border-width) solid var(--color-border);
-    border-left-color: var(--color-accent);
-}
-
-.event-entry.phase-event .event-time,
-.event-entry.phase-event span:last-child {
-    color: var(--color-accent-hover);
-}
-
-
-/* EVENT — ACTIVATION */
-
-.event-entry.activation {
-    border-left-color: var(--color-status-success);
-}
-
-.event-entry.activation span:last-child {
-    color: var(--color-status-success);
-}
-
-
-/* EVENT — DEACTIVATION */
-
-.event-entry.deactivation {
-    border-left-color: var(--color-text-muted);
-}
-
-.event-entry.deactivation span:last-child {
-    color: var(--color-text-muted);
-}
-
-
-/* EVENT — ERROR */
-
-.event-entry.error {
-    border-left-color: var(--color-status-error);
-    background: rgba(197, 107, 91, .08);
-}
-
-.event-entry.error span:last-child {
-    color: var(--color-status-error);
-}
-
-
-/* EVENT — NAVIGATION */
-
-.event-entry.navigation-event {
-    border-left-color: var(--color-status-info);
-}
-
-.event-entry.navigation-event span:last-child {
-    color: var(--color-status-info);
-}
-
-
-/* EVENT — WARNING */
-
-.event-entry.warning {
-    border-left-color: var(--color-status-warning);
-}
-
-.event-entry.warning span:last-child {
-    color: var(--color-status-warning);
-}
-
-
-/* EVENT — NORMAL */
-
-.event-entry.normal {
-    border-left-color: var(--color-border);
-}
-
-.event-entry.normal span:last-child {
-    color: var(--color-text-muted);
-}
-
-
-/* ---------------------------------
-   SYSTEM INFO
---------------------------------- */
+/* SYSTEM INFO */
 
 .system-info > div {
     background: var(--color-surface);
@@ -1070,9 +803,7 @@ header {
 }
 
 
-/* ---------------------------------
-   FLIGHT DATA RECORDER
---------------------------------- */
+/* FLIGHT DATA RECORDER */
 
 .recorder-dot {
     background: var(--color-status-success);
@@ -1085,13 +816,9 @@ header {
 }
 
 
-/* ---------------------------------
-   TELEMETRY GRAPHS
---------------------------------- */
+/* TELEMETRY GRAPHS */
 
 .telemetry-chart-panel {
-    background: var(--color-surface);
-    border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-sm);
 }
 
@@ -1154,36 +881,53 @@ header {
 }
 
 
-/* =========================================================
-   06. SYSTEM STATES
-========================================================= */
+/* =====================================================
+   06. SCROLLBAR
+===================================================== */
+
+.event-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.event-list::-webkit-scrollbar-track {
+    background: var(--color-background);
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border: var(--border-width) solid var(--color-surface);
+}
+
+.event-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+}
 
 
-/* ---------------------------------
-   MISSION STATES
---------------------------------- */
+/* =====================================================
+   07. FOOTER
+===================================================== */
 
-.state-pill.running {
+footer {
+    border-top: var(--border-width) solid var(--color-border);
+
+    color: var(--color-text-muted);
+
+    font-family: var(--font-monospace);
+    font-size: var(--font-size-footer);
+    font-weight: var(--font-weight-regular);
+}
+
+
+/* =====================================================
+   08. SYSTEM STATES
+===================================================== */
+
+/* SUCCESS */
+
+.state-pill.running,
+.diagnostic-status b.active-text {
     color: var(--color-status-success) !important;
 }
-
-.state-pill.completed {
-    color: var(--color-status-info) !important;
-}
-
-.state-pill.idle {
-    color: var(--color-status-warning) !important;
-}
-
-.mission-data .state-pill {
-    color: var(--color-status-success);
-    font-size: var(--font-size-sm);
-}
-
-
-/* ---------------------------------
-   INDICATOR STATES
---------------------------------- */
 
 .indicator.active {
     background: var(--color-status-success);
@@ -1194,10 +938,93 @@ header {
     animation: indicator-pulse var(--animation-indicator);
 }
 
+.event-entry.activation {
+    border-left-color: var(--color-status-success);
+}
 
-/* ---------------------------------
-   BOOSTER STATES
---------------------------------- */
+.event-entry.activation span:last-child {
+    color: var(--color-status-success);
+}
+
+
+/* INFO */
+
+.state-pill.completed {
+    color: var(--color-status-info) !important;
+}
+
+.event-entry.navigation-event {
+    border-left-color: var(--color-status-info);
+}
+
+.event-entry.navigation-event span:last-child {
+    color: var(--color-status-info);
+}
+
+
+/* WARNING */
+
+.state-pill.idle {
+    color: var(--color-status-warning) !important;
+}
+
+.event-entry.warning {
+    border-left-color: var(--color-status-warning);
+}
+
+.event-entry.warning span:last-child {
+    color: var(--color-status-warning);
+}
+
+
+/* ERROR */
+
+.event-entry.error {
+    border-left-color: var(--color-status-error);
+    background: rgba(197, 107, 91, .08);
+}
+
+.event-entry.error span:last-child {
+    color: var(--color-status-error);
+}
+
+
+/* EVENT — FLIGHT PHASE */
+
+.event-entry.phase-event {
+    border-top: var(--border-width) solid var(--color-border);
+    border-left-color: var(--color-accent);
+}
+
+.event-entry.phase-event .event-time,
+.event-entry.phase-event span:last-child {
+    color: var(--color-accent-hover);
+}
+
+
+/* EVENT — DEACTIVATION */
+
+.event-entry.deactivation {
+    border-left-color: var(--color-text-muted);
+}
+
+.event-entry.deactivation span:last-child {
+    color: var(--color-text-muted);
+}
+
+
+/* EVENT — NORMAL */
+
+.event-entry.normal {
+    border-left-color: var(--color-border);
+}
+
+.event-entry.normal span:last-child {
+    color: var(--color-text-muted);
+}
+
+
+/* ACTIVE BOOSTER */
 
 .booster.pulse {
     background: var(--color-surface-hover);
@@ -1218,106 +1045,16 @@ header {
 }
 
 
-/* ---------------------------------
-   EVENT STATES
---------------------------------- */
-
-.event-header span:last-child {
-    color: var(--color-status-success);
-}
+/* EVENT INTERACTION STATES */
 
 .event-entry:hover {
     background: rgba(196, 166, 106, .07);
 }
 
 
-/* =========================================================
-   07. GRAPHS & TELEMETRY
-========================================================= */
-
-/* Graph color tokens are defined in DESIGN TOKENS.
-   Telemetry components and readouts are defined above.
-*/
-
-
-/* =========================================================
-   08. VISUAL EFFECTS
-========================================================= */
-
-
-/* ---------------------------------
-   METRIC CARD ACCENT
---------------------------------- */
-
-.card::after {
-    background: var(--color-accent);
-}
-
-
-/* ---------------------------------
-   TELEMETRY ACCENT
---------------------------------- */
-
-.telemetry-chart-panel::after {
-    background: var(--color-chart-primary);
-}
-
-
-/* ---------------------------------
-   INPUT FOCUS
---------------------------------- */
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: 1px solid var(--color-accent);
-    outline-offset: 2px;
-    border-color: var(--color-accent);
-
-    box-shadow: 0 0 8px rgba(196, 166, 106, .12);
-}
-
-
-/* =========================================================
-   09. SCROLLBAR
-========================================================= */
-
-.event-list::-webkit-scrollbar {
-    width: 5px;
-}
-
-.event-list::-webkit-scrollbar-track {
-    background: var(--color-background);
-}
-
-.event-list::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border: var(--border-width) solid var(--color-surface);
-}
-
-.event-list::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent);
-}
-
-
-/* =========================================================
-   10. FOOTER
-========================================================= */
-
-footer {
-    border-top: var(--border-width) solid var(--color-border);
-
-    color: var(--color-text-muted);
-
-    font-family: var(--font-monospace);
-    font-size: var(--font-size-footer);
-    font-weight: var(--font-weight-regular);
-}
-
-
-/* =========================================================
-   11. ANIMATIONS
-========================================================= */
+/* =====================================================
+   09. ANIMATIONS
+===================================================== */
 
 @keyframes indicator-pulse {
 
@@ -1346,9 +1083,9 @@ footer {
 }
 
 
-/* =========================================================
-   12. ACCESSIBILITY
-========================================================= */
+/* =====================================================
+   10. ACCESSIBILITY
+===================================================== */
 
 @media (prefers-reduced-motion: reduce) {
 

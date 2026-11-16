@@ -19,8 +19,8 @@
         },
         {
             "id": 4,
-            "name": "military",
-            "path": "/static/modularStylesheet/themes/military.css"
+            "name": "military-ghost-protocol",
+            "path": "/static/modularStylesheet/themes/military-ghost-protocol.css"
         },
         {
             "id": 5,
@@ -30,7 +30,10 @@
         {
             "id": 6,
             "name": "cyberpunk-glitch",
-            "path": "/static/modularStylesheet/themes/cyberpunk-glitch.css"
+            "path": "/static/modularStylesheet/themes/cyberpunk-glitch.css",
+            "scripts": [
+                "/static/modularStylesheet/scripts/cyberpunk-glitch.js"
+            ]
         },
         {
             "id": 7,

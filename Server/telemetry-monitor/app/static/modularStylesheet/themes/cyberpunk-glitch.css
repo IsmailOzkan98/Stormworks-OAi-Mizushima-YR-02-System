@@ -1,3 +1,4 @@
+
 /* =====================================================
    GLITCH SYSTEM — CORRUPTED INTERFACE
    DESIGN SYSTEM & FULL THEME
@@ -10,9 +11,7 @@
 
 :root {
 
-    /* ---------------------------------
-       COLORS — BACKGROUNDS
-    --------------------------------- */
+    /* COLORS — BACKGROUNDS */
 
     --color-background: #08080c;
     --color-background-grid: rgba(27, 199, 251, .07);
@@ -30,27 +29,25 @@
     --color-surface-input: #09090f;
     --color-surface-indicator: #292934;
 
-    /* ---------------------------------
-       COLORS — TEXT
-    --------------------------------- */
+
+    /* COLORS — TEXT */
 
     --color-text-primary: #eeeeF5;
     --color-text-secondary: #a5a5b5;
     --color-text-muted: #777787;
     --color-text-inverted: #08080c;
     --color-text-subtle: #b5b5c4;
+    --color-text-event: #ccccd5;
 
-    /* ---------------------------------
-       COLORS — ACCENTS
-    --------------------------------- */
+
+    /* COLORS — ACCENTS */
 
     --color-accent: #e0287d;
     --color-accent-hover: #ff4b9b;
     --color-accent-muted: #1bc7fb;
 
-    /* ---------------------------------
-       COLORS — BORDERS
-    --------------------------------- */
+
+    /* COLORS — BORDERS & SHADOWS */
 
     --color-border: #383847;
     --color-border-strong: #555565;
@@ -58,17 +55,12 @@
     --color-border-muted: #444452;
     --color-border-indicator-active: #8ceaff;
 
-    /* ---------------------------------
-       COLORS — SHADOWS
-    --------------------------------- */
-
+    --color-shadow: rgba(0, 0, 0, .5);
     --color-shadow-info: rgba(27, 199, 251, .2);
     --color-shadow-accent: rgba(224, 40, 125, .25);
-    --color-shadow-dark: rgba(0, 0, 0, .5);
 
-    /* ---------------------------------
-       COLORS — SYSTEM STATUS
-    --------------------------------- */
+
+    /* COLORS — SYSTEM STATUS */
 
     --color-status-success: #8affb8;
     --color-status-info: #1bc7fb;
@@ -76,25 +68,22 @@
     --color-status-error: #ff3864;
     --color-status-idle: #777787;
 
-    /* ---------------------------------
-       COLORS — TELEMETRY
-    --------------------------------- */
+
+    /* COLORS — TELEMETRY */
 
     --color-chart-primary: var(--color-status-info);
     --color-chart-target: var(--color-text-inverted);
     --color-chart-warning: var(--color-status-warning);
     --color-chart-error: var(--color-status-error);
 
-    /* ---------------------------------
-       TYPOGRAPHY — FONTS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — FONTS */
 
     --font-primary: "Rajdhani", sans-serif;
     --font-monospace: "Share Tech Mono", monospace;
 
-    /* ---------------------------------
-       TYPOGRAPHY — GLOBAL SIZES
-    --------------------------------- */
+
+    /* TYPOGRAPHY — GLOBAL SIZES */
 
     --font-size-xs: 9px;
     --font-size-sm: 10px;
@@ -103,9 +92,8 @@
     --font-size-lg: 18px;
     --font-size-xl: 24px;
 
-    /* ---------------------------------
-       TYPOGRAPHY — HEADINGS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — HEADINGS */
 
     --font-size-h1: 36px;
     --font-size-h2: 22px;
@@ -114,67 +102,55 @@
     --font-size-h5: 12px;
     --font-size-h6: 10px;
 
-    /* ---------------------------------
-       TYPOGRAPHY — COMPONENTS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — COMPONENTS */
 
     /* HEADER */
-
     --font-size-header-title: 36px;
     --font-size-header-subtitle: 12px;
 
     /* MISSION BAR */
-
     --font-size-mission-label: 9px;
     --font-size-mission-value: 18px;
     --font-size-mission-data: 14px;
 
     /* METRIC CARDS */
-
     --font-size-card-label: 10px;
     --font-size-card-value: 24px;
     --font-size-card-unit: 10px;
 
     /* DIAGNOSTICS */
-
     --font-size-diagnostic-header: 14px;
     --font-size-diagnostic-label: 11px;
     --font-size-diagnostic-status: 11px;
 
     /* BOOSTERS */
-
     --font-size-booster-label: 12px;
 
     /* MONITOR */
-
     --font-size-monitor-title: 13px;
     --font-size-monitor-label: 11px;
     --font-size-monitor-value: 12px;
 
     /* EVENT LOG */
-
     --font-size-event-header: 13px;
     --font-size-event-time: 10px;
     --font-size-event-entry: 11px;
 
     /* SYSTEM INFO */
-
     --font-size-system-label: 10px;
     --font-size-system-value: 12px;
 
     /* TELEMETRY */
-
     --font-size-telemetry-title: 13px;
     --font-size-telemetry-label: 10px;
     --font-size-telemetry-value: 12px;
 
     /* FOOTER */
-
     --font-size-footer: 10px;
 
-    /* ---------------------------------
-       TYPOGRAPHY — WEIGHTS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — WEIGHTS */
 
     --font-weight-light: 300;
     --font-weight-regular: 400;
@@ -182,9 +158,8 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-    /* ---------------------------------
-       TYPOGRAPHY — LETTER SPACING
-    --------------------------------- */
+
+    /* TYPOGRAPHY — LETTER SPACING */
 
     --letter-spacing-tight: 0;
     --letter-spacing-normal: .035rem;
@@ -194,24 +169,21 @@
     --letter-spacing-section: 2px;
     --letter-spacing-button: .05rem;
 
-    /* ---------------------------------
-       TYPOGRAPHY — TRANSFORMS
-    --------------------------------- */
+
+    /* TYPOGRAPHY — TRANSFORMS */
 
     --text-transform-heading: uppercase;
     --text-transform-label: uppercase;
 
-    /* ---------------------------------
-       BORDERS
-    --------------------------------- */
+
+    /* BORDERS */
 
     --border-width: 1px;
     --border-width-accent: 4px;
     --border-radius: 2px;
 
-    /* ---------------------------------
-       SHADOWS
-    --------------------------------- */
+
+    /* SHADOWS */
 
     --shadow-sm: 1px 1px 0 rgba(27, 199, 251, .12);
     --shadow-md: 2px 2px 0 rgba(224, 40, 125, .25);
@@ -223,9 +195,8 @@
     --shadow-panel: 0 0 18px rgba(224, 40, 125, .07);
     --shadow-text-glow: 0 0 8px rgba(27, 199, 251, .2);
 
-    /* ---------------------------------
-       SPACING
-    --------------------------------- */
+
+    /* SPACING */
 
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -234,27 +205,25 @@
     --spacing-xl: 24px;
     --spacing-2xl: 32px;
 
-    /* ---------------------------------
-       MOTION
-    --------------------------------- */
+
+    /* MOTION */
 
     --transition-fast: .18s steps(2, end);
     --transition-normal: .3s ease;
 
     --animation-indicator: 2s infinite ease-in-out;
 
-    /* ---------------------------------
-       LAYOUT
-    --------------------------------- */
+
+    /* LAYOUT */
 
     --grid-size: 20px;
+
 }
 
 
 /* =====================================================
    02. TYPOGRAPHY SYSTEM
 ===================================================== */
-
 
 /* GLOBAL TEXT */
 
@@ -292,13 +261,35 @@ h1 {
         0 0 15px rgba(255, 255, 255, .25);
 }
 
-h1 span {
-    color: var(--color-status-info);
-    text-shadow: 2px 0 var(--color-accent);
+h2 {
+    font-size: var(--font-size-h2);
+}
+
+h3 {
+    font-size: var(--font-size-h3);
+}
+
+h4 {
+    font-size: var(--font-size-h4);
+}
+
+h5 {
+    font-size: var(--font-size-h5);
+}
+
+h6 {
+    font-size: var(--font-size-h6);
 }
 
 
 /* LABELS */
+
+.eyebrow,
+.subtitle,
+.micro-label,
+.card-label {
+    font-weight: var(--font-weight-regular);
+}
 
 .eyebrow {
     color: var(--color-accent);
@@ -308,33 +299,48 @@ h1 span {
 
 .subtitle {
     color: var(--color-text-secondary);
+    font-size: var(--font-size-header-subtitle);
 }
 
 .micro-label {
     color: var(--color-status-info);
+    font-size: var(--font-size-mission-label);
     letter-spacing: var(--letter-spacing-section);
 }
 
 .card-label {
     color: var(--color-accent);
+    font-size: var(--font-size-card-label);
     letter-spacing: var(--letter-spacing-section);
 }
 
 
 /* DATA TYPOGRAPHY */
 
+.value,
+.mission-data strong,
+.telemetry-readouts strong {
+    font-family: var(--font-monospace);
+    font-weight: var(--font-weight-regular);
+}
+
 .value {
     color: var(--color-surface-inverted);
     font-family: var(--font-primary);
+    font-size: var(--font-size-card-value);
     text-shadow:
         2px 0 rgba(27, 199, 251, .5),
         -2px 0 rgba(224, 40, 125, .5);
 }
 
-.mission-data strong,
+.mission-data strong {
+    color: var(--color-surface-inverted);
+    font-size: var(--font-size-mission-data);
+}
+
 .telemetry-readouts strong {
     color: var(--color-surface-inverted);
-    font-family: var(--font-monospace);
+    font-size: var(--font-size-telemetry-value);
 }
 
 
@@ -387,10 +393,17 @@ body::before {
    04. REUSABLE COMPONENTS
 ===================================================== */
 
+/* PANELS */
 
-/* ---------------------------------
-   SECTION HEADERS
---------------------------------- */
+.panel {
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-panel);
+}
+
+
+/* SECTION HEADERS */
 
 .section-header {
     color: var(--color-surface-inverted);
@@ -411,9 +424,7 @@ body::before {
 }
 
 
-/* ---------------------------------
-   INPUTS
---------------------------------- */
+/* INPUTS */
 
 input,
 select,
@@ -428,7 +439,7 @@ textarea {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-regular);
 
-    box-shadow: inset 0 0 8px var(--color-shadow-dark);
+    box-shadow: inset 0 0 8px var(--color-shadow);
     transition: var(--transition-fast);
 }
 
@@ -445,9 +456,7 @@ textarea:focus {
 }
 
 
-/* ---------------------------------
-   BUTTON SYSTEM
---------------------------------- */
+/* BUTTON SYSTEM */
 
 button,
 .button {
@@ -474,9 +483,17 @@ button,
 }
 
 
+/* BUTTON SWEEP */
+
+button::after,
+.button::after {
+    border-color: rgba(27, 199, 251, .3);
+}
+
+
 /* BUTTON HOVER */
 
-button:hover,
+button:not(:disabled):hover,
 .button:hover {
     background: var(--color-surface-secondary);
     color: var(--color-status-info);
@@ -490,29 +507,31 @@ button:hover,
     transform: translate(-1px, -1px);
 }
 
+button:not(:disabled):hover::after,
+.button:hover::after {
+    opacity: 1;
+}
+
 
 /* BUTTON ACTIVE */
 
-button:active,
+button:not(:disabled):active,
 .button:active {
     transform: translate(1px, 1px);
     box-shadow: none;
 }
 
 
-/* BUTTON PSEUDO-ELEMENTS */
+/* BUTTON DISABLED */
 
-button::before,
-button::after,
-.button::before,
-.button::after {
-    border-color: rgba(27, 199, 251, .3);
+button:disabled,
+.button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
 }
 
 
-/* ---------------------------------
-   INDICATORS
---------------------------------- */
+/* INDICATORS */
 
 .indicator {
     background: var(--color-surface-indicator);
@@ -531,10 +550,7 @@ button::after,
    05. APPLICATION LAYOUT
 ===================================================== */
 
-
-/* ---------------------------------
-   HEADER
---------------------------------- */
+/* HEADER */
 
 header {
     border-bottom: var(--border-width) solid rgba(27, 199, 251, .4);
@@ -542,6 +558,11 @@ header {
 
 header h1 {
     font-size: var(--font-size-header-title);
+}
+
+h1 span {
+    color: var(--color-status-info);
+    text-shadow: 2px 0 var(--color-accent);
 }
 
 .connection {
@@ -559,9 +580,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   MISSION BAR
---------------------------------- */
+/* MISSION BAR */
 
 .mission-bar {
     background:
@@ -583,15 +602,15 @@ header h1 {
     border-right: var(--border-width) solid var(--color-border);
 }
 
+.mission-stage .micro-label {
+    color: var(--color-accent);
+    font-size: var(--font-size-mission-label);
+}
+
 .mission-stage strong {
     color: var(--color-surface-inverted);
     font-family: var(--font-monospace);
     font-size: var(--font-size-mission-value);
-}
-
-.mission-stage .micro-label {
-    color: var(--color-accent);
-    font-size: var(--font-size-mission-label);
 }
 
 .mission-data > div {
@@ -614,31 +633,7 @@ header h1 {
 }
 
 
-/* MISSION STATES */
-
-.state-pill.running {
-    color: var(--color-status-success);
-    border-color: var(--color-status-success);
-    background: rgba(138, 255, 184, .06);
-    box-shadow: 0 0 8px rgba(138, 255, 184, .15);
-}
-
-.state-pill.completed {
-    color: var(--color-status-info);
-    border-color: var(--color-status-info);
-    background: rgba(27, 199, 251, .06);
-}
-
-.state-pill.idle {
-    color: var(--color-status-idle);
-    border-color: var(--color-border-muted);
-    background: rgba(100, 100, 120, .06);
-}
-
-
-/* ---------------------------------
-   RECORDER PANEL
---------------------------------- */
+/* RECORDER PANEL */
 
 .recorder-panel {
     background: var(--color-surface);
@@ -649,9 +644,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   METRIC CARDS
---------------------------------- */
+/* METRIC CARDS */
 
 .card {
     position: relative;
@@ -715,9 +708,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   DIAGNOSTICS
---------------------------------- */
+/* DIAGNOSTICS */
 
 .diagnostics-panel {
     background: var(--color-surface);
@@ -756,9 +747,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   DIRECTIONAL BOOSTERS
---------------------------------- */
+/* DIRECTIONAL BOOSTERS */
 
 .booster {
     background: var(--color-surface);
@@ -786,9 +775,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   MONITOR
---------------------------------- */
+/* MONITOR */
 
 .monitor-panel {
     background: var(--color-surface);
@@ -819,9 +806,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   EVENT LOG
---------------------------------- */
+/* EVENT LOG */
 
 .event-panel {
     background: var(--color-surface);
@@ -842,7 +827,7 @@ header h1 {
 
 .event-entry {
     border-bottom: var(--border-width) solid var(--color-border-subtle);
-    color: #ccccd5;
+    color: var(--color-text-event);
     font-size: var(--font-size-event-entry);
     transition: var(--transition-fast);
 }
@@ -858,7 +843,7 @@ header h1 {
 }
 
 .event-entry span:last-child {
-    color: #ccccd5;
+    color: var(--color-text-event);
 }
 
 
@@ -936,13 +921,11 @@ header h1 {
 }
 
 .event-entry.normal span:last-child {
-    color: #ccccd5;
+    color: var(--color-text-event);
 }
 
 
-/* ---------------------------------
-   SYSTEM INFO
---------------------------------- */
+/* SYSTEM INFO */
 
 .system-info > div {
     border-bottom: var(--border-width) solid var(--color-border-subtle);
@@ -959,9 +942,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   FLIGHT DATA RECORDER
---------------------------------- */
+/* FLIGHT DATA RECORDER */
 
 .recorder-dot {
     background: var(--color-status-error);
@@ -974,9 +955,7 @@ header h1 {
 }
 
 
-/* ---------------------------------
-   TELEMETRY GRAPHS
---------------------------------- */
+/* TELEMETRY GRAPHS */
 
 .telemetry-chart-panel {
     background: var(--color-surface);
@@ -1086,7 +1065,6 @@ footer {
    08. SYSTEM STATES
 ===================================================== */
 
-
 /* SUCCESS */
 
 .state-pill.running,
@@ -1094,11 +1072,19 @@ footer {
     color: var(--color-status-success);
 }
 
+.state-pill.running {
+    border-color: var(--color-status-success);
+    background: rgba(138, 255, 184, .06);
+    box-shadow: 0 0 8px rgba(138, 255, 184, .15);
+}
+
 
 /* INFO */
 
 .state-pill.completed {
     color: var(--color-status-info);
+    border-color: var(--color-status-info);
+    background: rgba(27, 199, 251, .06);
 }
 
 
@@ -1106,6 +1092,8 @@ footer {
 
 .state-pill.idle {
     color: var(--color-status-idle);
+    border-color: var(--color-border-muted);
+    background: rgba(100, 100, 120, .06);
 }
 
 
@@ -1148,6 +1136,11 @@ footer {
 /* =====================================================
    10. ACCESSIBILITY
 ===================================================== */
+
+:focus-visible {
+    outline: 2px solid var(--color-status-info);
+    outline-offset: 3px;
+}
 
 @media (prefers-reduced-motion: reduce) {
 

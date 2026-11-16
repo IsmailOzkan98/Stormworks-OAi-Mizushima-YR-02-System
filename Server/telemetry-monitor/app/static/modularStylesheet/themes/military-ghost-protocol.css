@@ -11,29 +11,23 @@
    01. DESIGN TOKENS
 ===================================================== */
 
-
-/* ---------------------------------
-   COLORS — BACKGROUNDS
---------------------------------- */
-
 :root {
+
+    /* COLORS — BACKGROUNDS */
 
     --color-background: #070b10;
     --color-background-grid: rgba(104, 180, 164, .075);
+    --color-background-deep: #05080d;
 
     --color-surface: #101820;
     --color-surface-secondary: #16232b;
     --color-surface-hover: #20343b;
     --color-surface-inverted: #e4eee8;
-
-    --color-background-deep: #05080d;
     --color-surface-glass: rgba(16, 28, 35, .84);
     --color-surface-metal: #19262c;
 
 
-/* ---------------------------------
-   COLORS — TEXT
---------------------------------- */
+    /* COLORS — TEXT */
 
     --color-text-primary: #d5e9df;
     --color-text-secondary: #a7beb5;
@@ -41,9 +35,7 @@
     --color-text-inverted: #07100e;
 
 
-/* ---------------------------------
-   COLORS — ACCENTS
---------------------------------- */
+    /* COLORS — ACCENTS */
 
     --color-accent: #65e6c1;
     --color-accent-hover: #a1ffe3;
@@ -53,31 +45,23 @@
     --color-accent-olive: #4b8170;
     --color-accent-phosphor: #a5ffe0;
     --color-accent-steel: #829ca8;
-
-    --color-accent-neon: #65e6c1;
     --color-accent-electric: #42ffc5;
     --color-accent-blue: #62b9df;
 
 
-/* ---------------------------------
-   COLORS — BORDERS & SHADOWS
---------------------------------- */
+    /* COLORS — BORDERS & SHADOWS */
 
     --color-border: rgba(117, 188, 171, .19);
     --color-border-strong: rgba(101, 230, 193, .55);
     --color-border-subtle: rgba(117, 188, 171, .09);
+    --color-border-glow: rgba(101, 230, 193, .28);
 
     --color-shadow: rgba(0, 0, 0, .7);
-
     --color-shadow-soft: rgba(0, 0, 0, .35);
     --color-shadow-inset: rgba(101, 230, 193, .035);
 
-    --color-border-glow: rgba(101, 230, 193, .28);
 
-
-/* ---------------------------------
-   COLORS — SYSTEM STATUS
---------------------------------- */
+    /* COLORS — SYSTEM STATUS */
 
     --color-status-success: #65e6a0;
     --color-status-info: #69c5df;
@@ -86,53 +70,23 @@
     --color-status-idle: #71847f;
 
 
-/* ---------------------------------
-   COLORS — TELEMETRY
---------------------------------- */
+    /* COLORS — TELEMETRY */
 
     --color-chart-primary: #65e6c1;
     --color-chart-target: #65e6a0;
     --color-chart-warning: #edbc63;
     --color-chart-error: #ff625f;
-
-    --color-chart-altitude: var(--color-chart-primary);
-    --color-chart-vs-error: var(--color-chart-warning);
-
-
-/* ---------------------------------
-   COLORS — ORIGINAL THEME PALETTE
---------------------------------- */
-
-    --color-gold: #65e6c1;
-    --color-gold-light: #c2ffea;
-    --color-ivory: #e4eee8;
-    --color-muted: #637e79;
-
-    --color-green: #65e6a0;
-    --color-cyan: #69c5df;
-    --color-yellow: #edbc63;
-    --color-red: #ff625f;
-
-    --color-olive: #4b8170;
-    --color-khaki: #e3b66c;
-    --color-phosphor: #a5ffe0;
-    --color-steel: #829ca8;
+    --color-chart-altitude: #65e6c1;
+    --color-chart-vs-error: #edbc63;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — FONTS
---------------------------------- */
+    /* TYPOGRAPHY — FONTS */
 
     --font-primary: 'Rajdhani', 'Arial Narrow', sans-serif;
     --font-monospace: 'Share Tech Mono', 'IBM Plex Mono', monospace;
 
-    --font-display: var(--font-primary);
-    --font-data: var(--font-monospace);
 
-
-/* ---------------------------------
-   TYPOGRAPHY — GLOBAL SIZES
---------------------------------- */
+    /* TYPOGRAPHY — GLOBAL SIZES */
 
     --font-size-xs: 9px;
     --font-size-sm: 10px;
@@ -142,9 +96,7 @@
     --font-size-xl: 24px;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — HEADINGS
---------------------------------- */
+    /* TYPOGRAPHY — HEADINGS */
 
     --font-size-h1: 42px;
     --font-size-h2: 25px;
@@ -154,9 +106,7 @@
     --font-size-h6: 10px;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — COMPONENTS
---------------------------------- */
+    /* TYPOGRAPHY — COMPONENTS */
 
     /* HEADER */
 
@@ -221,9 +171,7 @@
     --font-size-footer: 10px;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — WEIGHTS
---------------------------------- */
+    /* TYPOGRAPHY — WEIGHTS */
 
     --font-weight-light: 300;
     --font-weight-regular: 400;
@@ -232,32 +180,29 @@
     --font-weight-bold: 700;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — LETTER SPACING
---------------------------------- */
+    /* TYPOGRAPHY — LETTER SPACING */
 
     --letter-spacing-tight: -.02em;
     --letter-spacing-normal: .045em;
     --letter-spacing-wide: .12em;
     --letter-spacing-wider: .2em;
     --letter-spacing-heading: .16em;
-
     --letter-spacing-section: .2em;
     --letter-spacing-button: .14em;
+    --letter-spacing-eyebrow: .18em;
+    --letter-spacing-micro: .16em;
+    --letter-spacing-card: .14em;
+    --letter-spacing-footer: .16em;
 
 
-/* ---------------------------------
-   TYPOGRAPHY — TRANSFORMS
---------------------------------- */
+    /* TYPOGRAPHY — TRANSFORMS */
 
     --text-transform-heading: uppercase;
     --text-transform-label: uppercase;
     --text-transform-button: uppercase;
 
 
-/* ---------------------------------
-   BORDERS
---------------------------------- */
+    /* BORDERS */
 
     --border-width: 1px;
     --border-width-accent: 3px;
@@ -265,13 +210,10 @@
 
     --border-radius: 3px;
     --border-radius-large: 7px;
-
     --border-cut: 12px;
 
 
-/* ---------------------------------
-   SHADOWS
---------------------------------- */
+    /* SHADOWS */
 
     --shadow-sm:
         0 2px 5px rgba(0, 0, 0, .3);
@@ -316,9 +258,7 @@
         0 0 12px rgba(255, 98, 95, .3);
 
 
-/* ---------------------------------
-   SPACING
---------------------------------- */
+    /* SPACING */
 
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -328,9 +268,7 @@
     --spacing-2xl: 32px;
 
 
-/* ---------------------------------
-   MOTION
---------------------------------- */
+    /* MOTION */
 
     --transition-fast: .2s ease;
     --transition-normal: .35s cubic-bezier(.2, .8, .2, 1);
@@ -341,67 +279,9 @@
     --animation-glow: 3s ease-in-out infinite;
 
 
-/* ---------------------------------
-   LAYOUT
---------------------------------- */
+    /* LAYOUT */
 
     --grid-size: 32px;
-
-
-/* ---------------------------------
-   ORIGINAL THEME ALIASES
---------------------------------- */
-
-    --bg: var(--color-background);
-    --panel: var(--color-surface);
-    --panel2: var(--color-surface-secondary);
-
-    --paper-light: #20343b;
-    --paper-shadow: #05080d;
-
-    --border: var(--color-border);
-
-    --gold: var(--color-gold);
-    --gold-light: var(--color-gold-light);
-    --ivory: var(--color-ivory);
-    --muted: var(--color-muted);
-
-    --text-primary: var(--color-text-primary);
-    --text-secondary: var(--color-text-secondary);
-    --text-shadow: var(--color-border);
-
-    --main-bg-color: var(--color-background);
-
-    --bg-grid-color: rgba(104, 180, 164, .075);
-    --bg-grid-2-color: rgba(104, 180, 164, .012);
-
-    --green: var(--color-green);
-    --cyan: var(--color-cyan);
-    --yellow: var(--color-yellow);
-    --red: var(--color-red);
-
-    --olive: var(--color-olive);
-    --khaki: var(--color-khaki);
-    --phosphor: var(--color-phosphor);
-    --steel: var(--color-steel);
-
-    --mono: var(--font-monospace);
-    --display: var(--font-primary);
-
-    --graph-altitude: #65e6c1;
-    --graph-target: #65e6a0;
-    --graph-alt-error: #ff625f;
-    --graph-vs-error: #edbc63;
-
-    --alt-error-color: #edbc63;
-    --vs-error-color: #ff625f;
-
-    --neon-glow: var(--shadow-glow);
-    --neon-glow-strong: var(--shadow-glow-strong);
-
-    --panel-shadow: 0 12px 35px rgba(0, 0, 0, .4);
-
-    --transition: var(--transition-fast);
 
 }
 
@@ -410,14 +290,12 @@
    02. TYPOGRAPHY SYSTEM
 ===================================================== */
 
-
-/* ---------------------------------
-   GLOBAL TEXT
---------------------------------- */
+/* GLOBAL TEXT */
 
 body {
     color: var(--color-text-secondary);
     font-family: var(--font-primary);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-normal);
 
@@ -426,54 +304,73 @@ body {
 }
 
 
-/* ---------------------------------
-   HEADINGS
---------------------------------- */
+/* HEADINGS */
 
-h1 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--color-gold-light);
     font-family: var(--font-primary);
     font-weight: var(--font-weight-bold);
-
-    text-shadow:
-        0 0 18px rgba(101, 230, 193, .16),
-        0 2px 0 rgba(0, 0, 0, .7);
-
     letter-spacing: var(--letter-spacing-heading);
     text-transform: var(--text-transform-heading);
 }
 
-h1 span {
-    color: var(--color-accent);
+h1 {
+    font-size: var(--font-size-h1);
+
+    text-shadow:
+        0 0 18px rgba(101, 230, 193, .16),
+        0 2px 0 rgba(0, 0, 0, .7);
+}
+
+h2 {
+    font-size: var(--font-size-h2);
+}
+
+h3 {
+    font-size: var(--font-size-h3);
+}
+
+h4 {
+    font-size: var(--font-size-h4);
+}
+
+h5 {
+    font-size: var(--font-size-h5);
+}
+
+h6 {
+    font-size: var(--font-size-h6);
 }
 
 
-/* ---------------------------------
-   LABELS
---------------------------------- */
+/* LABELS */
 
 .eyebrow,
 .subtitle {
     color: var(--color-text-muted);
-    letter-spacing: .18em;
+    letter-spacing: var(--letter-spacing-eyebrow);
 }
 
 .micro-label {
     color: var(--color-text-muted);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: .16em;
+    letter-spacing: var(--letter-spacing-micro);
 }
 
 .card-label {
     color: var(--color-text-muted);
+    font-size: var(--font-size-card-label);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: .14em;
+    letter-spacing: var(--letter-spacing-card);
 }
 
 
-/* ---------------------------------
-   DATA TYPOGRAPHY
---------------------------------- */
+/* DATA TYPOGRAPHY */
 
 .value,
 .mission-stage strong,
@@ -490,11 +387,6 @@ h1 span {
    03. GLOBAL STYLES
 ===================================================== */
 
-
-/* ---------------------------------
-   DOCUMENT
---------------------------------- */
-
 html {
     background: var(--color-background);
     scroll-behavior: smooth;
@@ -504,17 +396,17 @@ body {
     position: relative;
     isolation: isolate;
 
-    background-color: var(--main-bg-color);
+    background-color: var(--color-background);
 
     background-image:
         linear-gradient(
             90deg,
-            var(--bg-grid-color) 1px,
+            var(--color-background-grid) 1px,
             transparent 1px
         ),
         linear-gradient(
             0deg,
-            var(--bg-grid-color) 1px,
+            var(--color-background-grid) 1px,
             transparent 1px
         ),
         radial-gradient(
@@ -545,9 +437,7 @@ body {
 }
 
 
-/* ---------------------------------
-   ATMOSPHERIC BACKGROUND
---------------------------------- */
+/* ATMOSPHERIC BACKGROUND */
 
 body::before {
     content: "";
@@ -589,9 +479,7 @@ body::after {
 }
 
 
-/* ---------------------------------
-   TEXT SELECTION
---------------------------------- */
+/* TEXT SELECTION */
 
 ::selection {
     background: var(--color-accent);
@@ -604,10 +492,17 @@ body::after {
    04. REUSABLE COMPONENTS
 ===================================================== */
 
+/* PANELS */
 
-/* ---------------------------------
-   SECTION HEADERS
---------------------------------- */
+.panel {
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-panel);
+}
+
+
+/* SECTION HEADERS */
 
 .section-header {
     position: relative;
@@ -627,10 +522,10 @@ body::after {
             #111c23
         );
 
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
-    border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-accent);
+    border: var(--border-width) solid var(--color-border);
+    border-left: var(--border-width-accent) solid var(--color-accent);
 
     border-radius: 2px;
 
@@ -689,46 +584,13 @@ body::after {
 }
 
 
-/* ---------------------------------
-   INDICATORS
---------------------------------- */
-
-.indicator {
-    position: relative;
-
-    background: #293a3b;
-    border: 1px solid #47645d;
-    border-radius: 50%;
-
-    box-shadow:
-        inset 0 0 5px rgba(0, 0, 0, .8),
-        0 0 2px rgba(0, 0, 0, .6);
-
-    transition: all var(--transition-normal);
-}
-
-.indicator.active {
-    background: var(--color-status-success);
-    border-color: #b0ffd0;
-
-    box-shadow:
-        0 0 5px var(--color-status-success),
-        0 0 14px rgba(101, 230, 160, .6),
-        0 0 25px rgba(101, 230, 160, .18);
-
-    animation: indicator-pulse var(--animation-indicator);
-}
-
-
-/* ---------------------------------
-   INPUTS
---------------------------------- */
+/* INPUTS */
 
 input,
 select,
 textarea {
-    border: 1px solid rgba(101, 230, 193, .24);
-    border-radius: 3px;
+    border: var(--border-width) solid rgba(101, 230, 193, .24);
+    border-radius: var(--border-radius);
 
     background:
         linear-gradient(
@@ -738,14 +600,15 @@ textarea {
         ),
         #090f15;
 
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-regular);
     letter-spacing: inherit;
 
     box-shadow:
-        inset 0 3px 8px rgba(0, 0, 0, .4),
+        var(--shadow-input),
         0 1px rgba(255, 255, 255, .02);
 
     transition:
@@ -775,9 +638,7 @@ textarea:focus {
 }
 
 
-/* ---------------------------------
-   BUTTON SYSTEM
---------------------------------- */
+/* BUTTON SYSTEM */
 
 button,
 .button {
@@ -786,8 +647,8 @@ button,
     isolation: isolate;
     overflow: hidden;
 
-    border: 1px solid rgba(101, 230, 193, .4);
-    border-radius: 3px;
+    border: var(--border-width) solid rgba(101, 230, 193, .4);
+    border-radius: var(--border-radius);
 
     background:
         linear-gradient(
@@ -797,7 +658,7 @@ button,
         ),
         #14242a;
 
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
     font-size: var(--font-size-button);
@@ -891,14 +752,234 @@ button:disabled,
 }
 
 
+/* INDICATORS */
+
+.indicator {
+    position: relative;
+
+    background: #293a3b;
+    border: var(--border-width) solid #47645d;
+    border-radius: 50%;
+
+    box-shadow:
+        inset 0 0 5px rgba(0, 0, 0, .8),
+        0 0 2px rgba(0, 0, 0, .6);
+
+    transition: all var(--transition-normal);
+}
+
+.indicator.active {
+    background: var(--color-status-success);
+    border-color: #b0ffd0;
+
+    box-shadow:
+        0 0 5px var(--color-status-success),
+        0 0 14px rgba(101, 230, 160, .6),
+        0 0 25px rgba(101, 230, 160, .18);
+
+    animation: indicator-pulse var(--animation-indicator);
+}
+
+
+/* TACTICAL EFFECTS — REUSABLE */
+
+.tactical-frame {
+    position: relative;
+    isolation: isolate;
+}
+
+.tactical-frame::before,
+.tactical-frame::after {
+    content: "";
+
+    position: absolute;
+
+    width: 16px;
+    height: 16px;
+
+    pointer-events: none;
+    z-index: 5;
+}
+
+.tactical-frame::before {
+    top: -1px;
+    left: -1px;
+
+    border-top: 2px solid var(--color-accent);
+    border-left: 2px solid var(--color-accent);
+
+    filter: drop-shadow(0 0 4px var(--color-accent));
+}
+
+.tactical-frame::after {
+    right: -1px;
+    bottom: -1px;
+
+    border-right: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+
+    filter: drop-shadow(0 0 4px var(--color-accent));
+}
+
+.tactical-scanner {
+    position: relative;
+    overflow: hidden;
+}
+
+.tactical-scanner::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--color-accent),
+            transparent
+        );
+
+    box-shadow:
+        0 0 12px var(--color-accent),
+        0 0 25px rgba(101, 230, 193, .35);
+
+    animation: scan-line var(--animation-scan);
+
+    pointer-events: none;
+}
+
+.radar-display {
+    position: relative;
+    overflow: hidden;
+
+    background:
+        repeating-radial-gradient(
+            circle at center,
+            transparent 0,
+            transparent 34px,
+            rgba(101, 230, 193, .15) 35px,
+            transparent 36px
+        ),
+        linear-gradient(
+            90deg,
+            transparent 49.8%,
+            rgba(101, 230, 193, .12) 50%,
+            transparent 50.2%
+        ),
+        linear-gradient(
+            0deg,
+            transparent 49.8%,
+            rgba(101, 230, 193, .12) 50%,
+            transparent 50.2%
+        ),
+        #0b171b;
+}
+
+.radar-display::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            rgba(101, 230, 193, .18) 35deg,
+            transparent 75deg
+        );
+
+    border-radius: 50%;
+
+    animation: radar-rotation 5s linear infinite;
+
+    pointer-events: none;
+}
+
+.neon-text {
+    color: var(--color-accent);
+
+    text-shadow:
+        0 0 4px rgba(101, 230, 193, .5),
+        0 0 12px rgba(101, 230, 193, .3),
+        0 0 24px rgba(101, 230, 193, .15);
+}
+
+.tactical-warning {
+    border-color: rgba(237, 188, 99, .65) !important;
+
+    box-shadow:
+        0 0 12px rgba(237, 188, 99, .12),
+        inset 0 0 15px rgba(237, 188, 99, .045);
+}
+
+.tactical-critical {
+    border-color: var(--color-status-error) !important;
+
+    animation: alert-flash 1.8s ease-in-out infinite;
+}
+
+.hud-divider {
+    height: 1px;
+
+    border: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--color-accent-muted),
+            var(--color-accent),
+            var(--color-accent-muted),
+            transparent
+        );
+
+    box-shadow: 0 0 8px rgba(101, 230, 193, .2);
+}
+
+.tactical-glass {
+    background: rgba(14, 26, 32, .72);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: var(--border-width) solid rgba(101, 230, 193, .22);
+
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, .045),
+        0 12px 30px rgba(0, 0, 0, .3);
+}
+
+.tactical-boot {
+    animation: boot-sequence .65s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.tactical-live {
+    animation: floating-glow var(--animation-glow);
+}
+
+.tactical-angular {
+    clip-path: polygon(
+        0 0,
+        calc(100% - 14px) 0,
+        100% 14px,
+        100% 100%,
+        14px 100%,
+        0 calc(100% - 14px)
+    );
+}
+
+
 /* =====================================================
    05. APPLICATION LAYOUT
 ===================================================== */
 
-
-/* ---------------------------------
-   HEADER
---------------------------------- */
+/* HEADER */
 
 header {
     position: relative;
@@ -922,13 +1003,13 @@ header {
             #101820 70%
         );
 
-    border: 1px solid rgba(101, 230, 193, .23);
+    border: var(--border-width) solid rgba(101, 230, 193, .23);
     border-left: 4px solid var(--color-accent);
 
     border-radius: 4px;
 
     box-shadow:
-        0 12px 35px rgba(0, 0, 0, .4),
+        var(--shadow-panel),
         inset 0 1px rgba(255, 255, 255, .06),
         inset 0 -1px rgba(101, 230, 193, .08);
 }
@@ -962,14 +1043,15 @@ header::after {
     color: rgba(101, 230, 193, .35);
 
     font-family: var(--font-monospace);
-    font-size: 8px;
-    letter-spacing: 2px;
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--letter-spacing-normal);
 
     pointer-events: none;
 }
 
-h1 {
+header h1 {
     position: relative;
+    font-size: var(--font-size-header-title);
 }
 
 h1 span {
@@ -989,8 +1071,8 @@ h1 span {
         ),
         rgba(7, 16, 21, .8);
 
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
 
     box-shadow:
         inset 0 1px rgba(255, 255, 255, .04),
@@ -1008,12 +1090,11 @@ h1 span {
 
 .connection small {
     color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
 }
 
 
-/* ---------------------------------
-   MISSION BAR
---------------------------------- */
+/* MISSION BAR */
 
 .mission-bar {
     position: relative;
@@ -1026,16 +1107,13 @@ h1 span {
         ),
         #101b23;
 
-    border: 1px solid rgba(101, 230, 193, .24);
+    border: var(--border-width) solid rgba(101, 230, 193, .24);
     border-radius: 4px;
 
     box-shadow:
         0 8px 25px rgba(0, 0, 0, .3),
         inset 0 1px rgba(255, 255, 255, .04);
 }
-
-
-/* MISSION STAGE */
 
 .mission-stage {
     position: relative;
@@ -1048,7 +1126,7 @@ h1 span {
         ),
         #1c2a30;
 
-    border-left: 3px solid var(--color-accent-khaki);
+    border-left: var(--border-width-accent) solid var(--color-accent-khaki);
 
     box-shadow:
         inset 0 0 20px rgba(227, 182, 108, .035);
@@ -1064,7 +1142,7 @@ h1 span {
     width: 6px;
     height: 6px;
 
-    border: 1px solid var(--color-accent-khaki);
+    border: var(--border-width) solid var(--color-accent-khaki);
 
     transform: rotate(45deg);
 
@@ -1080,7 +1158,7 @@ h1 span {
 }
 
 .mission-stage strong {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
     font-size: var(--font-size-mission-value);
@@ -1102,8 +1180,8 @@ h1 span {
         ),
         #111e24;
 
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
 
     box-shadow:
         inset 0 1px rgba(255, 255, 255, .025),
@@ -1132,7 +1210,7 @@ h1 span {
 }
 
 .mission-data strong {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
     font-size: var(--font-size-mission-data);
@@ -1143,13 +1221,11 @@ h1 span {
 
 .mission-data .state-pill {
     color: var(--color-status-success);
-    font-size: 11px;
+    font-size: var(--font-size-diagnostic-status);
 }
 
 
-/* ---------------------------------
-   RECORDER PANEL
---------------------------------- */
+/* RECORDER PANEL */
 
 .recorder-panel {
     position: relative;
@@ -1162,16 +1238,14 @@ h1 span {
         ),
         #101a21;
 
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-border);
     border-radius: 4px;
 
     box-shadow: var(--shadow-panel);
 }
 
 
-/* ---------------------------------
-   METRIC CARDS
---------------------------------- */
+/* METRIC CARDS */
 
 .card {
     position: relative;
@@ -1190,7 +1264,7 @@ h1 span {
             #111b22
         );
 
-    border: 1px solid rgba(117, 188, 171, .2);
+    border: var(--border-width) solid rgba(117, 188, 171, .2);
     border-radius: 5px;
 
     box-shadow: var(--shadow-card);
@@ -1270,9 +1344,10 @@ h1 span {
 }
 
 .value {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-card-value);
     font-weight: var(--font-weight-medium);
 
     text-shadow:
@@ -1281,6 +1356,7 @@ h1 span {
 
 .unit {
     color: var(--color-text-muted);
+    font-size: var(--font-size-card-unit);
 }
 
 .highlight {
@@ -1296,9 +1372,7 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   DIAGNOSTICS
---------------------------------- */
+/* DIAGNOSTICS */
 
 .diagnostics-panel {
     background:
@@ -1309,7 +1383,7 @@ h1 span {
         ),
         #101a21;
 
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-border);
     border-radius: 4px;
 
     box-shadow: var(--shadow-panel);
@@ -1319,13 +1393,14 @@ h1 span {
     color: var(--color-accent);
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-diagnostic-header);
     font-weight: var(--font-weight-medium);
 
     text-shadow: 0 0 8px rgba(101, 230, 193, .2);
 }
 
 .diagnostic-row {
-    border-top: 1px solid var(--color-border-subtle);
+    border-top: var(--border-width) solid var(--color-border-subtle);
 
     transition: background var(--transition-fast);
 }
@@ -1336,6 +1411,7 @@ h1 span {
 
 .diagnostic-status b {
     color: var(--color-text-muted);
+    font-size: var(--font-size-diagnostic-status);
     font-weight: var(--font-weight-medium);
 }
 
@@ -1346,14 +1422,12 @@ h1 span {
 }
 
 .diagnostic-separator {
-    border-top: 1px solid var(--color-border);
+    border-top: var(--border-width) solid var(--color-border);
     color: var(--color-accent);
 }
 
 
-/* ---------------------------------
-   DIRECTIONAL BOOSTERS
---------------------------------- */
+/* DIRECTIONAL BOOSTERS */
 
 .booster {
     position: relative;
@@ -1366,8 +1440,8 @@ h1 span {
         ),
         #17252c;
 
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
 
     transition: all var(--transition-normal);
 }
@@ -1377,6 +1451,10 @@ h1 span {
     background: #20343a;
 
     transform: translateY(-2px);
+}
+
+.booster span {
+    font-size: var(--font-size-booster-label);
 }
 
 .booster.pulse {
@@ -1396,7 +1474,7 @@ h1 span {
 }
 
 .booster.pulse span {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 }
 
 .booster.pulse .indicator {
@@ -1407,9 +1485,7 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   MONITOR
---------------------------------- */
+/* MONITOR */
 
 .monitor-panel {
     background:
@@ -1420,7 +1496,7 @@ h1 span {
         ),
         #101a21;
 
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-border);
     border-radius: 4px;
 
     box-shadow: var(--shadow-panel);
@@ -1429,16 +1505,17 @@ h1 span {
 .monitor-title {
     color: var(--color-accent);
 
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: var(--border-width) solid var(--color-border);
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-monitor-title);
     font-weight: var(--font-weight-medium);
 
     text-shadow: 0 0 8px rgba(101, 230, 193, .15);
 }
 
 .monitor-item {
-    border-bottom: 1px solid var(--color-border-subtle);
+    border-bottom: var(--border-width) solid var(--color-border-subtle);
 
     transition: background var(--transition-fast);
 }
@@ -1449,19 +1526,19 @@ h1 span {
 
 .monitor-item span {
     color: var(--color-text-muted);
+    font-size: var(--font-size-monitor-label);
 }
 
 .monitor-item strong {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-monitor-value);
     font-weight: var(--font-weight-medium);
 }
 
 
-/* ---------------------------------
-   EVENT LOG
---------------------------------- */
+/* EVENT LOG */
 
 .event-panel {
     background:
@@ -1472,7 +1549,7 @@ h1 span {
         ),
         #0e171e;
 
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-border);
     border-radius: 4px;
 
     box-shadow: var(--shadow-panel);
@@ -1481,9 +1558,10 @@ h1 span {
 .event-header {
     color: var(--color-accent);
 
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: var(--border-width) solid var(--color-border);
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-event-header);
     font-weight: var(--font-weight-medium);
 }
 
@@ -1494,7 +1572,9 @@ h1 span {
 .event-entry {
     position: relative;
 
-    border-bottom: 1px solid rgba(117, 188, 171, .09);
+    border-bottom: var(--border-width) solid rgba(117, 188, 171, .09);
+
+    font-size: var(--font-size-event-entry);
 
     transition:
         background var(--transition-fast),
@@ -1509,6 +1589,7 @@ h1 span {
 .event-time {
     color: var(--color-text-muted);
     font-family: var(--font-monospace);
+    font-size: var(--font-size-event-time);
 }
 
 .event-entry span:last-child {
@@ -1519,7 +1600,7 @@ h1 span {
 /* EVENT — FLIGHT PHASE */
 
 .event-entry.phase-event {
-    border-top: 1px solid var(--color-border);
+    border-top: var(--border-width) solid var(--color-border);
     border-left-color: var(--color-accent-khaki);
 }
 
@@ -1596,9 +1677,7 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   SYSTEM INFO
---------------------------------- */
+/* SYSTEM INFO */
 
 .system-info > div {
     background:
@@ -1609,8 +1688,8 @@ h1 span {
         ),
         #17252c;
 
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
 
     box-shadow:
         inset 0 1px rgba(255, 255, 255, .025),
@@ -1626,19 +1705,19 @@ h1 span {
 
 .system-info span {
     color: var(--color-text-muted);
+    font-size: var(--font-size-system-label);
 }
 
 .system-info strong {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-system-value);
     font-weight: var(--font-weight-medium);
 }
 
 
-/* ---------------------------------
-   FLIGHT DATA RECORDER
---------------------------------- */
+/* FLIGHT DATA RECORDER */
 
 .recorder-dot {
     background: var(--color-status-success);
@@ -1657,9 +1736,7 @@ h1 span {
 }
 
 
-/* ---------------------------------
-   TELEMETRY GRAPHS
---------------------------------- */
+/* TELEMETRY GRAPHS */
 
 .telemetry-chart-panel {
     position: relative;
@@ -1672,7 +1749,7 @@ h1 span {
         ),
         #0e191f;
 
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-border);
     border-radius: 4px;
 
     box-shadow: var(--shadow-panel);
@@ -1696,14 +1773,16 @@ h1 span {
 .telemetry-chart-header {
     color: var(--color-accent);
 
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: var(--border-width) solid var(--color-border);
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-telemetry-title);
     font-weight: var(--font-weight-medium);
 }
 
 .telemetry-chart-header span:last-child {
     color: var(--color-text-muted);
+    font-size: var(--font-size-telemetry-label);
 }
 
 
@@ -1712,12 +1791,14 @@ h1 span {
 .telemetry-readouts span,
 .telemetry-readouts small {
     color: var(--color-text-muted);
+    font-size: var(--font-size-telemetry-label);
 }
 
 .telemetry-readouts strong {
-    color: var(--color-gold-light);
+    color: #c2ffea;
 
     font-family: var(--font-monospace);
+    font-size: var(--font-size-telemetry-value);
     font-weight: var(--font-weight-medium);
 
     text-shadow: 0 0 8px rgba(101, 230, 193, .15);
@@ -1780,12 +1861,13 @@ h1 span {
 ===================================================== */
 
 footer {
-    border-top: 1px solid var(--color-border);
+    border-top: var(--border-width) solid var(--color-border);
 
     color: var(--color-text-muted);
+    font-size: var(--font-size-footer);
     font-weight: var(--font-weight-regular);
 
-    letter-spacing: .16em;
+    letter-spacing: var(--letter-spacing-footer);
 }
 
 
@@ -1793,10 +1875,7 @@ footer {
    08. SYSTEM STATES
 ===================================================== */
 
-
-/* ---------------------------------
-   SUCCESS
---------------------------------- */
+/* SUCCESS */
 
 .state-pill.running,
 .diagnostic-status b.active-text {
@@ -1806,27 +1885,21 @@ footer {
 }
 
 
-/* ---------------------------------
-   INFO
---------------------------------- */
+/* INFO */
 
 .state-pill.completed {
     color: var(--color-status-info);
 }
 
 
-/* ---------------------------------
-   WARNING / IDLE
---------------------------------- */
+/* WARNING */
 
 .state-pill.idle {
     color: var(--color-status-warning);
 }
 
 
-/* ---------------------------------
-   ERROR
---------------------------------- */
+/* ERROR */
 
 .state-pill.error {
     color: var(--color-status-error);
@@ -1838,10 +1911,7 @@ footer {
    09. ANIMATIONS
 ===================================================== */
 
-
-/* ---------------------------------
-   INDICATOR PULSE
---------------------------------- */
+/* INDICATOR PULSE */
 
 @keyframes indicator-pulse {
 
@@ -1863,9 +1933,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   GENERAL PULSE
---------------------------------- */
+/* GENERAL PULSE */
 
 @keyframes pulse {
 
@@ -1880,9 +1948,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   HEADER SWEEP
---------------------------------- */
+/* HEADER SWEEP */
 
 @keyframes header-sweep {
 
@@ -1903,9 +1969,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   NEON BREATHING
---------------------------------- */
+/* NEON BREATHING */
 
 @keyframes neon-breathing {
 
@@ -1922,9 +1986,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   DATA FLICKER
---------------------------------- */
+/* DATA FLICKER */
 
 @keyframes data-flicker {
 
@@ -1943,9 +2005,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   BOOT SEQUENCE
---------------------------------- */
+/* BOOT SEQUENCE */
 
 @keyframes boot-sequence {
 
@@ -1964,9 +2024,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   SCANNING LINE
---------------------------------- */
+/* SCANNING LINE */
 
 @keyframes scan-line {
 
@@ -1991,9 +2049,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   RADAR ROTATION
---------------------------------- */
+/* RADAR ROTATION */
 
 @keyframes radar-rotation {
 
@@ -2008,9 +2064,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   FLOATING GLOW
---------------------------------- */
+/* FLOATING GLOW */
 
 @keyframes floating-glow {
 
@@ -2027,9 +2081,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   ALERT FLASH
---------------------------------- */
+/* ALERT FLASH */
 
 @keyframes alert-flash {
 
@@ -2048,10 +2100,7 @@ footer {
    10. ACCESSIBILITY
 ===================================================== */
 
-
-/* ---------------------------------
-   KEYBOARD FOCUS
---------------------------------- */
+/* KEYBOARD FOCUS */
 
 :focus-visible {
     outline: 2px solid var(--color-accent);
@@ -2059,9 +2108,7 @@ footer {
 }
 
 
-/* ---------------------------------
-   REDUCED MOTION
---------------------------------- */
+/* REDUCED MOTION */
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -2079,272 +2126,3 @@ footer {
     }
 
 }
-
-
-/* =====================================================
-   11. ADVANCED TACTICAL EFFECTS
-   OPTIONAL ENHANCEMENTS
-===================================================== */
-
-
-/* ---------------------------------
-   PANEL CORNER BRACKETS
-   Add class: tactical-frame
---------------------------------- */
-
-.tactical-frame {
-    position: relative;
-    isolation: isolate;
-}
-
-.tactical-frame::before,
-.tactical-frame::after {
-    content: "";
-
-    position: absolute;
-
-    width: 16px;
-    height: 16px;
-
-    pointer-events: none;
-    z-index: 5;
-}
-
-.tactical-frame::before {
-    top: -1px;
-    left: -1px;
-
-    border-top: 2px solid var(--color-accent);
-    border-left: 2px solid var(--color-accent);
-
-    filter: drop-shadow(0 0 4px var(--color-accent));
-}
-
-.tactical-frame::after {
-    right: -1px;
-    bottom: -1px;
-
-    border-right: 2px solid var(--color-accent);
-    border-bottom: 2px solid var(--color-accent);
-
-    filter: drop-shadow(0 0 4px var(--color-accent));
-}
-
-
-/* ---------------------------------
-   ACTIVE SCANNER
-   Add class: tactical-scanner
---------------------------------- */
-
-.tactical-scanner {
-    position: relative;
-    overflow: hidden;
-}
-
-.tactical-scanner::after {
-    content: "";
-
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: -2px;
-
-    height: 2px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--color-accent),
-            transparent
-        );
-
-    box-shadow:
-        0 0 12px var(--color-accent),
-        0 0 25px rgba(101, 230, 193, .35);
-
-    animation: scan-line 5s linear infinite;
-
-    pointer-events: none;
-}
-
-
-/* ---------------------------------
-   RADAR DISPLAY
-   Add class: radar-display
---------------------------------- */
-
-.radar-display {
-    position: relative;
-    overflow: hidden;
-
-    background:
-        repeating-radial-gradient(
-            circle at center,
-            transparent 0,
-            transparent 34px,
-            rgba(101, 230, 193, .15) 35px,
-            transparent 36px
-        ),
-        linear-gradient(
-            90deg,
-            transparent 49.8%,
-            rgba(101, 230, 193, .12) 50%,
-            transparent 50.2%
-        ),
-        linear-gradient(
-            0deg,
-            transparent 49.8%,
-            rgba(101, 230, 193, .12) 50%,
-            transparent 50.2%
-        ),
-        #0b171b;
-}
-
-.radar-display::before {
-    content: "";
-
-    position: absolute;
-    inset: 0;
-
-    background:
-        conic-gradient(
-            from 0deg,
-            transparent 0deg,
-            rgba(101, 230, 193, .18) 35deg,
-            transparent 75deg
-        );
-
-    border-radius: 50%;
-
-    animation: radar-rotation 5s linear infinite;
-
-    pointer-events: none;
-}
-
-
-/* ---------------------------------
-   NEON TEXT
-   Add class: neon-text
---------------------------------- */
-
-.neon-text {
-    color: var(--color-accent);
-
-    text-shadow:
-        0 0 4px rgba(101, 230, 193, .5),
-        0 0 12px rgba(101, 230, 193, .3),
-        0 0 24px rgba(101, 230, 193, .15);
-}
-
-
-/* ---------------------------------
-   AMBER ALERT
-   Add class: tactical-warning
---------------------------------- */
-
-.tactical-warning {
-    border-color: rgba(237, 188, 99, .65) !important;
-
-    box-shadow:
-        0 0 12px rgba(237, 188, 99, .12),
-        inset 0 0 15px rgba(237, 188, 99, .045);
-}
-
-
-/* ---------------------------------
-   CRITICAL ALERT
-   Add class: tactical-critical
---------------------------------- */
-
-.tactical-critical {
-    border-color: var(--color-status-error) !important;
-
-    animation: alert-flash 1.8s ease-in-out infinite;
-}
-
-
-/* ---------------------------------
-   HUD DIVIDER
-   Add class: hud-divider
---------------------------------- */
-
-.hud-divider {
-    height: 1px;
-
-    border: 0;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--color-accent-muted),
-            var(--color-accent),
-            var(--color-accent-muted),
-            transparent
-        );
-
-    box-shadow: 0 0 8px rgba(101, 230, 193, .2);
-}
-
-
-/* ---------------------------------
-   GLASS PANEL
-   Add class: tactical-glass
---------------------------------- */
-
-.tactical-glass {
-    background: rgba(14, 26, 32, .72);
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    border: 1px solid rgba(101, 230, 193, .22);
-
-    box-shadow:
-        inset 0 1px rgba(255, 255, 255, .045),
-        0 12px 30px rgba(0, 0, 0, .3);
-}
-
-
-/* ---------------------------------
-   DATA BOOT ANIMATION
-   Add class: tactical-boot
---------------------------------- */
-
-.tactical-boot {
-    animation: boot-sequence .65s cubic-bezier(.2, .8, .2, 1) both;
-}
-
-
-/* ---------------------------------
-   FLOATING STATUS
-   Add class: tactical-live
---------------------------------- */
-
-.tactical-live {
-    animation: floating-glow 3s ease-in-out infinite;
-}
-
-
-/* ---------------------------------
-   ANGULAR HUD PANEL
-   Add class: tactical-angular
---------------------------------- */
-
-.tactical-angular {
-    clip-path: polygon(
-        0 0,
-        calc(100% - 14px) 0,
-        100% 14px,
-        100% 100%,
-        14px 100%,
-        0 calc(100% - 14px)
-    );
-}
-
-
-/* =====================================================
-   END OF GHOST PROTOCOL
-   ALL SYSTEMS NOMINAL
-===================================================== */
