@@ -114,7 +114,7 @@ const ThemeSelector = (() => {
 
         modal = document.createElement("dialog");
         modal.id = "theme-selector-modal";
-        modal.style.background = "var(--panel)";
+        modal.style.background = "var(--color-background)";
 
         const closeButton = createElement("button", "×");
         closeButton.type = "button";
