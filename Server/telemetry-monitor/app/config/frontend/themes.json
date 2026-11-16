@@ -4,36 +4,41 @@
     "themes": [
         {
             "id": 1,
+            "name": "oia-mizushima",
+            "path": "/static/modularStylesheet/themes/oai-mizushima.css"
+        },
+        {
+            "id": 2,
             "name": "nier-automata",
             "path": "/static/modularStylesheet/themes/nier-automata.css"
         },
         {
-            "id": 2,
+            "id": 3,
             "name": "cyberpunk-2077",
             "path": "/static/modularStylesheet/themes/cyberpunk-2077.css"
         },
         {
-            "id": 3,
+            "id": 4,
             "name": "military",
             "path": "/static/modularStylesheet/themes/military.css"
         },
         {
-            "id": 4,
+            "id": 5,
             "name": "final-fantasy-vii",
             "path": "/static/modularStylesheet/themes/final-fantasy-vii.css"
         },
         {
-            "id": 5,
+            "id": 6,
             "name": "cyberpunk-glitch",
             "path": "/static/modularStylesheet/themes/cyberpunk-glitch.css"
         },
         {
-            "id": 6,
+            "id": 7,
             "name": "retro-crt-terminal",
             "path": "/static/modularStylesheet/themes/retro-crt-terminal.css"
         },
         {
-            "id": 7,
+            "id": 8,
             "name": "hydra",
             "path": "/static/modularStylesheet/themes/hydra.css",
             "scripts": [
@@ -41,12 +46,12 @@
             ]
         },
         {
-            "id": 8,
+            "id": 9,
             "name": "star-citizen",
             "path": "/static/modularStylesheet/themes/star-citizen.css"
         },
         {
-            "id": 9,
+            "id": 10,
             "name": "resident-evil",
             "path": "/static/modularStylesheet/themes/resident-evil.css"
         }

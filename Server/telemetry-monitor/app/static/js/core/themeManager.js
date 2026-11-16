@@ -1,348 +1,407 @@
 
-/* =========================================
-   THEME MANAGER
-   Modular Theme Management System
-========================================= */
+"use strict";
 
-
-/* =========================================
+/* =====================================================
    CONFIGURATION
-========================================= */
+===================================================== */
 
-const THEME_CONFIG = {
-
-    CONFIG_PATH: "/api/themes-config",
-
+const THEME_CONFIG = Object.freeze({
+    API: "/api/themes-config",
+    STORAGE_KEY: "ActiveDashboardTheme",
     LOG_PREFIX: "[THEME]",
-
-    SELECTED_PROPERTY: "SelectedTheme",
-
-    THEMES_PROPERTY: "themes"
-
-};
+    TRIGGER_ID: "theme-selector-trigger",
+    MODAL_ID: "theme-selector-modal"
+});
 
 
-/* =========================================
-   LOGGING
-========================================= */
+/* =====================================================
+   LOGGER
+===================================================== */
 
 const ThemeLogger = {
 
-    info(message) {
-
-        console.info(
-            `${THEME_CONFIG.LOG_PREFIX} ${message}`
-        );
-
+    info(message, ...details) {
+        console.info(THEME_CONFIG.LOG_PREFIX, message, ...details);
     },
 
-    error(message, error = null) {
-
-        console.error(
-            `${THEME_CONFIG.LOG_PREFIX} ERROR: ${message}`,
-            error ?? ""
-        );
-
+    error(message, error) {
+        console.error(THEME_CONFIG.LOG_PREFIX, message, error ?? "");
     }
 
 };
 
 
-/* =========================================
-   CONFIGURATION LOADER
-========================================= */
+/* =====================================================
+   THEME MANAGER
+===================================================== */
 
-async function loadThemeConfiguration() {
+const ThemeManager = (() => {
 
-    const response = await fetch(
-        THEME_CONFIG.CONFIG_PATH,
-        {
-            cache: "no-cache"
+    let configurationPromise = null;
+    let activeStylesheet = null;
+
+    const loadedScripts = new Map();
+
+
+    async function getConfiguration() {
+
+        if (!configurationPromise) {
+
+            configurationPromise = fetch(THEME_CONFIG.API, {
+                cache: "no-store"
+            })
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    return response.json();
+
+                })
+                .then(config => {
+
+                    if (!Array.isArray(config.themes)) {
+                        throw new Error("Invalid themes configuration.");
+                    }
+
+                    return config;
+
+                })
+                .catch(error => {
+
+                    configurationPromise = null;
+                    throw error;
+
+                });
+
         }
-    );
 
-    if (!response.ok) {
-
-        throw new Error(
-            `Configuration request failed: HTTP ${response.status}`
-        );
+        return configurationPromise;
 
     }
 
-    const config = await response.json();
 
-    if (
-        !config ||
-        !Array.isArray(config[THEME_CONFIG.THEMES_PROPERTY])
-    ) {
+    function getSelectedTheme(config) {
 
-        throw new Error(
-            "Invalid theme configuration structure."
+        const storedId = Number(
+            localStorage.getItem(THEME_CONFIG.STORAGE_KEY)
         );
+
+        return config.themes.find(theme => theme.id === storedId)
+            || config.themes.find(theme => theme.id === config.SelectedTheme);
 
     }
 
-    return config;
 
-}
+    function loadStylesheet(theme) {
 
+        return new Promise((resolve, reject) => {
 
-/* =========================================
-   THEME VALIDATION
-========================================= */
+            const link = document.createElement("link");
 
-function validateThemeConfiguration(config) {
+            link.rel = "stylesheet";
+            link.href = theme.path;
 
-    const selectedId = config[THEME_CONFIG.SELECTED_PROPERTY];
+            link.onload = () => {
 
-    if (
-        !Number.isInteger(selectedId) ||
-        selectedId < 1
-    ) {
+                activeStylesheet?.remove();
 
-        throw new Error(
-            "SelectedTheme must be a positive integer."
-        );
+                activeStylesheet = link;
 
-    }
+                ThemeLogger.info(`Theme loaded: ${theme.name}`);
 
-    const themes = config[THEME_CONFIG.THEMES_PROPERTY];
+                resolve();
 
-    const selectedTheme = themes.find(
-        theme => theme.id === selectedId
-    );
+            };
 
-    if (!selectedTheme) {
+            link.onerror = () => {
 
-        throw new Error(
-            `Theme ID ${selectedId} does not exist.`
-        );
+                link.remove();
+
+                reject(new Error(`Failed to load: ${theme.path}`));
+
+            };
+
+            document.head.appendChild(link);
+
+        });
 
     }
 
-    if (
-        typeof selectedTheme.name !== "string" ||
-        !selectedTheme.name.trim()
-    ) {
 
-        throw new Error(
-            "Selected theme name is invalid."
-        );
+    function loadScript(path) {
 
-    }
+        if (loadedScripts.has(path)) {
+            return loadedScripts.get(path);
+        }
 
-    if (
-        typeof selectedTheme.path !== "string" ||
-        !selectedTheme.path.trim()
-    ) {
+        const promise = new Promise((resolve, reject) => {
 
-        throw new Error(
-            "Selected theme CSS path is invalid."
-        );
+            const script = document.createElement("script");
 
-    }
+            script.src = path;
+            script.async = false;
 
-    const duplicateIds = themes.filter(
-        theme => theme.id === selectedId
-    );
-
-    if (duplicateIds.length !== 1) {
-
-        throw new Error(
-            `Theme ID ${selectedId} is duplicated.`
-        );
-
-    }
-
-    // Validate optional scripts
-
-    if (
-        selectedTheme.scripts !== undefined &&
-        (
-            !Array.isArray(selectedTheme.scripts) ||
-            !selectedTheme.scripts.every(
-                script =>
-                    typeof script === "string" &&
-                    script.trim().length > 0
-            )
-        )
-    ) {
-
-        throw new Error(
-            "Theme scripts must be an array of valid paths."
-        );
-
-    }
-
-    return selectedTheme;
-
-}
-
-
-/* =========================================
-   CSS LOADER
-========================================= */
-
-function loadThemeStylesheet(theme) {
-
-    return new Promise((resolve, reject) => {
-
-        const stylesheet = document.createElement("link");
-
-        stylesheet.rel = "stylesheet";
-        stylesheet.href = theme.path;
-        stylesheet.dataset.themeManager = "active";
-
-        stylesheet.onload = () => {
-
-            resolve(stylesheet);
-
-        };
-
-        stylesheet.onerror = () => {
-
-            stylesheet.remove();
-
-            reject(
-                new Error(
-                    `Failed to load CSS: ${theme.path}`
-                )
+            script.onload = () => resolve();
+            script.onerror = () => reject(
+                new Error(`Failed to load script: ${path}`)
             );
 
-        };
+            document.head.appendChild(script);
 
-        document.head.appendChild(stylesheet);
+        });
 
+        loadedScripts.set(path, promise);
+
+        promise.catch(() => loadedScripts.delete(path));
+
+        return promise;
+
+    }
+
+
+    async function loadScripts(theme) {
+
+        for (const path of theme.scripts ?? []) {
+            await loadScript(path);
+        }
+
+    }
+
+
+    async function initialize() {
+
+        try {
+
+            const config = await getConfiguration();
+            const theme = getSelectedTheme(config);
+
+            if (!theme) {
+                throw new Error("Selected theme does not exist.");
+            }
+
+            await loadStylesheet(theme);
+            await loadScripts(theme);
+
+            ThemeLogger.info(`Active theme: ${theme.name}`);
+
+            return theme;
+
+        } catch (error) {
+
+            ThemeLogger.error("Initialization failed.", error);
+
+            return null;
+
+        }
+
+    }
+
+
+    return Object.freeze({
+        initialize,
+        getConfiguration,
+        getSelectedTheme
     });
 
-}
+})();
 
 
-/* =========================================
-   JAVASCRIPT LOADER
-========================================= */
+/* =====================================================
+   THEME SELECTOR
+===================================================== */
 
-function loadThemeScript(scriptPath) {
+const ThemeSelector = (() => {
 
-    return new Promise((resolve, reject) => {
+    let modal = null;
 
-        const script = document.createElement("script");
 
-        script.src = scriptPath;
-        script.async = false;
+    function createElement(tag, text = "") {
 
-        script.dataset.themeManager = "active";
+        const element = document.createElement(tag);
 
-        script.onload = () => {
+        element.textContent = text;
 
-            ThemeLogger.info(
-                `Script loaded: ${scriptPath}`
+        return element;
+
+    }
+
+
+    function initialize() {
+
+        const trigger = document.getElementById(
+            THEME_CONFIG.TRIGGER_ID
+        );
+
+        if (!trigger) {
+            ThemeLogger.error("Theme button not found.");
+            return;
+        }
+
+        trigger.addEventListener("click", open);
+
+        ThemeLogger.info("Selector initialized.");
+
+    }
+
+
+    
+    function createModal() {
+
+        if (modal) return modal;
+
+        modal = document.createElement("dialog");
+        modal.style.background = "var(--panel)";
+        modal.id = THEME_CONFIG.MODAL_ID;
+
+        const title = createElement("h1", "THEME SELECTOR");
+
+        const description = createElement(
+            
+            "p",
+            "Select your dashboard theme."
+        );
+
+        description.style.color = "var(--muted)";
+
+        const closeButton = createElement("button", "×");
+        closeButton.type = "button";
+        closeButton.addEventListener("click", close);
+
+        const list = createElement("div");
+        list.id = "ts-theme-list";
+
+        // Vertical layout, without visual styling.
+        list.style.display = "flex";
+        list.style.flexDirection = "column";
+        list.style.gap = "8px";
+
+        modal.append(
+            closeButton,
+            title,
+            description,
+            list
+        );
+
+        modal.addEventListener("click", event => {
+            if (event.target === modal) {
+                close();
+            }
+        });
+
+        document.body.appendChild(modal);
+
+        return modal;
+    }
+
+
+
+    async function open() {
+
+        const dialog = createModal();
+
+        if (!dialog.open) {
+            dialog.showModal();
+        }
+
+        await renderThemes();
+
+    }
+
+
+    function close() {
+
+        modal?.close();
+
+    }
+
+
+    async function renderThemes() {
+
+        const list = modal.querySelector("#ts-theme-list");
+
+        list.replaceChildren();
+
+        try {
+
+            const config = await ThemeManager.getConfiguration();
+
+            const activeTheme = ThemeManager.getSelectedTheme(config);
+
+            for (const theme of config.themes) {
+
+                const card = createElement(
+                    "button",
+                    `${theme.name}${theme.id === activeTheme.id ? " ✓ ACTIVE" : ""}`
+                );
+
+                card.type = "button";
+
+                card.addEventListener("click", () => {
+                    selectTheme(theme);
+                });
+
+                list.appendChild(card);
+
+            }
+
+        } catch (error) {
+
+            list.appendChild(
+                createElement("p", error.message)
             );
 
-            resolve(script);
+            ThemeLogger.error("Unable to render themes.", error);
 
-        };
+        }
 
-        script.onerror = () => {
+    }
 
-            script.remove();
 
-            reject(
-                new Error(
-                    `Failed to load JavaScript: ${scriptPath}`
-                )
+    function selectTheme(theme) {
+
+        if (!window.confirm(`Apply "${theme.name}"?\n\nThe dashboard will reload.`)) {
+            return;
+        }
+
+        try {
+
+            localStorage.setItem(
+                THEME_CONFIG.STORAGE_KEY,
+                String(theme.id)
             );
 
-        };
+            window.location.reload();
 
-        document.body.appendChild(script);
+        } catch (error) {
 
+            ThemeLogger.error("Unable to save theme.", error);
+
+        }
+
+    }
+
+
+    return Object.freeze({
+        initialize,
+        open,
+        close
     });
 
-}
+})();
 
 
-/* =========================================
-   THEME SCRIPT INITIALIZATION
-========================================= */
+/* =====================================================
+   START
+===================================================== */
 
-async function loadThemeScripts(theme) {
+async function initializeThemeSystem() {
 
-    const scripts = theme.scripts ?? [];
+    ThemeSelector.initialize();
 
-    if (scripts.length === 0) {
-
-        ThemeLogger.info(
-            "No additional scripts requested."
-        );
-
-        return;
-
-    }
-
-    for (const scriptPath of scripts) {
-
-        await loadThemeScript(scriptPath);
-
-    }
+    await ThemeManager.initialize();
 
 }
 
-
-/* =========================================
-   INITIALIZATION
-========================================= */
-
-async function initializeThemeManager() {
-
-    try {
-
-        // Load configuration
-
-        const config = await loadThemeConfiguration();
-
-
-        // Validate and retrieve selected theme
-
-        const selectedTheme = validateThemeConfiguration(config);
-
-
-        // Load selected stylesheet
-
-        await loadThemeStylesheet(selectedTheme);
-
-
-        // Load theme-specific JavaScript
-
-        await loadThemeScripts(selectedTheme);
-
-
-        // Initialization successful
-
-        ThemeLogger.info(
-            "Initialized successfully."
-        );
-
-        ThemeLogger.info(
-            `Active theme: ${selectedTheme.name} (ID: ${selectedTheme.id})`
-        );
-
-    }
-
-    catch (error) {
-
-        ThemeLogger.error(
-            "Failed to initialize Theme Manager.",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   AUTOMATIC EXECUTION
-========================================= */
-
-initializeThemeManager();
+initializeThemeSystem();
