@@ -154,6 +154,26 @@ function validateThemeConfiguration(config) {
 
     }
 
+    // Validate optional scripts
+
+    if (
+        selectedTheme.scripts !== undefined &&
+        (
+            !Array.isArray(selectedTheme.scripts) ||
+            !selectedTheme.scripts.every(
+                script =>
+                    typeof script === "string" &&
+                    script.trim().length > 0
+            )
+        )
+    ) {
+
+        throw new Error(
+            "Theme scripts must be an array of valid paths."
+        );
+
+    }
+
     return selectedTheme;
 
 }
@@ -199,6 +219,77 @@ function loadThemeStylesheet(theme) {
 
 
 /* =========================================
+   JAVASCRIPT LOADER
+========================================= */
+
+function loadThemeScript(scriptPath) {
+
+    return new Promise((resolve, reject) => {
+
+        const script = document.createElement("script");
+
+        script.src = scriptPath;
+        script.async = false;
+
+        script.dataset.themeManager = "active";
+
+        script.onload = () => {
+
+            ThemeLogger.info(
+                `Script loaded: ${scriptPath}`
+            );
+
+            resolve(script);
+
+        };
+
+        script.onerror = () => {
+
+            script.remove();
+
+            reject(
+                new Error(
+                    `Failed to load JavaScript: ${scriptPath}`
+                )
+            );
+
+        };
+
+        document.body.appendChild(script);
+
+    });
+
+}
+
+
+/* =========================================
+   THEME SCRIPT INITIALIZATION
+========================================= */
+
+async function loadThemeScripts(theme) {
+
+    const scripts = theme.scripts ?? [];
+
+    if (scripts.length === 0) {
+
+        ThemeLogger.info(
+            "No additional scripts requested."
+        );
+
+        return;
+
+    }
+
+    for (const scriptPath of scripts) {
+
+        await loadThemeScript(scriptPath);
+
+    }
+
+}
+
+
+/* =========================================
    INITIALIZATION
 ========================================= */
 
@@ -207,19 +298,30 @@ async function initializeThemeManager() {
     try {
 
         // Load configuration
+
         const config = await loadThemeConfiguration();
 
 
         // Validate and retrieve selected theme
+
         const selectedTheme = validateThemeConfiguration(config);
 
 
         // Load selected stylesheet
+
         await loadThemeStylesheet(selectedTheme);
 
 
+        // Load theme-specific JavaScript
+
+        await loadThemeScripts(selectedTheme);
+
+
         // Initialization successful
-        ThemeLogger.info("Initialized successfully.");
+
+        ThemeLogger.info(
+            "Initialized successfully."
+        );
 
         ThemeLogger.info(
             `Active theme: ${selectedTheme.name} (ID: ${selectedTheme.id})`

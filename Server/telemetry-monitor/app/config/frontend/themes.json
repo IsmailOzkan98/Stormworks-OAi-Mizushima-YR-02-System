@@ -34,8 +34,11 @@
         },
         {
             "id": 7,
-            "name": "minecraft-classic",
-            "path": "/static/modularStylesheet/themes/minecraft-classic.css"
+            "name": "hydra",
+            "path": "/static/modularStylesheet/themes/hydra.css",
+            "scripts": [
+                "/static/modularStylesheet/scripts/hydra.js"
+            ]
         }
     ]
 }
