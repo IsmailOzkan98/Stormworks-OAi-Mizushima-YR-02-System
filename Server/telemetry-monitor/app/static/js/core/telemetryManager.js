@@ -1,16 +1,21 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    TELEMETRY MANAGER
    ============================================================ */
 
-import { state, modules} from "./state.js";
+import { state, modules } from "./state.js";
 
 
 /* ============================================================
    01. CONNECTION MANAGEMENT
    ============================================================ */
 
+/**
+ * Updates the telemetry connection status and interface.
+ *
+ * @param {boolean} online - Whether the telemetry connection is active.
+ * @param {string} detail - Connection status description.
+ */
 export function setConnection(online, detail) {
 
     const light = document.getElementById("onlineLight");
@@ -56,6 +61,11 @@ export function setConnection(online, detail) {
    02. TELEMETRY DATA MANAGEMENT
    ============================================================ */
 
+/**
+ * Updates the application interface with the latest telemetry data.
+ *
+ * @param {Object} data - Received telemetry data.
+ */
 export function updateInterface(data) {
 
     state.pendingMissionData = data;
@@ -108,6 +118,11 @@ function renderModules(data) {
    04. CONNECTION MANAGER INITIALIZATION
    ============================================================ */
 
+/**
+ * Initializes the telemetry connection manager and its callbacks.
+ *
+ * @returns {Promise<void>}
+ */
 export async function initializeTelemetry() {
 
     try {
@@ -138,7 +153,6 @@ export async function initializeTelemetry() {
 
                 }
 
-                // UPDATE INTERFACE
 
                 updateInterface(data);
 
@@ -193,8 +207,3 @@ function setValue(id, value) {
     element.textContent = value;
 
 }
-
-
-/* ============================================================
-   END OF TELEMETRY MANAGER
-   ============================================================ */

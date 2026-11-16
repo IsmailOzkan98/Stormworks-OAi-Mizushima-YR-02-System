@@ -15,6 +15,7 @@ recorder_bp = Blueprint("recorder", __name__)
 
 @recorder_bp.route("/api/recorder/start", methods=["POST"])
 def api_start_recording():
+    """Start a new telemetry recording."""
 
     success, result = start_recording()
 
@@ -35,6 +36,7 @@ def api_start_recording():
 
 @recorder_bp.route("/api/recorder/stop", methods=["POST"])
 def api_stop_recording():
+    """Stop the current telemetry recording."""
 
     success, result = stop_recording()
 
@@ -53,5 +55,6 @@ def api_stop_recording():
 
 @recorder_bp.route("/api/recorder", methods=["GET"])
 def api_recorder_status():
+    """Return the current recorder status."""
 
     return jsonify(get_recorder_status())

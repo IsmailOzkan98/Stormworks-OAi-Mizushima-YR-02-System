@@ -1,9 +1,5 @@
-
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    CONNECTION MANAGER
-
-   VERSION: 1.0.0
 
    RESPONSIBILITY:
    - Flask server health monitoring
@@ -315,13 +311,9 @@ function checkTelemetryConnection() {
     }
 
 
-    // CALCULATE PACKET AGE
-
     const age =
         Date.now() - timestamp * 1000;
 
-
-    // DETERMINE TELEMETRY STATUS
 
     const online =
         age >= 0 &&
@@ -330,8 +322,6 @@ function checkTelemetryConnection() {
 
     updateTelemetryState(online);
 
-
-    // UPDATE PACKET AGE
 
     if (callbacks.onPacketAge) {
 
@@ -373,6 +363,9 @@ function updateTelemetryState(online) {
    07.1 START CONNECTION MANAGER
    ------------------------------------------------------------ */
 
+/**
+ * Starts all connection and telemetry monitoring loops.
+ */
 function start() {
 
     if (state.started) return;
@@ -433,6 +426,9 @@ function start() {
    07.2 STOP CONNECTION MANAGER
    ------------------------------------------------------------ */
 
+/**
+ * Stops all connection and telemetry monitoring loops.
+ */
 function stop() {
 
     if (!state.started) return;
@@ -464,6 +460,15 @@ function stop() {
    07.3 INITIALIZE CONNECTION MANAGER
    ------------------------------------------------------------ */
 
+/**
+ * Initializes the connection manager and registers its callbacks.
+ *
+ * Starts server health monitoring, telemetry reception
+ * and telemetry connection monitoring.
+ *
+ * @param {Object} options - Connection manager callbacks.
+ * @returns {Object} Connection manager public API.
+ */
 function initConnectionManager(options = {}) {
 
     callbacks = {
@@ -513,8 +518,3 @@ export {
     initConnectionManager
 
 };
-
-
-/* ============================================================
-   END OF CONNECTION MANAGER
-   ============================================================ */

@@ -1,3 +1,7 @@
+/* ============================================================
+   THEME MANAGER
+   Dashboard theme loading and selection.
+   ============================================================ */
 
 "use strict";
 
@@ -55,25 +59,54 @@ const ThemeManager = (() => {
         link.id = "active-theme";
     }
 
+    
     async function loadScript(path) {
-        if (document.querySelector(`script[src="${CSS.escape(path)}"]`)) {
-            return;
+        const existing = document.querySelector(
+            `script[data-theme-module="${CSS.escape(path)}"]`
+        );
+
+        if (existing) {
+            if (existing.dataset.loaded === "true") return;
+
+            // Prevents the same module from loading multiple times concurrently.
+            if (existing._loadPromise) {
+                return existing._loadPromise;
+            }
         }
 
-        await new Promise((resolve, reject) => {
-            const script = document.createElement("script");
+        const script = existing || document.createElement("script");
 
-            script.src = path;
-            script.onload = resolve;
-            script.onerror = () => {
-                script.remove();
-                reject(new Error(`Failed to load: ${path}`));
+        script.type = "module";
+        script.src = path;
+        script.dataset.themeModule = path;
+
+        script._loadPromise = new Promise((resolve, reject) => {
+            script.onload = () => {
+                script.dataset.loaded = "true";
+                resolve();
             };
 
-            document.head.appendChild(script);
+            script.onerror = () => {
+                script.remove();
+                reject(new Error(`Failed to load module: ${path}`));
+            };
+
+            if (!existing) {
+                document.head.appendChild(script);
+            }
         });
+
+        return script._loadPromise;
     }
 
+
+    /**
+     * Initializes the selected dashboard theme.
+     *
+     * Loads its stylesheet and associated JavaScript modules.
+     *
+     * @returns {Promise<Object|null>} Loaded theme configuration.
+     */
     async function initialize() {
         try {
             const config = await getConfig();
@@ -114,7 +147,7 @@ const ThemeSelector = (() => {
 
         modal = document.createElement("dialog");
         modal.id = "theme-selector-modal";
-        modal.style.background = "var(--panel)";
+        modal.style.background = "var(--color-background)";
 
         const closeButton = createElement("button", "×");
         closeButton.type = "button";
@@ -192,6 +225,11 @@ const ThemeSelector = (() => {
         }
     }
 
+    /**
+     * Opens the theme selector dialog and renders available themes.
+     *
+     * @returns {Promise<void>}
+     */
     async function open() {
         const modal = createModal();
 
@@ -212,8 +250,9 @@ const ThemeSelector = (() => {
 })();
 
 
-
-/* START */
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
 
 ThemeSelector.initialize();
 ThemeManager.initialize();

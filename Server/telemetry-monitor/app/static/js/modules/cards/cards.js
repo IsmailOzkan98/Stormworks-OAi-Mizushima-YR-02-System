@@ -1,5 +1,13 @@
 const CONFIG_URL = "/api/cards-config";
 
+/**
+ * Initializes dashboard cards from the configured sections.
+ *
+ * Generates the card layout and prepares it for telemetry updates.
+ *
+ * @param {Array<Object>} containers - Dashboard section containers.
+ * @returns {Promise<Object|null>} Cards API or null if initialization fails.
+ */
 export async function initCards(containers) {
     if (!Array.isArray(containers) || containers.length === 0) {
         console.error("[CARDS] No containers provided.");
@@ -59,17 +67,14 @@ export async function initCards(containers) {
 
             const container = item.element;
 
-            // CLEAR CONTAINER
 
             container.innerHTML = "";
 
-            // SECTION CONTAINER
 
             const sectionElement = document.createElement("section");
             sectionElement.className = "dashboard-section";
             sectionElement.id = `section-${section.id}`;
 
-            // SECTION HEADER
 
             const cardHeader = document.createElement("div");
             cardHeader.className = "card-header section-header";
@@ -77,7 +82,6 @@ export async function initCards(containers) {
 
             sectionElement.appendChild(cardHeader);
 
-            // METRIC GRID
 
             const grid = document.createElement("div");
             grid.className = "metric-grid";

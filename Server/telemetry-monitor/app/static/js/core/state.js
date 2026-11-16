@@ -1,6 +1,5 @@
 
 /* ============================================================
-   OAI MIZUSHIMA YR-02
    APPLICATION STATE
    ============================================================ */
 
@@ -47,6 +46,12 @@ export const state = {
    03. COMMON UTILITIES
    ============================================================ */
 
+/**
+ * Updates an HTML element's text content by its ID.
+ *
+ * @param {string} id - Target element ID.
+ * @param {*} value - Value to display.
+ */
 export function setValue(id, value) {
 
     const element = document.getElementById(id);
@@ -56,8 +61,3 @@ export function setValue(id, value) {
     element.textContent = value;
 
 }
-
-
-/* ============================================================
-   END OF APPLICATION STATE
-   ============================================================ */

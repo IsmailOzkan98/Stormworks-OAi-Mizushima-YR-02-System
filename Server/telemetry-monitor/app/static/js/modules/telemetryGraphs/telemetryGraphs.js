@@ -1,3 +1,10 @@
+/* ============================================================
+   TELEMETRY GRAPHS MODULE
+
+   RESPONSIBILITY:
+   Telemetry history management, dynamic graph scaling,
+   data readouts and Canvas chart rendering.
+   ============================================================ */
 
 const CONFIG_URL = "/api/telemetryGraphs-config";
 
@@ -6,6 +13,8 @@ let container = null;
 let telemetryHistory = [];
 let graphExtremes = {};
 let latestData = null;
+
+// 01. CONFIGURATION
 
 async function loadConfiguration() {
 
@@ -21,6 +30,9 @@ async function loadConfiguration() {
     config = await response.json();
 
 }
+
+
+// 02. HTML GENERATION
 
 function createTelemetryGraphs() {
 
@@ -125,6 +137,9 @@ function createTelemetryGraphs() {
 
 }
 
+
+// 03. GRAPH SCALE MANAGEMENT
+
 function initializeGraphExtremes() {
 
     graphExtremes = {};
@@ -148,6 +163,9 @@ function initializeGraphExtremes() {
     });
 
 }
+
+
+// 04. TELEMETRY HISTORY
 
 function getNumericValue(data, key) {
 
@@ -257,6 +275,9 @@ function recordTelemetry(data) {
 
 }
 
+
+// 05. GRAPH RANGE CALCULATION
+
 function createFixedRange(min, max) {
 
     if (
@@ -314,6 +335,9 @@ function getGraphRanges(graph) {
 
 }
 
+
+// 06. DATA READOUTS
+
 function updateReadouts(data) {
 
     config.graphs.forEach(graph => {
@@ -345,6 +369,9 @@ function updateReadouts(data) {
     });
 
 }
+
+
+// 07. CANVAS RENDERING
 
 function drawTelemetryChart(graph) {
 
@@ -551,6 +578,9 @@ function drawTelemetryChart(graph) {
 
 }
 
+
+// 08. GRAPH UPDATE
+
 function updateTelemetryGraphs(data) {
 
     if (
@@ -571,6 +601,17 @@ function updateTelemetryGraphs(data) {
 
 }
 
+
+// 09. PUBLIC API
+
+/**
+ * Updates the telemetry graphs with incoming telemetry data.
+ *
+ * Stores the latest data and refreshes graph readouts,
+ * telemetry history and chart rendering.
+ *
+ * @param {Object} data - Latest telemetry data.
+ */
 export function updateTelemetryGraphsData(data) {
 
     if (!data) return;
@@ -583,6 +624,9 @@ export function updateTelemetryGraphsData(data) {
 
 }
 
+/**
+ * Redraws all telemetry charts after a container resize.
+ */
 export function drawTelemetryGraphsOnResize() {
 
     if (!config || !container) return;
@@ -593,6 +637,18 @@ export function drawTelemetryGraphsOnResize() {
 
 }
 
+
+// 10. MODULE INITIALIZATION
+
+/**
+ * Initializes the telemetry graphs module.
+ *
+ * Loads the graph configuration, generates the interface
+ * and prepares the charts for telemetry updates.
+ *
+ * @param {HTMLElement} targetContainer - Container for the graphs.
+ * @returns {Promise<boolean>} True if initialization succeeds.
+ */
 export async function initTelemetryGraphs(targetContainer) {
 
     try {

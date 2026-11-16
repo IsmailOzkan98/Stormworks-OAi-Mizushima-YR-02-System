@@ -19,8 +19,8 @@
         },
         {
             "id": 4,
-            "name": "military",
-            "path": "/static/modularStylesheet/themes/military.css"
+            "name": "military-ghost-protocol",
+            "path": "/static/modularStylesheet/themes/military-ghost-protocol.css"
         },
         {
             "id": 5,
@@ -30,25 +30,34 @@
         {
             "id": 6,
             "name": "cyberpunk-glitch",
-            "path": "/static/modularStylesheet/themes/cyberpunk-glitch.css"
+            "path": "/static/modularStylesheet/themes/cyberpunk-glitch/cyberpunk-glitch.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/cyberpunk-glitch/cyberpunk-glitch.js"
+            ]
         },
         {
             "id": 7,
             "name": "retro-crt-terminal",
-            "path": "/static/modularStylesheet/themes/retro-crt-terminal.css"
+            "path": "/static/modularStylesheet/themes/retro-crt-terminal/retro-crt-terminal.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/retro-crt-terminal/retro-crt-terminal.js"
+            ]
         },
         {
             "id": 8,
             "name": "hydra",
-            "path": "/static/modularStylesheet/themes/hydra.css",
+            "path": "/static/modularStylesheet/themes/hydra/hydra.css",
             "scripts": [
-                "/static/modularStylesheet/scripts/hydra.js"
+                "/static/modularStylesheet/themes/hydra/hydra.js"
             ]
         },
         {
             "id": 9,
             "name": "star-citizen",
-            "path": "/static/modularStylesheet/themes/star-citizen.css"
+            "path": "/static/modularStylesheet/themes/star-citizen/star-citizen.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/star-citizen/star-citizen.js"
+            ]
         },
         {
             "id": 10,
@@ -58,7 +67,10 @@
         {
             "id": 11,
             "name": "resident-evil-stars",
-            "path": "/static/modularStylesheet/themes/resident-evil-stars.css"
+            "path": "/static/modularStylesheet/themes/resident-evil-stars/resident-evil-stars.css",
+            "scripts": [
+                "/static/modularStylesheet/themes/resident-evil-stars/resident-evil-stars.js"
+            ]
         },
         {
             "id": 12,
@@ -68,9 +80,9 @@
         {
             "id": 13,
             "name": "cognitive-core",
-            "path": "/static/modularStylesheet/themes/cognitive-core.css",
+            "path": "/static/modularStylesheet/themes/cognitive-core/cognitive-core.css",
             "scripts": [
-                "/static/modularStylesheet/scripts/cognitive-core.js"
+                "/static/modularStylesheet/themes/cognitive-core/cognitive-core.js"
             ]
         }
     ]

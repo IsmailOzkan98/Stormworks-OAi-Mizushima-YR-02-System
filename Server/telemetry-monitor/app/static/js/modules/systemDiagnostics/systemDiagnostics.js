@@ -1,5 +1,15 @@
 const CONFIG_URL = "/api/systemDiagnostics-config";
 
+/**
+ * Initializes the system diagnostics module.
+ *
+ * Loads the diagnostics configuration, generates the HTML interface
+ * and returns an update function for incoming telemetry data.
+ *
+ * @param {HTMLElement} targetContainer - Container for the diagnostics interface.
+ * @returns {Promise<Object|boolean>} An object containing the update function,
+ * or false if initialization fails.
+ */
 export async function initSystemDiagnostics(targetContainer) {
     if (!targetContainer) {
         console.error("[SYSTEM DIAGNOSTICS] Container not found.");

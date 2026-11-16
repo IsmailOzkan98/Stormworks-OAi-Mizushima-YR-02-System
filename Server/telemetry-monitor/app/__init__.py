@@ -1,3 +1,10 @@
+"""
+Flask application initialization.
+
+Creates the Flask application instance and registers
+the application route blueprints.
+"""
+
 
 from flask import Flask
 
@@ -8,10 +15,19 @@ from app.routes.health import health_bp
 
 
 def create_app():
+    """
+    Create and configure the Flask application.
+
+    Initializes the Flask instance and registers all
+    application blueprints.
+
+    Returns:
+        Flask: Configured Flask application instance.
+    """
+
 
     app = Flask(__name__)
 
-    # Registrar rutas
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(telemetry_bp)
     app.register_blueprint(recorder_bp)
